@@ -1,53 +1,53 @@
 ID,Sektor,Tenaga_Kerja
-1,Tanaman Pangan ,2029.105333
-2,Tanaman Hortikultura,4760.849038
-3,Perkebunan,25392.89894
-4,Peternakan ,5477.964013
-5,"Jasa Pertanian, dan Perburuan  ",5384.69343
-6,Kehutanan dan Penebangan Kayu,15944.30118
-7,Perikanan ,1868.963159
-8,"Pertambangan Minyak, Gas dan Panas Bumi",12980.22893
-9,Pertambangan Bijih Logam,123568.7991
-10,Pertambangan dan Penggalian Lainnya,298780.4015
-11,Industri Batubara dan Pengilangan Migas,28233.91417
-12,Industri Makanan dan Minuman ,102513.8183
-13,Pengolahan Tembakau,8684.456872
-14,Industri Tekstil dan Pakaian Jadi,132.2670408
-15,"Industri Kulit, Barang dari Kulit dan Alas Kaki ",9181.689031
-16,"Industri Kayu, Barang dari Kayu dan Gabus dan Barang Anyaman dari Bambu, Rotan dan Sejenisnya ",3925.60684
-17,"Industri Kertas dan Barang dari Kertas, Percetakan dan Reproduksi Media Rekaman ",10858.9871
-18,"Industri Kimia, Farmasi dan Obat Tradisional",593.2182111
-19,"Industri Karet, Barang dari Karet dan Plastik",0
-20,Industri Barang Galian bukan Logam,1048.531762
-21,Industri Logam Dasar ,303.5193682
-22,"Industri Barang dari Logam, Komputer, Barang Elektronik, Optik dan Peralatan Listrik",362.8047941
-23,Industri Mesin dan Perlengkapan YTDL,56037.97077
-24,Industri Alat Angkutan,446199.3225
-25,Industri Furnitur,31645.69788
-26,"Industri pengolahan lainnya, jasa reparasi dan pemasangan mesin dan peralatan",26460.54912
-27,Ketenagalistrikan ,37386.89986
-28,Pengadaan Gas dan Produksi Es,34593.46241
-29,"Pengadaan Air, Pengelolaan Sampah, Limbah dan Daur Ulang",44670.30103
-30,Konstruksi,27687.01343
-31,"Perdagangan Mobil, Sepeda Motor dan Reparasinya",35734.54731
-32,"Perdagangan Besar dan Eceran, Bukan Mobil dan Sepeda Motor",23252.00488
-33,Angkutan Rel ,7955
-34,Angkutan Darat,16223.23022
-35,Angkutan Laut ,2023.704275
-36,Angkutan Sungai Danau dan Penyeberangan,31031.00868
-37,Angkutan Udara,0
-38,"Pergudangan dan Jasa Penunjang Angkutan, Pos dan Kurir",34593.46241
-39,Penyediaan Akomodasi ,44670.30103
-40,Penyediaan Makan Minum,27687.01343
-41,Informasi dan Komunikasi,35734.54731
-42,Jasa Perantara Keuangan,23252.00488
-43,Asuransi dan Dana Pensiun,7955
-44,Jasa Keuangan Lainnya,16223.23022
-45,Jasa Penunjang Keuangan,2023.704275
-46,Real Estate,31031.00868
-47,Jasa Perusahaan,0
-48,"Administrasi Pemerintahan, Pertahanan dan Jaminan Sosial Wajib",23252.00488
-49,Jasa Pendidikan,7955
-50,Jasa Kesehatan dan Kegiatan Sosial,16223.23022
-51,Jasa lainnya,2023.704275
-52,Lainnya,0
+1,Tanaman Pangan,55063.00
+2,Tanaman Hortikultura,39030.00
+3,Perkebunan,41408.00
+4,Peternakan,179986.00
+5,Jasa Pertanian dan Perburuan ,0.00
+6,Kehutanan dan Penebangan Kayu,679.00
+7,Perikanan,52987.00
+8,Pertambangan Minyak Gas dan Panas Bumi,78507.00
+9,Pertambangan Bijih Logam,3121.00
+10,Pertambangan dan Penggalian Lainnya,22744.00
+11,Industri Batubara dan Pengilangan Migas,1412703.00
+12,Industri Makanan dan Minuman,601232.00
+13,Pengolahan Tembakau,17809.00
+14,Industri Tekstil dan Pakaian Jadi,1126111.00
+15,Industri Kulit Barang dari Kulit dan Alas Kaki,142194.00
+16,Industri Kayu Barang dari Kayu dan Gabus dan Barang Anyaman dari Bambu Rotan dan Sejenisnya,221142.00
+17,Industri Kertas dan Barang dari Kertas Percetakan dan Reproduksi Media Rekaman,241691.00
+18,Industri Kimia Farmasi dan Obat Tradisional,900574.00
+19,Industri Karet Barang dari Karet dan Plastik,307785.00
+20,Industri Barang Galian bukan Logam,119731.00
+21,Industri Logam Dasar,216182.00
+22,Industri Barang dari Logam Komputer Barang Elektronik Optik dan Peralatan Listrik,7316530.00
+23,Industri Mesin dan Perlengkapan YTDL,1488937.00
+24,Industri Alat Angkutan,1231934.00
+25,Industri Furnitur,65841.00
+26,Industri pengolahan lainnya jasa reparasi dan pemasangan mesin dan peralatan,122085.00
+27,Ketenagalistrikan,286047.00
+28,Pengadaan Gas dan Produksi Es,7273.00
+29,Pengadaan Air Pengelolaan Sampah Limbah dan Daur Ulang,15615.00
+30,Konstruksi,1263443.00
+31,Perdagangan Mobil Sepeda Motor dan Reparasinya,90736.00
+32,Perdagangan Besar dan Eceran Bukan Mobil dan Sepeda Motor,979907.00
+33,Angkutan Rel,47305.00
+34,Angkutan Darat,722150.00
+35,Angkutan Laut,7219.00
+36,Angkutan Sungai Danau dan Penyeberangan,7.00
+37,Angkutan Udara,124238.00
+38,Pergudangan dan Jasa Penunjang Angkutan Pos dan Kurir,8862.00
+39,Penyediaan Akomodasi,23663.00
+40,Penyediaan Makan Minum,271674.00
+41,Informasi dan Komunikasi,79634.00
+42,Jasa Perantara Keuangan,54080.00
+43,Asuransi dan Dana Pensiun,5610.00
+44,Jasa Keuangan Lainnya,5925.00
+45,Jasa Penunjang Keuangan,932.00
+46,Real Estate,12766.00
+47,Jasa Perusahaan,23735.00
+48,Administrasi Pemerintahan Pertahanan dan Jaminan Sosial Wajib,86919.00
+49,Jasa Pendidikan,139704.00
+50,Jasa Kesehatan dan Kegiatan Sosial,162639.00
+51,Jasa lainnya,33318.00
+52,Lainnya,594.00

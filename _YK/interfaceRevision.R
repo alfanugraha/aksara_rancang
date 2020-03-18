@@ -287,9 +287,7 @@ body <- dashboardBody(
                         tabPanel("Sektor Energi", tableOutput("plot")),
                         tabPanel("Sektor Lahan", tableOutput("summary")),
                         tabPanel("Sektor Limbah", tableOutput("table"))
-                        # tabPanel("Sektor Pertanian", tableOutput("SatelitLahan")),
-                        # tabPanel("Sektor Transportasi", tableOutput("SatelitEnergi"))
-            ),
+                        ),
             # fluidRow(
             #   # h3(style="padding-left: 15px;", textOutput("yearIO")),
             # 
@@ -311,7 +309,6 @@ body <- dashboardBody(
             #          )
             #   )
             # ),
-            hr(),
             actionButton("defineScenario", "Definisi"),
             actionButton("constructScenario", "Konstruksi"),
             actionButton("runScenario", "Jalankan")

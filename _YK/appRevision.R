@@ -23,7 +23,7 @@ library(gridExtra)
 # source("land.R")
 
 ###*setup dashboard page####
-ui <- source('interface.R')
+ui <- source('interfaceRevision.R')
 
 ###*define server#### 
 server <- function(input, output, session) {
@@ -2644,7 +2644,7 @@ server <- function(input, output, session) {
       sec <- allInputs()
     }
     analysisResult <- sec$result
-    selectizeInput('selectMultiSector', 'Lapangan Usaha Terkait', choices=list(
+    selectizeInput('selectMultiSector', 'Lapangan usaha terkait:', choices=list(
       Sektor=as.character(analysisResult$Sektor)
     ), multiple=TRUE)
   })
@@ -3471,97 +3471,6 @@ server <- function(input, output, session) {
           title.style.visibility = "hidden";
         }
   '}))
-  
-  observeEvent(input$defineScenario, {
-    showModal(modalDialog(
-      title = "Definisikan Aksi Mitigasi Provinsi",
-      textInput("scenarioName", "Nama Aksi Mitigasi",
-                placeholder = ''
-      ),
-      textInput("yearFrom", "Tahun Awal",
-                placeholder = '2015'
-      ),
-      textInput("yearTo", "Tahun Awal",
-                placeholder = '2030'
-      ),
-      textInput("scenarioDesc", "Deskripsi Aksi Mitigasi",
-                placeholder = ''
-      ),
-      footer = tagList(
-        actionButton("submit", "Kirimkan"),
-        modalButton("Batal")
-      )
-    ))
-  })
-  
-  observeEvent(input$constructScenario, {
-    showModal(modalDialog(
-      title = "Revisi Titik Intervensi",
-      footer = tagList(
-        actionButton("economyButton", "Pertumbuhan Ekonomi"),
-        actionButton("satelliteButton", "Akun Satelit"),
-        br(),
-        br(),
-        modalButton("Batal")
-    ))
-    )
-  })
-  
-  observeEvent(input$economyButton, {
-      showModal(modalDialog(
-        title = "Pertumbuhan Ekonomi",
-        selectInput('selectIntervention', label="Pilih Titik Intervensi", 
-                    choices=c("Permintaan Akhir (Final Demand)", "Nilai Tambah (Added Value)", "Input Antara (Intermediate Demand)")),
-        uiOutput("selectizeSector"),
-        actionButton("run", "Jalankan"),
-        br(),
-        br(),
-        actionButton("save", "Simpan"),
-        actionButton("load", "Muat"),
-        footer = tagList(
-          actionButton("submit", "Kirimkan"),
-          modalButton("Kembali"))
-      ))
-    })
-  
-  observeEvent(input$satelliteButton, {
-    showModal(modalDialog(
-      title = "Akun Satelit",
-      footer = tagList(
-        actionButton("consumptionButton", "Nilai Konsumsi"),
-        actionButton("emissionFactorButton", "Faktor Emisi"),
-        br(),
-        br(),
-        modalButton("Kembali")
-      ))
-    )
-  })
-  
-  observeEvent(input$consumptionButton, {
-    showModal(modalDialog(
-      title = "Nilai Konsumsi",
-      uiOutput("selectizeSector"),
-      selectInput("yearInter", "Tahun skenario aksi:", choices = 1990:2100, selected=2015),
-      actionButton("run", "Jalankan"),
-      br(),
-      br(),
-      uiOutput("selectizeSector"),
-      footer = tagList(
-        actionButton("submit", "Kirimkan"),
-        modalButton("Kembali"))
-    ))
-  })
-  
-  observeEvent(input$emissionFactorButton, {
-    showModal(modalDialog(
-      title = "Nilai Konsumsi",
-      selectInput("yearInter", "Tahun skenario aksi:", choices = 1990:2100, selected=2015),
-      actionButton("run", "Jalankan"),
-      footer = tagList(
-        actionButton("submit", "Kirimkan"),
-        modalButton("Kembali"))
-    ))
-  })
 }
 
 ###*run the apps#### 
