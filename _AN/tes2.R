@@ -15,12 +15,12 @@ sector<-as.character(sector)
 
 
 ### variable untuk aksi energy
-FD_his <- read.table("_DB/17_final_demand_proyeksi_sken1_d.csv",header = T,sep = ",")
+FD_his <- read.table("_AN/17_final_demand_proyeksi_sken1_d.csv",header = T,sep = ",")
 row.names(FD_his)<-sector
 FDIntervensiSken1 <- FD_his[c(23,27,30,34),]
 
 ### variable untuk aksi satelit energi
-sat_his <- read.table("_DB/konsumsi 2016.csv",header = T,sep = ",")
+sat_his <- read.table("_AN/konsumsi 2016.csv",header = T,sep = ",")
 row.names(sat_his)<-sector
 satIntervensiSken1 <- sat_his[,c(1,5)]
 
@@ -46,10 +46,10 @@ user.scen<-readRDS("user/user.scen")
 
 
 ### data lahan,limbah,transportasi,pertanian
-dataDummyLahan <- readRDS("_DB/LDMProp")
-dataDummyLimbah <- readRDS("_DB/waste")
-dataDummyTransportasi <-readRDS("_DB/waste") 
-dataDummyPertanian <- readRDS("_DB/waste")
+dataDummyLahan <- readRDS("_AN/LDMProp")
+dataDummyLimbah <- readRDS("_AN/waste")
+dataDummyTransportasi <-readRDS("_AN/waste") 
+dataDummyPertanian <- readRDS("_AN/waste")
 
 
 ui <- fluidPage(
