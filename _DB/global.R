@@ -1,6 +1,6 @@
 ### input
 ### nama 52 sector
-sector<-readRDS("data/JaBar/sector")
+sector<-readRDS("_DB/data/JaBar/sector")
 sector<-sector[,1]
 sector <- as.character(sector)
 

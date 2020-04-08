@@ -1,26 +1,16 @@
-library(shiny)
-library(gridExtra)
-library(shinyBS)
-library(rhandsontable)
-library(shinyBS)
-library(DT)
-library(stringr)
-library(shinyWidgets)
-library(dplyr)
-library(openxlsx)
-library(plotly)
-
-
-source("_DB/input1.R")
-source("_DB/lcd-scenario.R")
-
 
 buttonUI <- function(id) {
   ns <- NS(id)
+  
   tagList(
     actionButton(ns("modalDefineButton"),'Deskripsi Skenario'),
     actionButton(ns("modalEconButton"),'Konstruksi Ekonomi dan Satelit Akun'),
-    actionButton(ns("modalRUNButton"),'Run')
+    actionButton(ns("modalRUNButton"),'Run'),
+    uiOutput(ns("daftarDefineShow")),
+    plotlyOutput(ns('hasilRun')),
+    plotlyOutput(ns('plot2'))
+    # tags$div(id = 'hasilRun'),
+    # tags$div(id = 'plot2')
   )
 }
 
@@ -28,26 +18,8 @@ buttonUI <- function(id) {
 
 buttonModule <- function(input, output, session, data) {
   
-  # dataDef <- reactive({
-  #   namaSken <- unique(data$skenario)
-  #   namaSken
-  # })
-  
-  ################################################################################
-  #                                                                              #
-  #                                  BUTTON RUN                                  #
-  #                                                                              #
-  ################################################################################
-  observeEvent(input$modalRUNButton,{
-    insertUI(selector='#hasilRun',
-             where='afterEnd',
-             ui= plotlyOutput ("hasilRun"))
-    insertUI(selector='#plot2',
-             where='afterEnd',
-             ui= plotlyOutput ("plot2"))
-  })
-  
-  
+  # load the namespace
+  ns <- session$ns
   
   ################################################################################
   #                                                                              #
@@ -57,21 +29,21 @@ buttonModule <- function(input, output, session, data) {
   observeEvent(input$modalDefineButton,{
     showModal(modalDialog(sidebarLayout(sidebarPanel(
       fluidRow(
-        textInput("intervensiDef",
-                    label="nama skenario"
-                    ),
-        selectInput("tahunAwal",
+        textInput(ns("intervensiDef"),
+                  label="nama skenario"
+        ),
+        selectInput(ns("tahunAwal"),
                     label="tahun awal",
                     choices=c(2016:2030)),
-        selectInput("tahunAkhir",
+        selectInput(ns("tahunAkhir"),
                     label="tahun akhir",
                     choices=c(2016:2030)),
-        textAreaInput("deskripsi",
+        textAreaInput(ns("deskripsi"),
                       label = "Deskripsi Skenario",
                       width = "330px")
       ),
       tags$br(),
-      actionButton("defHit","tampilkan"),
+      actionButton(ns("defHit"),"tampilkan"),
       width=5
     ),
     mainPanel(
@@ -80,124 +52,23 @@ buttonModule <- function(input, output, session, data) {
     )),
     title="Deskripsi Skenario",
     footer= tagList(
-      actionButton("closeModalDef", "tutup"),
+      actionButton(ns("closeModalDef"), "tutup"),
     ),
     size="l",
     easyClose = FALSE
     ))
   })
   
-
-  ################################################################################
-  #                                                                              #
-  #                          BUTTON KONSTRUKSI EKONOMI                           #
-  #                                                                              #
-  ################################################################################
-  observeEvent(input$modalEconButton,{
-    showModal(
-      modalDialog( 
-        footer=tagList(
-          actionButton("closeModalFD", "Tutup")
-        ),
-        tabsetPanel(
-          tabPanel(
-            h2("Ekonomi"),
-            sidebarLayout(
-              sidebarPanel(
-                fluidRow(
-                  selectInput("intervensiEcon",
-                              label="pilih intervensi",
-                              choices=c("Final Demand","AV","Input-Output")),
-                  pickerInput("sektorEcon",
-                              label="pilih sektor", selected = sector[1],
-                              choices=sector,options = list(`actions-box` = TRUE),multiple = T)),
-                tags$br(),
-                actionButton("econHit","tampilkan"),
-                width=5
-              ),
-              mainPanel(
-                tags$div(id = 'FDPlaceholder'),
-                width=7)
-            ),
-            title="Sunting Intervensi Ekonomi"
-          ),
-          
-          
-          ################################################################################
-          #                                                                              #
-          #                        BUTTON KONSTRUKSI SATELIT AKUN                        #
-          #                                                                              #
-          ################################################################################
-          tabPanel(
-            h2("Satelit akun"),
-            sidebarLayout(sidebarPanel(
-              fluidRow(
-                selectInput("intervensiSat",
-                            label="pilih intervensi",
-                            choices=c("konsumsi energi","faktor emisi")),
-                pickerInput("sektorSat",
-                            label="pilih sektor",selected = sector[1],
-                            choices=sector,options = list(`actions-box` = TRUE),multiple = T)),
-              tags$br(),
-              actionButton("satHit","tampilkan"),
-              width=5
-            ),
-            mainPanel(
-              tags$div(id = 'satPlaceholder'),
-              width=7)
-            ),
-            title="Sunting Intervensi Satelit Akun"
-          ))
-        ,
-        size="l",
-        easyClose = FALSE)
-    )
-  })
-}
-
-
-
-ui <- fluidPage(
-  titlePanel("SEKTOR"),
-  tabsetPanel(
-    tabPanel(
-      h3("energi"),
-      tags$br(),
-      tags$br(),
-      buttonUI("forEnergy"),
-      tags$br(),
-      tags$br(),
-      tags$br(),
-      tags$div(id = 'daftarDefine'),
-      tags$br(),
-      tags$br(),
-      tags$div(id = 'hasilRun'),
-      tags$div(id = 'plot2')
-    ),
-    tabPanel(h3("limbah"),
-             tags$br(),
-             tags$br(),
-             buttonUI("forWaste")
-    )
-  )
-)
-
-
-
-server <- function(input,output,session,data){
-  callModule(buttonModule, "forEnergy", energyData)
-  callModule(buttonModule, "forWaste", wasteData)
-
   
   observeEvent(input$defHit, {
     insertUI(selector='#defPlaceholder',
              where='afterEnd',
-             ui= uiOutput('defUIManual')
+             ui= uiOutput(ns('defUIManual'))
     )
   })
   
   output$defUIManual<- renderUI({
-    tagList(rHandsontableOutput('editDefine'),
+    tagList(rHandsontableOutput(ns('editDefine')),
             tags$br(),
             actionButton('saveModalDef', 'simpan tabel')
     )
@@ -240,45 +111,132 @@ server <- function(input,output,session,data){
   ### tutup modal dialog define ###
   observeEvent(input$closeModalDef,{
     removeModal()
-    # textTampil <- paste0("Nama Skenario: ",input$intervensiDef, " dari tahun ",input$tahunAwal," sampai tahun ",
-    #                      input$tahunAkhir)
-    insertUI(selector='#daftarDefine',
-             where='afterEnd',
-             ui= htmlOutput ("daftarDefine"))
+    uiOutput(ns("daftarDefineShow"))
     
   })
   
-  output$daftarDefine <- renderText({HTML(paste0("Nama Skenario: ","<b>",tags$span(style="color:blue", input$intervensiDef),"</b>",
-                " dari tahun ",tags$span(style="color:blue", input$tahunAwal),
-                " sampai tahun ",tags$span(style="color:blue", input$tahunAkhir)))
-    
+  coba <- eventReactive(input$closeModalDef,{
+    textTampil <- paste0("Nama Skenario: ",input$intervensiDef, " dari tahun ",input$tahunAwal," sampai tahun ",
+                         input$tahunAkhir)
+    textTampil
   })
-
+  
+  output$daftarDefineShow <- renderUI({
+    a <- coba()
+    a
+  })
+  
+  
+  
   
   ################################################################################
   #                                                                              #
   #                          BUTTON KONSTRUKSI EKONOMI                           #
   #                                                                              #
   ################################################################################
+  observeEvent(input$modalEconButton,{
+    showModal(
+      modalDialog( 
+        footer=tagList(
+          actionButton(ns("closeModalFD"), "Tutup")
+        ),
+        tabsetPanel(
+          tabPanel(
+            h2("Ekonomi"),
+            sidebarLayout(
+              sidebarPanel(
+                fluidRow(
+                  selectInput(ns("intervensiEcon"),
+                              label="pilih intervensi",
+                              choices=c("Final Demand","AV","Input-Output")),
+                  pickerInput(ns("sektorEcon"),
+                              label="pilih sektor", selected = sector[1],
+                              choices=sector,options = list(`actions-box` = TRUE),multiple = T)),
+                tags$br(),
+                actionButton(ns("econHit"),"tentukan tahun intervensi"),
+                width=5
+              ),
+              mainPanel(
+                tags$div(id = 'FDPlaceholder'),
+                width=7)
+            ),
+            title="Sunting Intervensi Ekonomi"
+          ),
+          
+          
+          ################################################################################
+          #                                                                              #
+          #                        BUTTON KONSTRUKSI SATELIT AKUN                        #
+          #                                                                              #
+          ################################################################################
+          tabPanel(
+            h2("Satelit akun"),
+            sidebarLayout(sidebarPanel(
+              fluidRow(
+                selectInput(ns("intervensiSat"),
+                            label="pilih intervensi",
+                            choices=c("konsumsi energi","faktor emisi")),
+                pickerInput(ns("sektorSat"),
+                            label="pilih sektor",selected = sector[1],
+                            choices=sector,options = list(`actions-box` = TRUE),multiple = T)),
+              tags$br(),
+              actionButton(ns("satHit"),"tentukan tahun intervensi"),
+              width=5
+            ),
+            mainPanel(
+              tags$div(id = 'satPlaceholder'),
+              width=7)
+            ),
+            title="Sunting Intervensi Satelit Akun"
+          ))
+        ,
+        size="l",
+        easyClose = FALSE)
+    )
+  })
+  
+  
+  
+  ################################################################################
+  #                                                                              #
+  #                     ALUR BUTTON KONSTRUKSI EKONOMI                           #
+  #                                                                              #
+  ################################################################################
   observeEvent(input$econHit, {
     insertUI(selector='#FDPlaceholder',
              where='afterEnd',
-             ui= uiOutput('FDUIManual')
+             ui= uiOutput(ns('FDUIManual'))
     )
   })  
   
   output$FDUIManual<- renderUI({
-    tagList(pickerInput("pilihtahunFD",
+    tagList(pickerInput(ns("pilihtahunFD"),
                         label="pilih tahun", selected = input$tahunAwal,
                         choices=c(input$tahunAwal:input$tahunAkhir),options = list(`actions-box` = TRUE),multiple = T),
-            tags$b('Sunting secara manual'),
+            tags$br(),
+            actionButton(ns('showYearEco'), 'tampilkan tabel'),
             tags$br(),
             tags$br(),
-            rHandsontableOutput('editFD'),
-            tags$br(),
-            actionButton('saveModalFD',' simpan tabel '),
-            #actionButton('downloadFD','download tabel')
-            tags$div(id = 'objDownloadFD')
+            tags$div(id = 'SuntingPlaceHolder')
+    )
+  })
+  
+  observeEvent(input$showYearEco, {
+    insertUI(selector='#SuntingPlaceHolder',
+             where='afterEnd',
+             ui= uiOutput(ns('SuntingUITable'))
+    )
+  }) 
+  
+  output$SuntingUITable<- renderUI({
+    tagList(
+      tags$b('Sunting secara manual'),
+      tags$br(),
+      rHandsontableOutput(ns('editFD')),
+      tags$br(),
+      actionButton(ns('saveModalFD'),' simpan tabel '),
+      #actionButton('downloadFD','download tabel')
+      tags$div(id = 'objDownloadFD')
     )
   })
   
@@ -295,7 +253,7 @@ server <- function(input,output,session,data){
     finalDemand$table1
   })
   
-    #observeEvent(input$econHit,
+  #observeEvent(input$econHit,
   valFD<- reactive({
     #browser()
     finalDemand$table1 <- FDdata()
@@ -304,8 +262,8 @@ server <- function(input,output,session,data){
     finalDemand$table1
   })
   
-  #valFD2 <- reactive(
-  observeEvent(input$pilihtahunFD,{
+  valFD2 <- eventReactive(c(input$showYearEco),{
+    #observeEvent(input$pilihtahunFD,{
     #browser()
     finalDemand$table1 <- valFD()
     finalDemand$table1 <- finalDemand$table1[,c("sector",paste0("y",input$pilihtahunFD))]
@@ -313,11 +271,13 @@ server <- function(input,output,session,data){
   })
   
   output$editFD <- renderRHandsontable({
-    rhandsontable(finalDemand$table1,
+    rhandsontable(valFD2(),
+                  #finalDemand$table1,
                   rowHeaderWidth = 160,
     )%>%hot_cols(format=3)
+    
   })
-
+  
   #### masukkan nilai sel baru ke dalam kolom fdBauNew 
   FDSave<-eventReactive(input$saveModalFD,{
     finalDemand$table1 <- as.data.frame(hot_to_r(input$editFD))
@@ -328,7 +288,7 @@ server <- function(input,output,session,data){
     #print(head(fdBauReact$isi))
     fdNew_list<-list(fdBauNew = fdBauReact$isi,
                      fdNew=finalDemand$table1,
-                   inputTahun=inputTahun
+                     inputTahun=inputTahun
     )
     fdNew_list
   })
@@ -344,13 +304,13 @@ server <- function(input,output,session,data){
     saveRDS(FDSave(), file = paste0('_DB/skenarioData/',selectedSektor,'/',selectedProv,'/',namafileDefine))
     insertUI(selector='#objDownloadFD',
              where='afterEnd',
-             ui= uiOutput('downButtonFD')
+             ui= uiOutput(ns('downButtonFD'))
     )
   })
   
   output$downButtonFD<- renderUI({
     tagList(tags$br(),
-            actionButton('downloadFD','download tabel')
+            actionButton(ns('downloadFD'),'download tabel')
     )
   })
   
@@ -370,9 +330,10 @@ server <- function(input,output,session,data){
                sheetName = namaSheet)
   })
   
+  
   ################################################################################
   #                                                                              #
-  #                        BUTTON KONSTRUKSI SATELIT AKUN                        #
+  #                   ALUR BUTTON KONSTRUKSI SATELIT AKUN                        #
   #                                                                              #
   ################################################################################
   
@@ -411,10 +372,6 @@ server <- function(input,output,session,data){
   })
   
   
-  
-  
-  
-
   ## proyeksi konsumsi energi
   #koefisien energi dari sheet energi
   #tabel konsumsi energi dari sheet proyeksi
@@ -422,15 +379,15 @@ server <- function(input,output,session,data){
     proyKons <- outputTable()*koefEnergi
     proyKons
   })
-
-
+  
+  
   # tabel proporsi energi yang diambil dari tahun 2015
   propEnergiTable <- reactive({
     propEnergiTable <- tabelKonsumsiEnergi/totalKonsumsiEnergi
     propEnergiTable
   })
-
-
+  
+  
   #terbentuk 15 tabel konsumsi energi
   proyTabelKonsEnergiTable <- reactive({
     proyTabelKonsEnergiTable<-list()
@@ -441,23 +398,19 @@ server <- function(input,output,session,data){
     proyTabelKonsEnergiTable
   })
   
-
-  
-  
-  
   
   observeEvent(input$satHit, {
     insertUI(selector='#satPlaceholder',
              where='afterEnd',
-             ui= uiOutput('satMUIManual')
+             ui= uiOutput(ns('satMUIManual'))
     )
   })
   
   output$satMUIManual<- renderUI({
-    tagList(selectInput("pilihtahunSat",
+    tagList(selectInput(ns("pilihtahunSat"),
                         label="pilih tahun", selected = input$tahunAwal,
                         choices=c(input$tahunAwal:input$tahunAkhir)),
-            pickerInput("pilihBahanBakar",
+            pickerInput(ns("pilihBahanBakar"),
                         label="pilih bahan bakar",selected = bahanBakar[5],
                         choices=bahanBakar,options = list(`actions-box` = TRUE),multiple = T),
             tags$br(),
@@ -465,9 +418,9 @@ server <- function(input,output,session,data){
             tags$b('Sunting secara manual'),
             tags$br(),
             tags$br(),
-            rHandsontableOutput('editSat'),
+            rHandsontableOutput(ns('editSat')),
             tags$br(),
-            actionButton('saveModalSat', 'simpan tabel'),
+            actionButton(ns('saveModalSat'), 'simpan tabel'),
             tags$br(),
             tags$br(),
             tags$div(id='teksSatSave')
@@ -485,7 +438,7 @@ server <- function(input,output,session,data){
   observeEvent(input$saveModalFD,{
     satBauReact$isi <- proyTabelKonsEnergiTable()
   })
-
+  
   SatData <- reactive({
     satAkun$table1 <- satBauReact$isi
     satAkun$table1
@@ -531,8 +484,8 @@ server <- function(input,output,session,data){
     satBauReact$isi[[inputTahun]][indexSektor,inputBahanBakar]<-satAkun$table1[,-1] 
     #print(head(satBauReact$isi[[inputTahun]]))
     satNew_list<-list(satBauNew = satBauReact$isi,
-                     satNew=satAkun$table1,
-                     inputTahun=inputTahun
+                      satNew=satAkun$table1,
+                      inputTahun=inputTahun
     )
     satNew_list
     
@@ -598,18 +551,37 @@ server <- function(input,output,session,data){
   })
   
   
-  
-  ### tutup modal dialog satelit akun###
-  observeEvent(input$closeModalSat,{
-    removeModal()
-  })
-  
   ### tutup modal dialog Econ ###
   observeEvent(input$closeModalFD,{
     removeModal()
+    #removeUI(selector = '#FDPlaceholder')
+  })
+  
+  ################################################################################
+  #                                                                              #
+  #                                  BUTTON RUN                                  #
+  #                                                                              #
+  ################################################################################
+  observeEvent(input$modalRUNButton,{
+    plotlyOutput(ns("hasilRun"))
+    plotlyOutput(ns("plot2"))
+  })
+  
+  plotPDRB <- eventReactive(input$modalRUNButton,{
+    ggplot(proyPdrbTable(), aes(x=year, y=totalPDRB, group=scenario))+
+      geom_line(aes(color=scenario))+
+      geom_point(aes(color=scenario))+
+      labs(x="Tahun", y="PDRB")+
+      ggtitle("Grafik Proyeksi PDRB")+
+      theme(plot.title = element_text(hjust = 0.5))
   })
   
   output$hasilRun <- renderPlotly({
+    plotPDRB()
+    
+  })
+  
+  plotEmisi <- eventReactive(input$modalRUNButton,{
     ggplot(proyPdrbTable(), aes(x=year, y=totalPDRB, group=scenario))+
       geom_line(aes(color=scenario))+
       geom_point(aes(color=scenario))+
@@ -619,18 +591,7 @@ server <- function(input,output,session,data){
   })
   
   output$plot2 <- renderPlotly({
-    ggplot(proyEmisiTabel(), aes(x=year, y=cumEmisi, group=scenario))+
-      geom_line(aes(color=scenario))+
-      geom_point(aes(color=scenario))+
-      labs(x="Tahun", y="Emisi Kumulatif")+
-      ggtitle("Grafik Emisi Kumulatif")+
-      theme(plot.title = element_text(hjust = 0.5))
+    plotEmisi()
   })
   
-
-  
-  
 }
-
-app <- shinyApp(ui,server)
-runApp(app)

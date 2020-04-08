@@ -2,7 +2,7 @@
 
 ###BEGIN: initiate all variables ####
 selectedProv = "JaBar"
-datapath <- paste0("data/", selectedProv, "/")
+datapath <- paste0("_DB/data/", selectedProv, "/")
 datapathCSV <- ("_DB/input csv")
 
 
