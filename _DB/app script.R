@@ -48,8 +48,8 @@ ui <- fluidPage(
 server <- function(input,output,session,data){
   callModule(buttonModule, "forEnergy", energyData)
   callModule(buttonModule, "forWaste", wasteData)
-  callModule(buttonModule, "forAgri", energyData)
-  callModule(buttonModule, "forLand", wasteData)
+  callModule(buttonModule, "forAgri", agriData)
+  callModule(buttonModule, "forLand", landData)
 }
 
 app <- shinyApp(ui,server)
