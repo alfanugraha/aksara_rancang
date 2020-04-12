@@ -51,6 +51,8 @@ server <- function(input,output,session,data){
   callModule(buttonModule, "forWaste", wasteData)
   callModule(buttonModule, "forAgri", agriData)
   #callModule(buttonModule, "forLand", landData)
+  
+  #callModule(editSatelliteServer, "forEnergy", energyData)
 }
 
 app <- shinyApp(ui,server)
