@@ -11,8 +11,8 @@ library(openxlsx)
 library(plotly)
 
 
-source("_DB/global.R")
 source("_DB/lcd-scenario.R")
+source("_DB/global.R")
 source("_DB/module.R")
 
 
@@ -34,12 +34,13 @@ ui <- fluidPage(
              tags$br(),
              tags$br(),
              buttonUI("forAgri")
-    ),
-    tabPanel(h3("lahan"),
-             tags$br(),
-             tags$br(),
-             buttonUI("forLand")
     )
+    # ,
+    # tabPanel(h3("lahan"),
+    #          tags$br(),
+    #          tags$br(),
+    #          buttonUI("forLand")
+    # )
   )
 )
 
@@ -49,7 +50,7 @@ server <- function(input,output,session,data){
   callModule(buttonModule, "forEnergy", energyData)
   callModule(buttonModule, "forWaste", wasteData)
   callModule(buttonModule, "forAgri", agriData)
-  callModule(buttonModule, "forLand", landData)
+  #callModule(buttonModule, "forLand", landData)
 }
 
 app <- shinyApp(ui,server)

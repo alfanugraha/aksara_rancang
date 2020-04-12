@@ -4,19 +4,21 @@ buttonUI <- function(id) {
   
   tagList(
     actionButton(ns("modalDefineButton"),'Deskripsi Skenario'),
-    actionButton(ns("modalEconButton"),'Konstruksi Ekonomi dan Satelit Akun'),
-    actionButton(ns("modalRUNButton"),'Run'),
+    tags$br(),
+    tags$br(),
+    dataTableOutput(ns("ListTable")),
     uiOutput(ns("daftarDefineShow")),
     plotlyOutput(ns('hasilRun')),
-    plotlyOutput(ns('plot2'))
-    # tags$div(id = 'hasilRun'),
-    # tags$div(id = 'plot2')
+    plotlyOutput(ns('plot2')),
+    shinyjs::useShinyjs(),
+    shinyjs::extendShinyjs(text = "shinyjs.refresh = function() { location.reload(); }")
   )
 }
 
 
 
 buttonModule <- function(input, output, session, data) {
+  
   
   # load the namespace
   ns <- session$ns
@@ -52,7 +54,8 @@ buttonModule <- function(input, output, session, data) {
     )),
     title="Deskripsi Skenario",
     footer= tagList(
-      actionButton(ns("closeModalDef"), "tutup"),
+      actionButton(ns("closeModalDef"), "simpan skenario"),
+      actionButton(ns("cancelModalDef"), "batal")
     ),
     size="l",
     easyClose = FALSE
@@ -69,8 +72,8 @@ buttonModule <- function(input, output, session, data) {
   
   output$defUIManual<- renderUI({
     tagList(rHandsontableOutput(ns('editDefine')),
-            tags$br(),
-            actionButton('saveModalDef', 'simpan tabel')
+            # tags$br(),
+            # actionButton('saveModalDef', 'simpan tabel')
     )
   })
   
@@ -88,6 +91,7 @@ buttonModule <- function(input, output, session, data) {
                             "tahun awal",
                             "tahun akhir",
                             "deskripsi")
+    
     tableDef
   })
   
@@ -98,43 +102,87 @@ buttonModule <- function(input, output, session, data) {
     )%>%hot_cols(format=3)
   })
   
+  listValDef <- reactive({
+    
+    newTableDef <- as.data.frame(hot_to_r(input$editDefine))
+    
+    namaSken <- as.character(newTableDef[1,])
+    tahunAwal <- as.numeric(newTableDef[2,])
+    tahunAkhir <- as.numeric(newTableDef[3,])
+    deskrip <- as.character(newTableDef[4,])
+    combineDef <- list(namaSken=namaSken,tahunAwal=tahunAwal,tahunAkhir=tahunAkhir, deskrip=deskrip)
+    
+    combineDef
+  })
+  
   ##### simpan tabel define ke dalam folder ####
-  observeEvent(input$saveModalDef,{
+  ### tutup modal dialog define ###
+  observeEvent(input$closeModalDef,{
+    removeModal()
+    
     waktuDefine<-Sys.time()
     simpanDefine<-gsub(" ","_",waktuDefine,fixed = TRUE)
     simpanDefine<-gsub(":","-",simpanDefine,fixed = TRUE)
     namaSken <- gsub(" ","",input$intervensiDef, fixed = TRUE) 
     namafileDefine<-paste0(username,"_",namaSken,"_",selectedProv,"_",simpanDefine)
-    saveRDS(valDef(), file = paste0('_DB/skenarioData/',selectedSektor,'/',selectedProv,'/',namafileDefine))
+    saveRDS(listValDef(), file = paste0(data$alamatFile,"/",namafileDefine))
+    shinyjs::js$refresh()
   })
   
-  ### tutup modal dialog define ###
-  observeEvent(input$closeModalDef,{
+  observeEvent(input$cancelModalDef,{
     removeModal()
-    uiOutput(ns("daftarDefineShow"))
+  })
+  #### coba 
+  
+  daftarFile<-reactiveValues(
+    ListFile = unique(list.files(data$alamatFile))
+  )
+  
+  ListButton_fun <- function(FUN, len, id, ...) {
+    inputs <- character(len)
+    for (i in seq_len(len)) {
+      inputs[i] <- as.character(FUN(paste0(id,i), ...))
+    }
+    inputs
+  }
+  
+  
+  ### buat tabel daftar nama file reaktif ###
+  
+  ListTableReact <- reactive({
+    data.frame(
+      Nama_File = c(daftarFile$ListFile),
+      Edit = ListButton_fun(actionButton, length(daftarFile$ListFile),
+                                     'button_',
+                                     label = "Edit Konstruksi Ekonomi dan Satelit Akun"
+                                     ,
+                                     onclick = paste0('Shiny.onInputChange(\"' , ns("select_button"), '\", this.id)')
+                                      ),
+      Run = ListButton_fun(actionButton, length(daftarFile$ListFile),
+                              'tombol_',
+                              label = "Tampilkan Plot",
+                              onclick = paste0('Shiny.onInputChange( \"run_button\" , this.id)'))
+    )
+  })
+
+  ###tampilkan tabel list ###
+  
+  output$ListTable <- renderDataTable({
+    ListTableReact()
+  }, escape = FALSE)
+  
+  
+  
+  observeEvent(input$select_button,{
+    #browser()
+    selectedRow <- as.numeric(strsplit(input$select_button,"_")[[1]][2])
+    fileName<- ListTableReact()[selectedRow,1]
+    selectedFile<-readRDS(paste0(data$alamatFile,"/",fileName))
+    listData<-list(fileName=fileName,
+                 selectedFile=selectedFile)
+    print("cek button")
     
-  })
-  
-  coba <- eventReactive(input$closeModalDef,{
-    textTampil <- paste0("Nama Skenario: ",input$intervensiDef, " dari tahun ",input$tahunAwal," sampai tahun ",
-                         input$tahunAkhir)
-    textTampil
-  })
-  
-  output$daftarDefineShow <- renderUI({
-    a <- coba()
-    a
-  })
-  
-  
-  
-  
-  ################################################################################
-  #                                                                              #
-  #                          BUTTON KONSTRUKSI EKONOMI                           #
-  #                                                                              #
-  ################################################################################
-  observeEvent(input$modalEconButton,{
+    
     showModal(
       modalDialog( 
         footer=tagList(
@@ -150,8 +198,8 @@ buttonModule <- function(input, output, session, data) {
                               label="pilih intervensi",
                               choices=c("Final Demand","AV","Input-Output")),
                   pickerInput(ns("sektorEcon"),
-                              label="pilih sektor", selected = sector[1],
-                              choices=sector,options = list(`actions-box` = TRUE),multiple = T)),
+                              label="pilih sektor", selected = Sector[1],
+                              choices=Sector,options = list(`actions-box` = TRUE),multiple = T)),
                 tags$br(),
                 actionButton(ns("econHit"),"tentukan tahun intervensi"),
                 width=5
@@ -177,8 +225,8 @@ buttonModule <- function(input, output, session, data) {
                             label="pilih intervensi",
                             choices=c("konsumsi energi","faktor emisi")),
                 pickerInput(ns("sektorSat"),
-                            label="pilih sektor",selected = sector[1],
-                            choices=sector,options = list(`actions-box` = TRUE),multiple = T)),
+                            label="pilih sektor",selected = Sector[1],
+                            choices=Sector,options = list(`actions-box` = TRUE),multiple = T)),
               tags$br(),
               actionButton(ns("satHit"),"tentukan tahun intervensi"),
               width=5
@@ -193,7 +241,76 @@ buttonModule <- function(input, output, session, data) {
         size="l",
         easyClose = FALSE)
     )
+
   })
+  
+  
+  
+  ################################################################################
+  #                                                                              #
+  #                          BUTTON KONSTRUKSI EKONOMI                           #
+  #                                                                              #
+  ################################################################################
+  #observeEvent(input$modalEconButton,{
+    # showModal(
+    #   modalDialog( 
+    #     footer=tagList(
+    #       actionButton(ns("closeModalFD"), "Tutup")
+    #     ),
+    #     tabsetPanel(
+    #       tabPanel(
+    #         h2("Ekonomi"),
+    #         sidebarLayout(
+    #           sidebarPanel(
+    #             fluidRow(
+    #               selectInput(ns("intervensiEcon"),
+    #                           label="pilih intervensi",
+    #                           choices=c("Final Demand","AV","Input-Output")),
+    #               pickerInput(ns("sektorEcon"),
+    #                           label="pilih sektor", selected = Sector[1],
+    #                           choices=Sector,options = list(`actions-box` = TRUE),multiple = T)),
+    #             tags$br(),
+    #             actionButton(ns("econHit"),"tentukan tahun intervensi"),
+    #             width=5
+    #           ),
+    #           mainPanel(
+    #             tags$div(id = 'FDPlaceholder'),
+    #             width=7)
+    #         ),
+    #         title="Sunting Intervensi Ekonomi"
+    #       ),
+    #       
+    #       
+    #       ################################################################################
+    #       #                                                                              #
+    #       #                        BUTTON KONSTRUKSI SATELIT AKUN                        #
+    #       #                                                                              #
+    #       ################################################################################
+    #       tabPanel(
+    #         h2("Satelit akun"),
+    #         sidebarLayout(sidebarPanel(
+    #           fluidRow(
+    #             selectInput(ns("intervensiSat"),
+    #                         label="pilih intervensi",
+    #                         choices=c("konsumsi energi","faktor emisi")),
+    #             pickerInput(ns("sektorSat"),
+    #                         label="pilih sektor",selected = Sector[1],
+    #                         choices=Sector,options = list(`actions-box` = TRUE),multiple = T)),
+    #           tags$br(),
+    #           actionButton(ns("satHit"),"tentukan tahun intervensi"),
+    #           width=5
+    #         ),
+    #         mainPanel(
+    #           tags$div(id = 'satPlaceholder'),
+    #           width=7)
+    #         ),
+    #         title="Sunting Intervensi Satelit Akun"
+    #       ))
+    #     ,
+    #     size="l",
+    #     easyClose = FALSE)
+    # )
+  #})
   
   
   
@@ -203,7 +320,8 @@ buttonModule <- function(input, output, session, data) {
   #                                                                              #
   ################################################################################
   observeEvent(input$econHit, {
-    insertUI(selector='#FDPlaceholder',
+    #browser()
+    insertUI(selector="FDPlaceholder",
              where='afterEnd',
              ui= uiOutput(ns('FDUIManual'))
     )
@@ -211,8 +329,8 @@ buttonModule <- function(input, output, session, data) {
   
   output$FDUIManual<- renderUI({
     tagList(pickerInput(ns("pilihtahunFD"),
-                        label="pilih tahun", selected = input$tahunAwal,
-                        choices=c(input$tahunAwal:input$tahunAkhir),options = list(`actions-box` = TRUE),multiple = T),
+                        label="pilih tahun", selected = listValDef()$tahunAwal,
+                        choices=c(listValDef()$tahunAwal:listValDef()$tahunAkhir),options = list(`actions-box` = TRUE),multiple = T),
             tags$br(),
             actionButton(ns('showYearEco'), 'tampilkan tabel'),
             tags$br(),
@@ -235,7 +353,6 @@ buttonModule <- function(input, output, session, data) {
       rHandsontableOutput(ns('editFD')),
       tags$br(),
       actionButton(ns('saveModalFD'),' simpan tabel '),
-      #actionButton('downloadFD','download tabel')
       tags$div(id = 'objDownloadFD')
     )
   })
@@ -257,16 +374,14 @@ buttonModule <- function(input, output, session, data) {
   valFD<- reactive({
     #browser()
     finalDemand$table1 <- FDdata()
-    finalDemand$table1 <- filter(finalDemand$table1, finalDemand$table1$sector %in% c(input$sektorEcon))
+    finalDemand$table1 <- filter(finalDemand$table1, finalDemand$table1$Sektor %in% c(input$sektorEcon))
     rownames(finalDemand$table1) <- c(input$sektorEcon)
     finalDemand$table1
   })
   
   valFD2 <- eventReactive(c(input$showYearEco),{
-    #observeEvent(input$pilihtahunFD,{
-    #browser()
     finalDemand$table1 <- valFD()
-    finalDemand$table1 <- finalDemand$table1[,c("sector",paste0("y",input$pilihtahunFD))]
+    finalDemand$table1 <- finalDemand$table1[,c("Sektor",paste0("y",input$pilihtahunFD))]
     finalDemand$table1
   })
   
@@ -283,9 +398,8 @@ buttonModule <- function(input, output, session, data) {
     finalDemand$table1 <- as.data.frame(hot_to_r(input$editFD))
     inputSektor<-input$sektorEcon #"tanaman pangan"
     inputTahun<-paste0("y",input$pilihtahunFD)
-    indexSektor <- as.numeric(which(sapply(sector,function(x) any(x==c(inputSektor)))))
+    indexSektor <- as.numeric(which(sapply(Sector,function(x) any(x==c(inputSektor)))))
     fdBauReact$isi[c(indexSektor), c(inputTahun)] <- finalDemand$table1[,-1]
-    #print(head(fdBauReact$isi))
     fdNew_list<-list(fdBauNew = fdBauReact$isi,
                      fdNew=finalDemand$table1,
                      inputTahun=inputTahun
@@ -301,7 +415,7 @@ buttonModule <- function(input, output, session, data) {
     namaSken <- gsub(" ","",input$intervensiDef, fixed = TRUE)
     intEconomy <- gsub(" ","",input$intervensiEcon, fixed = TRUE)
     namafileDefine<-paste0(username,"_",namaSken,"_",selectedProv,"_",intEconomy,"_",simpanEcon)
-    saveRDS(FDSave(), file = paste0('_DB/skenarioData/',selectedSektor,'/',selectedProv,'/',namafileDefine))
+    saveRDS(FDSave(), file = paste0('_DB/skenarioData/',selectedProv,'/',selectedSektor,'/',namafileDefine))
     insertUI(selector='#objDownloadFD',
              where='afterEnd',
              ui= uiOutput(ns('downButtonFD'))
@@ -341,16 +455,15 @@ buttonModule <- function(input, output, session, data) {
   ## bagian Output
   outputTable <- reactive({
     fdTable <- FDSave()$fdBauNew
-    out <- leontief %*% as.matrix(fdTable[,-1])
+    out <- ioLeontiefInverse %*% as.matrix(fdTable[,-1]) #leontief jadi ioLeontiefInverse 
     out
   })
   
   ## bagian PDRB
-  #proyPdrbTable <- reactive(
-  #observeEvent(input$saveModalFD,
+  #observeEvent(input$saveModalFD,{
   proyPdrbTable <- reactive({
     #browser()
-    proyPdrbScen <- outputTable()*proporsiPDRB[,1]
+    proyPdrbScen <- outputTable()*data.frame(proportionGDP)[,1]
     colProyPdrbScen <- data.frame(colSums(proyPdrbScen))
     colnames(colProyPdrbScen) <- c("totalPDRB")
     colProyPdrbScen$year <- rownames(colProyPdrbScen)
@@ -358,17 +471,15 @@ buttonModule <- function(input, output, session, data) {
     colProyPdrbScen$scenario <- c("SKENARIO")
     
     #BAU
-    colProyPdrbDF <- data.frame(colProyPdrb)
-    colnames(colProyPdrbDF) <- c("totalPDRB")
-    colProyPdrbDF$year <- rownames(colProyPdrbDF)
+    colProyPdrbDF <- colProyPdrb
     colProyPdrbDF <- colProyPdrbDF[1:length(input$tahunAwal:input$tahunAkhir), ]
+    colProyPdrbDF$year <- paste0("y",colProyPdrbDF$year)
     colProyPdrbDF$scenario <- c("BAU")
     
     #gabung BAU dan skenario
     colProyPdrbScen <- rbind(colProyPdrbScen,colProyPdrbDF)
     
     colProyPdrbScen
-    #plot(input$tahunAwal : input$tahunAkhir,colProyPdrbScen) #plot pdrb
   })
   
   
@@ -376,25 +487,18 @@ buttonModule <- function(input, output, session, data) {
   #koefisien energi dari sheet energi
   #tabel konsumsi energi dari sheet proyeksi
   proyKonsumsiEnergiTable <- reactive({
-    proyKons <- outputTable()*koefEnergi
+    proyKons <- outputTable() * data$koefisien
     proyKons
   })
   
-  
-  # tabel proporsi energi yang diambil dari tahun 2015
-  propEnergiTable <- reactive({
-    propEnergiTable <- tabelKonsumsiEnergi/totalKonsumsiEnergi
-    propEnergiTable
-  })
-  
-  
+
   #terbentuk 15 tabel konsumsi energi
   proyTabelKonsEnergiTable <- reactive({
     proyTabelKonsEnergiTable<-list()
     for (i in 1:ncol(proyKonsumsiEnergiTable())) {
-      proyTabelKonsEnergiTable[[i]]<-proyKonsumsiEnergiTable()[,i]*propEnergi
+      proyTabelKonsEnergiTable[[i]]<-proyKonsumsiEnergiTable()[,i]*data$proportionConsumption
     }
-    names(proyTabelKonsEnergiTable)<-paste0("y",yearFrom:yearTo)
+    names(proyTabelKonsEnergiTable)<-paste0("y",initialYear:finalYear)
     proyTabelKonsEnergiTable
   })
   
@@ -411,8 +515,8 @@ buttonModule <- function(input, output, session, data) {
                         label="pilih tahun", selected = input$tahunAwal,
                         choices=c(input$tahunAwal:input$tahunAkhir)),
             pickerInput(ns("pilihBahanBakar"),
-                        label="pilih bahan bakar",selected = bahanBakar[5],
-                        choices=bahanBakar,options = list(`actions-box` = TRUE),multiple = T),
+                        label="pilih faktor emisi",selected = data$faktorEmisi[1],
+                        choices=data$faktorEmisi,options = list(`actions-box` = TRUE),multiple = T),
             tags$br(),
             tags$br(),
             tags$b('Sunting secara manual'),
@@ -446,21 +550,19 @@ buttonModule <- function(input, output, session, data) {
   
   # observeEvent(input$saveModalSat,
   valSat<- reactive({
-    #browser()
     indexAwal <- paste0("y",input$pilihtahunSat)
     satAkun$table1 <- SatData()[indexAwal]
     satAkun$table1 <- data.frame(satAkun$table1)
-    satAkun$table1 <- cbind(sector,satAkun$table1)
-    satAkun$table1 <- filter(satAkun$table1, satAkun$table1$sector %in% c(input$sektorSat))
+    satAkun$table1 <- cbind(Sector,satAkun$table1)
+    satAkun$table1 <- filter(satAkun$table1, satAkun$table1$Sector %in% c(input$sektorSat))
     rownames(satAkun$table1) <- c(input$sektorSat)
     satAkun$table1
   })
   
   #valSat2 <- reactive(
   observeEvent(c(input$pilihtahunSat,input$pilihBahanBakar),{
-    #browser()
     satAkun$table1 <- valSat()
-    satAkun$table1 <- satAkun$table1[,c("sector",paste0("y",input$pilihtahunSat,".",input$pilihBahanBakar))]
+    satAkun$table1 <- satAkun$table1[,c("Sector",paste0("y",input$pilihtahunSat,".",input$pilihBahanBakar))]
     satAkun$table1
   })
   
@@ -475,14 +577,12 @@ buttonModule <- function(input, output, session, data) {
   observeEvent(input$saveModalSat,{
     #browser()
     satAkun$table1<-as.data.frame(hot_to_r(input$editSat))
-    #print(satAkun$table1)
     inputSektor<-input$sektorSat 
-    indexSektor <- as.numeric(which(sapply(sector,function(x) any(x==c(inputSektor)))))
+    indexSektor <- as.numeric(which(sapply(Sector,function(x) any(x==c(inputSektor)))))
     inputTahun<-paste0("y",input$pilihtahunSat)
     inputBahanBakar <- input$pilihBahanBakar
     
     satBauReact$isi[[inputTahun]][indexSektor,inputBahanBakar]<-satAkun$table1[,-1] 
-    #print(head(satBauReact$isi[[inputTahun]]))
     satNew_list<-list(satBauNew = satBauReact$isi,
                       satNew=satAkun$table1,
                       inputTahun=inputTahun
@@ -497,7 +597,7 @@ buttonModule <- function(input, output, session, data) {
     intEconomy <- gsub(" ","",input$intervensiEcon, fixed = TRUE)
     intSat <- gsub(" ","",input$intervensiSat, fixed = TRUE)
     namafileDefine<-paste0(username,"_",namaSken,"_",selectedProv,"_",intEconomy,"_",intSat,"_",simpanSat)
-    saveRDS(satNew_list, file = paste0('_DB/skenarioData/',selectedSektor,'/',selectedProv,'/',namafileDefine))
+    saveRDS(satNew_list, file = paste0('_DB/skenarioData/',selectedProv,'/',selectedSektor,'/',namafileDefine))
     
     inputSektorTampil<-capture.output(cat(input$sektorSat , sep=", ")) #"tanaman pangan"
     inputBahanBakarTampil <- capture.output(cat(input$pilihBahanBakar , sep=", "))
@@ -510,25 +610,22 @@ buttonModule <- function(input, output, session, data) {
   
   
   # terbentuk 15 tabel proyeksi emisi
-  #proyEmisiTabel <- reactive(
-  #observeEvent(input$saveModalSat,
   proyEmisiTabel <- reactive({
-    #browser()
     proyEmisiSken <- list()
-    for (i in 1:lengthYear) {
-      proyEmisiSken[[i]]<-as.matrix(proyTabelKonsEnergiTable()[[i]]) %*% matEfBau
+    for (i in 1:(iteration+1)) {
+      proyEmisiSken[[i]]<-as.matrix(proyTabelKonsEnergiTable()[[i]]) %*% data$matEfBau
     }
-    names(proyEmisiSken)<-paste0("y",yearFrom:yearTo)
-    
-    for (i in 1:lengthYear) {
+    names(proyEmisiSken)<-paste0("y",initialYear:finalYear)
+
+    for (i in 1:(iteration+1)) {
       if(i==1){
         rowsumProyEmisiSken <- rowSums(proyEmisiSken[[i]])
       }else{
         rowsumProyEmisiSken<- cbind(rowsumProyEmisiSken,rowSums(proyEmisiSken[[i]]))
       }
     }
-    colnames(rowsumProyEmisiSken) <- paste0("y",yearFrom:yearTo)
-    
+    colnames(rowsumProyEmisiSken) <- paste0("y",initialYear:finalYear)
+
     #COLSUM proyeksi energi
     colsumProyEmisiSken <- colSums(rowsumProyEmisiSken)
     cumProyEmisiSken <- data.frame(cumsum(colsumProyEmisiSken))
@@ -536,25 +633,35 @@ buttonModule <- function(input, output, session, data) {
     cumProyEmisiSken$year <- rownames(cumProyEmisiSken)
     cumProyEmisiSken <- cumProyEmisiSken[1:length(input$tahunAwal:input$tahunAkhir), ]
     cumProyEmisiSken$scenario <- c("SKENARIO")
-    
+
     #BAU
-    colProyEmisiDF <- data.frame(cumProyEmisi)
-    colnames(colProyEmisiDF) <- c("cumEmisi")
-    colProyEmisiDF$year <- rownames(colProyEmisiDF)
-    colProyEmisiDF <- colProyEmisiDF[1:length(input$tahunAwal:input$tahunAkhir), ]
-    colProyEmisiDF$scenario <- c("BAU")
+    totalEmisi <- data$tabelConsum %>% 
+      filter(between(year, initialYear, finalYear)) %>% 
+      group_by(year) %>% 
+      summarise(totalEmisi = sum(Temission))
     
+    cumsumTotalEmisi <- cumsum(totalEmisi[,2])
+    colnames(cumsumTotalEmisi) <- "cumEmisi"
+    
+    cumProyEmisi <- cbind(totalEmisi[,1],cumsumTotalEmisi)
+    
+    
+    cumProyEmisiDF <- cumProyEmisi
+    cumProyEmisiDF <- cumProyEmisiDF[1:length(input$tahunAwal:input$tahunAkhir), ]
+    cumProyEmisiDF$year <- paste0("y",cumProyEmisiDF$year)
+    cumProyEmisiDF$scenario <- c("BAU")
+
     #gabung BAU dan skenario
-    cumProyEmisiSken <- rbind(cumProyEmisiSken,colProyEmisiDF)
-    
+    cumProyEmisiSken <- rbind(cumProyEmisiSken,cumProyEmisiDF)
+
     cumProyEmisiSken
   })
+  
   
   
   ### tutup modal dialog Econ ###
   observeEvent(input$closeModalFD,{
     removeModal()
-    #removeUI(selector = '#FDPlaceholder')
   })
   
   ################################################################################
@@ -562,11 +669,6 @@ buttonModule <- function(input, output, session, data) {
   #                                  BUTTON RUN                                  #
   #                                                                              #
   ################################################################################
-  observeEvent(input$modalRUNButton,{
-    plotlyOutput(ns("hasilRun"))
-    plotlyOutput(ns("plot2"))
-  })
-  
   plotPDRB <- eventReactive(input$modalRUNButton,{
     ggplot(proyPdrbTable(), aes(x=year, y=totalPDRB, group=scenario))+
       geom_line(aes(color=scenario))+
@@ -582,14 +684,14 @@ buttonModule <- function(input, output, session, data) {
   })
   
   plotEmisi <- eventReactive(input$modalRUNButton,{
-    ggplot(proyPdrbTable(), aes(x=year, y=totalPDRB, group=scenario))+
+    ggplot(proyEmisiTabel(), aes(x=year, y=cumEmisi, group=scenario))+
       geom_line(aes(color=scenario))+
       geom_point(aes(color=scenario))+
-      labs(x="Tahun", y="PDRB")+
-      ggtitle("Grafik Proyeksi PDRB")+
+      labs(x="Tahun", y="Emisi Kumulatif")+
+      ggtitle("Grafik Emisi Kumulatif")+
       theme(plot.title = element_text(hjust = 0.5))
   })
-  
+
   output$plot2 <- renderPlotly({
     plotEmisi()
   })
