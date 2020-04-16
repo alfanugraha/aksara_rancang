@@ -260,6 +260,21 @@ for(c in 2:ncol(bauSeriesOfGDP)){
 }
 resultGDP <- resultGDP[resultGDP$year != 0, ] # remove initial values
 
+# 5. Energy cons (indicator number 2)
+resultEnergyConsumption <- bauSeriesOfImpactEnergy[[2]][[1]]
+resultEnergyConsumption$year <- initialYear
+resultEnergyConsumption <- resultEnergyConsumption[, c("year", names(bauSeriesOfImpactEnergy[[2]][[1]]))]
+for(t in 1:iteration){
+  t_curr <- initialYear + t
+  add.row <- data.frame(bauSeriesOfImpactEnergy[[t+2]][[1]]) # [[2]] for emission
+  add.row$year <- t_curr
+  add.row <- add.row[, names(resultEnergyConsumption)]
+  resultEnergyConsumption <- data.frame(rbind(resultEnergyConsumption, add.row), stringsAsFactors = FALSE)
+}
+names(resultEnergyConsumption)[2:3] <- c("id.sector", "sector")
+
+
+
 # 6. Energy emission (indicator number 3)
 resultEnergyEmission <- bauSeriesOfImpactEnergy[[2]][[2]] #tahun 2016
 resultEnergyEmission$year <- initialYear
@@ -272,6 +287,20 @@ for(t in 1:iteration){
   resultEnergyEmission <- data.frame(rbind(resultEnergyEmission, add.row), stringsAsFactors = FALSE)
 }
 names(resultEnergyEmission)[2:3] <- c("id.sector", "sector")
+
+# 7. Waste cons (indicator number 2)
+resultWasteDisposal <- bauSeriesOfImpactWaste[[2]][[1]]
+resultWasteDisposal$year <- initialYear
+resultWasteDisposal <- resultWasteDisposal[, c("year", names(bauSeriesOfImpactWaste[[2]][[1]]))]
+for(t in 1:iteration){
+  t_curr <- initialYear + t
+  add.row <- data.frame(bauSeriesOfImpactWaste[[t+2]][[1]]) # [[2]] for emission
+  add.row$year <- t_curr
+  add.row <- add.row[, names(resultWasteDisposal)]
+  resultWasteDisposal <- data.frame(rbind(resultWasteDisposal, add.row), stringsAsFactors = FALSE)
+  
+}
+names(resultWasteDisposal)[2:3] <- c("id.sector", "sector")
 
 # 8. Waste emission (indicator number 3)
 resultWasteEmission <- bauSeriesOfImpactWaste[[2]][[2]]
@@ -286,6 +315,20 @@ for(t in 1:iteration){
 }
 names(resultWasteEmission)[2:3] <- c("id.sector", "sector")
 
+# 9. Fertilizer cons (indicator number 2)
+resultFertilizerUsed <- bauSeriesOfImpactAgriculture[[2]][[1]]
+resultFertilizerUsed$year <- initialYear
+resultFertilizerUsed <- resultFertilizerUsed[, c("year", names(bauSeriesOfImpactAgriculture[[2]][[1]]))]
+for(t in 1:iteration){
+  t_curr <- initialYear + t
+  add.row <- data.frame(bauSeriesOfImpactAgriculture[[t+2]][[1]]) # [[2]] for emission
+  add.row$year <- t_curr
+  add.row <- add.row[, names(resultFertilizerUsed)]
+  resultFertilizerUsed <- data.frame(rbind(resultFertilizerUsed, add.row), stringsAsFactors = FALSE)
+  
+}
+names(resultFertilizerUsed)[2:3] <- c("id.sector", "sector")
+
 # 10. Fertilizer emission (indicator number 3)
 resultFertilizerEmission <- bauSeriesOfImpactAgriculture[[2]][[2]]
 resultFertilizerEmission$year <- initialYear
@@ -298,6 +341,7 @@ for(t in 1:iteration){
   resultFertilizerEmission <- data.frame(rbind(resultFertilizerEmission, add.row), stringsAsFactors = FALSE)
 }
 names(resultFertilizerEmission)[2:3] <- c("id.sector", "sector")
+
 
 ###END: BAU####
 

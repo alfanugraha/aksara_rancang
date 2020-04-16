@@ -13,11 +13,21 @@ Sector <- as.character(Sector)
 fdBau <- bauSeriesOfFinalDemandTable[,-2] #tabel 2015 nya ga masuk
 fdBau$Sektor <- as.character(fdBau$Sektor) 
 
+## FD zero
+fdZero <- fdBau
+fdZero[,2:16] <- 0
+
 #untuk plot BAU pdrb
 colProyPdrb <- resultGDP %>% 
   filter(between(year, initialYear, finalYear)) %>% 
   group_by(year) %>% 
   summarise(totalPDRB = sum(GDP))
+
+colProyPdrbDF <- colProyPdrb
+colProyPdrbDF$year <- paste0("y",colProyPdrbDF$year)
+colProyPdrbDF$scenario <- c("BAU")
+
+
 
 ################################################################################
 #                                                                              #
@@ -41,10 +51,27 @@ faktorEmisi <- as.character(emissionFactorEnergy[,1])  ###energi: nama 26 bahan 
 #4. matriks diagonal faktor emisi
 matEfBau <- emissionFactorEnergyDiagonal
 
-#5. cumulatif proyeksi emeisi untuk plot proyeksi emisi
-tabelConsum <- resultEnergyEmission
+#5. tabel konsumsi energi
+listConsumBAU <- lapply(bauSeriesOfImpactEnergy, 
+                    function(x){
+                      x[[1]]
+                    })
+listConsumBAU <- listConsumBAU[-1] #tahun 2015 dihilangkan
 
-#6. alamat rds untuk menampilkan daftar di ListTableReact
+listConsumZero <- lapply(listConsumBAU, function(x){
+  x[, 4:29] <- 0 #dari kolom tcons sampai bahan bakar terakhir
+  return(x)
+})
+
+#bentuk dataframe
+tabelConsumZero <- resultEnergyConsumption 
+tabelConsumZero[,4:30] <- 0
+
+#6. cumulatif proyeksi emisi untuk plot proyeksi emisi BAU
+tabelEmisi <- resultEnergyEmission
+
+
+#7. alamat rds untuk menampilkan daftar di ListTableReact
 selectedSektor <- "energi"
 alamatFile <- paste0("_DB/skenarioData/", selectedProv, "/", "energi")
 
@@ -52,7 +79,9 @@ energyData <- list(koefisien=koefisien,
                    proportionConsumption=proportionConsumption,
                    faktorEmisi=faktorEmisi,
                    matEfBau=matEfBau,
-                   tabelConsum=tabelConsum,
+                   tabelEmisi=tabelEmisi,
+                   listConsumBAU=listConsumBAU,
+                   listConsumZero=listConsumZero,
                    selectedSektor=selectedSektor,
                    alamatFile=alamatFile)
 
@@ -75,10 +104,15 @@ faktorEmisi <- as.character(emissionFactorWaste[,1])  ###energi: nama 26 bahan b
 #4. matriks diagonal faktor emisi
 matEfBau <- emissionFactorWasteDiagonal
 
-#5. cumulatif proyeksi emeisi untuk plot proyeksi emisi
-tabelConsum <- resultWasteEmission
+#5. tabel konsumsi energi
+tabelConsumBAU <- resultWasteDisposal
+tabelConsumZero <- tabelConsumBAU 
+tabelConsumZero[,4:30] <- 0
 
-#6. alamat rds untuk menampilkan daftar di ListTableReact
+#6. cumulatif proyeksi emisi untuk plot proyeksi emisi BAU
+tabelEmisi <- resultWasteEmission
+
+#7. alamat rds untuk menampilkan daftar di ListTableReact
 selectedSektor <- "limbah"
 alamatFile <- paste0("_DB/skenarioData/", selectedProv, "/", selectedSektor)
 
@@ -86,7 +120,8 @@ wasteData <- list(koefisien=koefisien,
                    proportionConsumption=proportionConsumption,
                    faktorEmisi=faktorEmisi,
                    matEfBau=matEfBau,
-                   tabelConsum=tabelConsum,
+                  tabelEmisi=tabelEmisi,
+                  tabelConsumZero=tabelConsumZero,
                   selectedSektor=selectedSektor,
                   alamatFile=alamatFile)
 
@@ -109,10 +144,15 @@ faktorEmisi <- as.character(emissionFactorAgriculture[,1])  ###energi: nama 26 b
 #4. matriks diagonal faktor emisi
 matEfBau <- emissionFactorAgricultureDiagonal
 
-#5. cumulatif proyeksi emeisi untuk plot proyeksi emisi
-tabelConsum <- resultFertilizerEmission
+#5. tabel konsumsi energi
+tabelConsumBAU <- resultFertilizerUsed
+tabelConsumZero <- tabelConsumBAU 
+tabelConsumZero[,4:30] <- 0
 
-#6. alamat rds untuk menampilkan daftar di ListTableReact
+#6. cumulatif proyeksi emisi untuk plot proyeksi emisi BAU
+tabelEmisi <- resultFertilizerEmission
+
+#7. alamat rds untuk menampilkan daftar di ListTableReact
 selectedSektor <- "pertanian"
 alamatFile <- paste0("_DB/skenarioData/", selectedProv, "/", selectedSektor)
 
@@ -120,7 +160,8 @@ agriData <- list(koefisien=koefisien,
                   proportionConsumption=proportionConsumption,
                   faktorEmisi=faktorEmisi,
                   matEfBau=matEfBau,
-                  tabelConsum=tabelConsum,
+                 tabelEmisi=tabelEmisi,
+                 tabelConsumZero=tabelConsumZero,
                  selectedSektor=selectedSektor,
                  alamatFile=alamatFile)
 

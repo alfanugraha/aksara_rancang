@@ -16,7 +16,7 @@ source("_DB/global.R")
 source("_DB/module.R")
 
 
-ui <- fluidPage(
+ui <- fluidPage( 
   titlePanel("SEKTOR"),
   tabsetPanel(
     tabPanel(

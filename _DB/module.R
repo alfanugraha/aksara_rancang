@@ -54,8 +54,8 @@ buttonModule <- function(input, output, session, data) {
     )),
     title="Deskripsi Skenario",
     footer= tagList(
-      actionButton(ns("closeModalDef"), "simpan skenario"),
-      actionButton(ns("cancelModalDef"), "batal")
+      actionButton(ns("saveModalDef"), "simpan skenario"),
+      actionButton(ns("cancelModalDef"), "tutup")
     ),
     size="l",
     easyClose = FALSE
@@ -101,41 +101,40 @@ buttonModule <- function(input, output, session, data) {
   })
   
   listValDef <- reactive({
-    #browser()
     newTableDef <- as.data.frame(hot_to_r(input$editDefine))
+
+    namaSken <- as.character(newTableDef[1,]) #2
+    tahunAwal <- as.numeric(trimws(newTableDef[2,])) #3
+    tahunAkhir <- as.numeric(trimws(newTableDef[3,])) #4
+    deskrip <- as.character(newTableDef[4,]) #5
+    fdSelisih <- NULL #6
+    satSelisih <- NULL #7
+    proyPdrb <- NULL #8
+    proyEmisi <- NULL #9
     
-    namaSken <- as.character(newTableDef[1,])
-    tahunAwal <- as.numeric(trimws(newTableDef[2,]))
-    tahunAkhir <- as.numeric(trimws(newTableDef[3,]))
-    deskrip <- as.character(newTableDef[4,])
-    combineDef <- list(namaSken=namaSken,tahunAwal=tahunAwal,tahunAkhir=tahunAkhir, deskrip=deskrip)
     
+    combineDef <- list(namaSken=namaSken,tahunAwal=tahunAwal,tahunAkhir=tahunAkhir, deskrip=deskrip,
+                       fdSelisih=fdSelisih, satSelisih=satSelisih, proyPdrb = proyPdrb,proyEmisi=proyEmisi)
+
     combineDef
   })
   
   ##### simpan tabel define ke dalam folder ####
-  ### tutup modal dialog define ###
-  observeEvent(input$closeModalDef,{
-    #browser()
-    removeModal()
-    
+  observeEvent(input$saveModalDef,{
     waktuDefine<-Sys.time()
     simpanDefine<-gsub(" ","_",waktuDefine,fixed = TRUE)
     simpanDefine<-gsub(":","-",simpanDefine,fixed = TRUE)
-    namaSken <- gsub(" ","",input$intervensiDef, fixed = TRUE) 
-    namafileDefine<-paste0(username,"_",namaSken,"_",selectedProv,"_",simpanDefine)
+    namaSken <- gsub(" ","",input$intervensiDef, fixed = TRUE)
+    namafileDefine<-paste0(username,"_",selectedProv,"_",simpanDefine,"_",namaSken)
     saveRDS(listValDef(), file = paste0(data$alamatFile,"/",namafileDefine))
     shinyjs::js$refresh()
   })
   
+  
   observeEvent(input$cancelModalDef,{
     removeModal()
   })
-  #### coba 
-  
-  daftarFile<-reactiveValues(
-    ListFile = unique(list.files(data$alamatFile))
-  )
+
   
   ListButton_fun <- function(FUN, len, id, ...) {
     inputs <- character(len)
@@ -145,28 +144,63 @@ buttonModule <- function(input, output, session, data) {
     inputs
   }
   
+  loadRDSAll <- reactive({
+    nameFiles <- list.files(path = data$alamatFile,
+                            pattern = paste0("^", username))
+    dirFile <- paste0(data$alamatFile, "/",
+                      nameFiles)
+    
+    if(identical(nameFiles,character(0))){
+      r <- data.frame(
+        Nama.Skenario =  "file tidak tersedia",
+        Tahun.Awal = "file tidak tersedia", 
+        Tahun.Akhir = "file tidak tersedia",
+        Deskripsi.Skenario = "file tidak tersedia",
+        fdSelisih = "file tidak tersedia",
+        satSelisih = "file tidak tersedia",
+        Nama.File = "file tidak tersedia", 
+        Sunting.Skenario = "file tidak tersedia",
+        Jalankan.analisis = "file tidak tersedia"
+      )
+      o <- list(r)
+    } else {
+      funcFile <- function(x){
+        a <- readRDS(x)
+        b <- c(x,a)
+        b
+      }
+      
+      r <- lapply(dirFile, funcFile)
+      r
+    }
+    
+  })
+  
   
   ### buat tabel daftar nama file reaktif ###
-  
   ListTableReact <- reactive({
     data.frame(
-      Nama_File = c(daftarFile$ListFile),
-      Edit = ListButton_fun(actionButton, length(daftarFile$ListFile),
+          Nama.Skenario =  unlist(lapply(loadRDSAll(), function(x)x[[2]])),
+          Tahun.Awal = unlist(lapply(loadRDSAll(), function(x)x[[3]])), 
+          Tahun.Akhir = unlist(lapply(loadRDSAll(), function(x)x[[4]])),
+          Deskripsi.Skenario = unlist(lapply(loadRDSAll(), function(x)x[[5]])),
+          Nama.File = unlist(lapply(loadRDSAll(), function(x)x[[1]])), #nama file dr listValDef ada di index terakhir = 6
+          Sunting.Skenario = ListButton_fun(actionButton,
+                                              length(loadRDSAll()),
                                      'button_',
-                                     label = "Edit Konstruksi Ekonomi dan Satelit Akun"
-                                     ,
+                                     label = "Sunting Konstruksi Ekonomi dan Satelit Akun",
                                      onclick = sprintf('Shiny.onInputChange("%s",this.id)', ns("select_button"))
                               #paste0('Shiny.onInputChange(\"' , ns("select_button"), '\", this.id)')
                                       ),
-      Run = ListButton_fun(actionButton, length(daftarFile$ListFile),
-                              'tombol_',
-                              label = "Tampilkan Plot",
-                              onclick = sprintf('Shiny.onInputChange("%s",this.id)', ns("run_button"))
-    ))
+          Jalankan.analisis = ListButton_fun(actionButton,
+                                         length(loadRDSAll()),
+                              'buttonRun_',
+                              label = "Jalankan Analisis",
+                              onclick = sprintf('Shiny.onInputChange("%s",this.id)', ns("run_button")))
+      )  
   })
 
   ###tampilkan tabel list ###
-  
   output$ListTable <- renderDataTable({
     ListTableReact()
   }, escape = FALSE)
@@ -175,9 +209,6 @@ buttonModule <- function(input, output, session, data) {
   
   observeEvent(input$select_button,{
     #browser()
-    
-    
-    
     showModal(
       modalDialog( 
         footer=tagList(
@@ -241,72 +272,6 @@ buttonModule <- function(input, output, session, data) {
   
   
   
-  ################################################################################
-  #                                                                              #
-  #                          BUTTON KONSTRUKSI EKONOMI                           #
-  #                                                                              #
-  ################################################################################
-  #observeEvent(input$modalEconButton,{
-    # showModal(
-    #   modalDialog( 
-    #     footer=tagList(
-    #       actionButton(ns("closeModalFD"), "Tutup")
-    #     ),
-    #     tabsetPanel(
-    #       tabPanel(
-    #         h2("Ekonomi"),
-    #         sidebarLayout(
-    #           sidebarPanel(
-    #             fluidRow(
-    #               selectInput(ns("intervensiEcon"),
-    #                           label="pilih intervensi",
-    #                           choices=c("Final Demand","AV","Input-Output")),
-    #               pickerInput(ns("sektorEcon"),
-    #                           label="pilih sektor", selected = Sector[1],
-    #                           choices=Sector,options = list(`actions-box` = TRUE),multiple = T)),
-    #             tags$br(),
-    #             actionButton(ns("econHit"),"tentukan tahun intervensi"),
-    #             width=5
-    #           ),
-    #           mainPanel(
-    #             tags$div(id = 'FDPlaceholder'),
-    #             width=7)
-    #         ),
-    #         title="Sunting Intervensi Ekonomi"
-    #       ),
-    #       
-    #       
-    #       ################################################################################
-    #       #                                                                              #
-    #       #                        BUTTON KONSTRUKSI SATELIT AKUN                        #
-    #       #                                                                              #
-    #       ################################################################################
-    #       tabPanel(
-    #         h2("Satelit akun"),
-    #         sidebarLayout(sidebarPanel(
-    #           fluidRow(
-    #             selectInput(ns("intervensiSat"),
-    #                         label="pilih intervensi",
-    #                         choices=c("konsumsi energi","faktor emisi")),
-    #             pickerInput(ns("sektorSat"),
-    #                         label="pilih sektor",selected = Sector[1],
-    #                         choices=Sector,options = list(`actions-box` = TRUE),multiple = T)),
-    #           tags$br(),
-    #           actionButton(ns("satHit"),"tentukan tahun intervensi"),
-    #           width=5
-    #         ),
-    #         mainPanel(
-    #           tags$div(id = 'satPlaceholder'),
-    #           width=7)
-    #         ),
-    #         title="Sunting Intervensi Satelit Akun"
-    #       ))
-    #     ,
-    #     size="l",
-    #     easyClose = FALSE)
-    # )
-  #})
-  
   
   
   ################################################################################
@@ -315,18 +280,15 @@ buttonModule <- function(input, output, session, data) {
   #                                                                              #
   ################################################################################
   loadFileRDS <- reactive({
-  #observeEvent(input$econHit, {
-    #browser()
     selectedRow <- as.numeric(strsplit(input$select_button,"_")[[1]][2])
-    fileName<- ListTableReact()[selectedRow,1]
-    selectedFile<-readRDS(paste0(data$alamatFile,"/",fileName))
+    fileName<- as.character(ListTableReact()[selectedRow,5]) #nama file dari ListTableReact ada di col=5
+    selectedFile<-readRDS(fileName)
     
     selectedFile
   })
   
   
   observeEvent(input$econHit, {
-    #browser()
     insertUI(selector=paste0("#", ns("FDPlaceholder")),
              where='afterEnd',
              ui= uiOutput(ns('FDUIManual'))
@@ -368,100 +330,60 @@ buttonModule <- function(input, output, session, data) {
   )
   
   fdBauReact <- reactiveValues(
-    isi = fdBau
+    isi = fdZero
   )
   
   FDdata <- reactive({
-    finalDemand$table1 <- fdBauReact$isi
-    finalDemand$table1
+    if (is.null(loadFileRDS()$fdSelisih)) {
+      finalDemand$table1 = fdZero
+    }else{
+      finalDemand$table1 =  loadFileRDS()$fdSelisih
+    }
   })
   
-  #observeEvent(input$econHit,
-  valFD<- reactive({
+  valFD<- eventReactive(c(input$showYearEco),{
     #browser()
     finalDemand$table1 <- FDdata()
     finalDemand$table1 <- filter(finalDemand$table1, finalDemand$table1$Sektor %in% c(input$sektorEcon))
     rownames(finalDemand$table1) <- c(input$sektorEcon)
-    finalDemand$table1
-  })
-  
-  valFD2 <- eventReactive(c(input$showYearEco),{
-    finalDemand$table1 <- valFD()
     finalDemand$table1 <- finalDemand$table1[,c("Sektor",paste0("y",input$pilihtahunFD))]
     finalDemand$table1
   })
   
   output$editFD <- renderRHandsontable({
-    rhandsontable(valFD2(),
-                  #finalDemand$table1,
+    rhandsontable(valFD(),
                   rowHeaderWidth = 160,
     )%>%hot_cols(format=3)
     
   })
   
-  #### masukkan nilai sel baru ke dalam kolom fdBauNew 
+  #### masukkan nilai sel baru ke dalam kolom fdNew 
   FDSave<-eventReactive(input$saveModalFD,{
     finalDemand$table1 <- as.data.frame(hot_to_r(input$editFD))
     inputSektor<-input$sektorEcon #"tanaman pangan"
     inputTahun<-paste0("y",input$pilihtahunFD)
     indexSektor <- as.numeric(which(sapply(Sector,function(x) any(x==c(inputSektor)))))
-    fdBauReact$isi[c(indexSektor), c(inputTahun)] <- finalDemand$table1[,-1]
-    fdNew_list<-list(fdBauNew = fdBauReact$isi,
-                     fdNew=finalDemand$table1,
-                     inputTahun=inputTahun
+    
+    fdBauReact$isi <- fdBau
+    fdBauReact$isi[c(indexSektor), c(inputTahun)] <- fdBauReact$isi[c(indexSektor), c(inputTahun)] + finalDemand$table1[,-1]
+    
+    fdSelisih <- fdZero
+    fdSelisih[c(indexSektor), c(inputTahun)] <- fdSelisih[c(indexSektor), c(inputTahun)] + finalDemand$table1[,-1]
+    
+    
+    fdNew_list<-list(fdBauReal = fdBau,
+                     fdNew = fdBauReact$isi,
+                     fdEditNew = finalDemand$table1,
+                     fdSelisih = fdSelisih
     )
     fdNew_list
 
   })
   
-  ##### simpan tabel FD baru ke dalam folder ####
-  # observeEvent(input$saveModalFD,{
-  #   waktuEcon<-Sys.time()
-  #   simpanEcon<-gsub(" ","_",waktuEcon,fixed = TRUE)
-  #   simpanEcon<-gsub(":","-",simpanEcon,fixed = TRUE)
-  #   namaSken <- gsub(" ","",input$intervensiDef, fixed = TRUE)
-  #   intEconomy <- gsub(" ","",input$intervensiEcon, fixed = TRUE)
-  #   namafileDefine<-paste0(username,"_",namaSken,"_",selectedProv,"_",intEconomy,"_",simpanEcon)
-  #   saveRDS(FDSave(), file = paste0('_DB/skenarioData/',selectedProv,'/',selectedSektor,'/',namafileDefine))
-  #   insertUI(selector='#objDownloadFD',
-  #            where='afterEnd',
-  #            ui= uiOutput(ns('downButtonFD'))
-  #   )
-  # })
-  
-  # output$downButtonFD<- renderUI({
-  #   tagList(tags$br(),
-  #           actionButton(ns('downloadFD'),'download tabel')
-  #   )
-  # })
-  # 
-  # 
-  # observeEvent(input$downloadFD,{
-  #   #browser()
-  #   waktuEcon<-Sys.time()
-  #   simpanEcon<-gsub(" ","_",waktuEcon,fixed = TRUE)
-  #   simpanEcon<-gsub(":","-",simpanEcon,fixed = TRUE)
-  #   namaSheet <- names(FDSave())
-  #   namaSken <- gsub(" ","",input$intervensiDef, fixed = TRUE)
-  #   intEconomy <- gsub(" ","",input$intervensiEcon, fixed = TRUE)
-  #   namafile<-paste0(username,"_",namaSken,"_",selectedProv,"_",intEconomy,"_",simpanEcon)
-  #   dirFile <- paste0("_DB/download file/",namafile,".xlsx")
-  #   write.xlsx(FDSave(), 
-  #              file = dirFile, 
-  #              sheetName = namaSheet)
-  # })
-  
-  
-  ################################################################################
-  #                                                                              #
-  #                   ALUR BUTTON KONSTRUKSI SATELIT AKUN                        #
-  #                                                                              #
-  ################################################################################
-  
   ### efek FD yang diubah ke tabel proyeksi konsumsi energi
   ## bagian Output
   outputTable <- reactive({
-    fdTable <- FDSave()$fdBauNew
+    fdTable <- FDSave()$fdNew
     out <- ioLeontiefInverse %*% as.matrix(fdTable[,-1]) #leontief jadi ioLeontiefInverse 
     out
   })
@@ -478,18 +400,54 @@ buttonModule <- function(input, output, session, data) {
     colProyPdrbScen$scenario <- c("SKENARIO")
     
     #BAU
-    colProyPdrbDF <- colProyPdrb
-    colProyPdrbDF <- colProyPdrbDF[1:length(loadFileRDS()$tahunAwal:loadFileRDS()$tahunAkhir), ]
-    colProyPdrbDF$year <- paste0("y",colProyPdrbDF$year)
-    colProyPdrbDF$scenario <- c("BAU")
+    colProyPdrbBAU <- colProyPdrbDF
+    colProyPdrbBAU <- colProyPdrbBAU[1:length(loadFileRDS()$tahunAwal:loadFileRDS()$tahunAkhir), ]
     
     #gabung BAU dan skenario
-    colProyPdrbScen <- rbind(colProyPdrbScen,colProyPdrbDF)
+    colProyPdrbScen <- rbind(colProyPdrbScen,colProyPdrbBAU)
     
     colProyPdrbScen
   })
   
+  ##### simpan tabel FD baru ke dalam folder ####
+  observeEvent(input$saveModalFD,{
+    dataDefine <-  loadFileRDS()
+    dataDefine$fdSelisih <- FDSave()$fdSelisih
+    dataDefine$proyPdrb <- proyPdrbTable()
+    selectedRow <- as.numeric(strsplit(input$select_button,"_")[[1]][2])
+    fileName<- as.character(ListTableReact()[selectedRow,5]) #nama file
+    saveRDS(dataDefine, file = fileName)
   
+    insertUI(selector='#objDownloadFD',
+             where='afterEnd',
+             ui= uiOutput(ns('downButtonFD'))
+    )
+  })
+
+  output$downButtonFD<- renderUI({
+    tagList(tags$br(),
+            actionButton(ns('downloadFD'),'download tabel')
+    )
+  })
+
+
+  observeEvent(input$downloadFD,{
+    selectedRow <- as.numeric(strsplit(input$select_button,"_")[[1]][2])
+    fileName<- as.character(ListTableReact()[selectedRow,5]) #nama file
+    namaSheet <- names(FDSave())
+    
+    dirFile <- paste0(fileName,".xlsx")
+    write.xlsx(FDSave(),
+               file = dirFile,
+               sheetName = namaSheet)
+  })
+  
+  
+  ################################################################################
+  #                                                                              #
+  #                   ALUR BUTTON KONSTRUKSI SATELIT AKUN                        #
+  #                                                                              #
+  ################################################################################
   ## proyeksi konsumsi energi
   #koefisien energi dari sheet energi
   #tabel konsumsi energi dari sheet proyeksi
@@ -525,16 +483,31 @@ buttonModule <- function(input, output, session, data) {
                         label="pilih faktor emisi",selected = data$faktorEmisi[1],
                         choices=data$faktorEmisi,options = list(`actions-box` = TRUE),multiple = T),
             tags$br(),
-            tags$br(),
-            tags$b('Sunting secara manual'),
-            tags$br(),
-            tags$br(),
-            rHandsontableOutput(ns('editSat')),
-            tags$br(),
-            actionButton(ns('saveModalSat'), 'simpan tabel'),
+            actionButton(ns('showYearSat'), 'tampilkan tabel'),
             tags$br(),
             tags$br(),
-            tags$div(id='teksSatSave')
+            tags$div(id = 'SuntingSatPlaceHolder')
+    )
+  })
+  
+  observeEvent(input$showYearSat, {
+    insertUI(selector='#SuntingSatPlaceHolder',
+             where='afterEnd',
+             ui= uiOutput(ns('SuntingSatUITable'))
+    )
+  }) 
+  
+  output$SuntingSatUITable<- renderUI({
+    tagList(
+      tags$b('Sunting secara manual'),
+      tags$br(),
+      tags$br(),
+      rHandsontableOutput(ns('editSat')),
+      tags$br(),
+      actionButton(ns('saveModalSat'), 'simpan tabel'),
+      tags$br(),
+      tags$br(),
+      tags$div(id='teksSatSave')
     )
   })
   
@@ -543,109 +516,71 @@ buttonModule <- function(input, output, session, data) {
   )
   
   satBauReact <- reactiveValues(
-    isi = NULL
+    isi = data$listConsumZero
   )
   
-  observeEvent(input$saveModalFD,{
-    satBauReact$isi <- proyTabelKonsEnergiTable()
-  })
-  
   SatData <- reactive({
-    satAkun$table1 <- satBauReact$isi
-    satAkun$table1
+    if (is.null(loadFileRDS()$satSelisih)) {
+      satAkun$table1 = satBauReact$isi
+    }else{
+      satAkun$table1 =  loadFileRDS()$satSelisih
+    }
   })
   
-  # observeEvent(input$saveModalSat,
-  valSat<- reactive({
+  #observeEvent(input$showYearSat,{
+  valSat<- eventReactive(c(input$showYearSat),{
+    #browser()
+    #bentuk list
     indexAwal <- paste0("y",input$pilihtahunSat)
     satAkun$table1 <- SatData()[indexAwal]
     satAkun$table1 <- data.frame(satAkun$table1)
+    satAkun$table1 <- satAkun$table1[,c(-1,-2,-3)]
     satAkun$table1 <- cbind(Sector,satAkun$table1)
     satAkun$table1 <- filter(satAkun$table1, satAkun$table1$Sector %in% c(input$sektorSat))
+    satAkun$table1 <- satAkun$table1[,c("Sector",paste0("y",input$pilihtahunSat,".",input$pilihBahanBakar))]
     rownames(satAkun$table1) <- c(input$sektorSat)
     satAkun$table1
   })
   
-  #valSat2 <- reactive(
-  observeEvent(c(input$pilihtahunSat,input$pilihBahanBakar),{
-    satAkun$table1 <- valSat()
-    satAkun$table1 <- satAkun$table1[,c("Sector",paste0("y",input$pilihtahunSat,".",input$pilihBahanBakar))]
-    satAkun$table1
-  })
-  
   output$editSat <- renderRHandsontable({
-    rhandsontable(satAkun$table1,
+    rhandsontable(valSat(),
                   rowHeaderWidth = 160,
     )%>%hot_cols(format=3)
   })
   
-  #### masukkan nilai sel baru ke dalam kolom satBauNew 
-  #satSave<-eventReactive(input$saveModalSat,
-  observeEvent(input$saveModalSat,{
-    #browser()
+  #### masukkan nilai sel baru ke dalam kolom satNew 
+  satSave<-eventReactive(input$saveModalSat,{
     satAkun$table1<-as.data.frame(hot_to_r(input$editSat))
     inputSektor<-input$sektorSat 
     indexSektor <- as.numeric(which(sapply(Sector,function(x) any(x==c(inputSektor)))))
     inputTahun<-paste0("y",input$pilihtahunSat)
     inputBahanBakar <- input$pilihBahanBakar
     
-    satBauReact$isi[[inputTahun]][indexSektor,inputBahanBakar]<-satAkun$table1[,-1] 
-    satNew_list<-list(satBauNew = satBauReact$isi,
-                      satNew=satAkun$table1,
-                      inputTahun=inputTahun,
-                      proyTabelKonsEnergiTable=proyTabelKonsEnergiTable()
+    satBauReact$isi <- data$listConsumBAU
+    satBauReact$isi[[inputTahun]][indexSektor,inputBahanBakar]<-satBauReact$isi[[inputTahun]][indexSektor,inputBahanBakar] + satAkun$table1[-1]
+    
+    satSelisih <- data$listConsumZero
+    satSelisih[[inputTahun]][indexSektor,inputBahanBakar]<-satSelisih[[inputTahun]][indexSektor,inputBahanBakar] + satAkun$table1[-1]
+      
+    satNew_list<-list(satBauReal = data$listConsumBAU, 
+                      satNew = satBauReact$isi, #hasil penjumlahan BAU dengan selisih
+                      satEditNew=satAkun$table1, # 1 data.frame = tabel yang diedit (partial) yang tampilkan di modal dialog UI
+                      satSelisih = satSelisih  #list selisih (15 tabel)
     )
     satNew_list
-    
-    ##### simpan tabel Sat baru ke dalam folder ####
-    waktuSat<-Sys.time()
-    simpanSat<-gsub(" ","_",waktuSat,fixed = TRUE)
-    simpanSat<-gsub(":","-",simpanSat,fixed = TRUE)
-    namaSken <- gsub(" ","",loadFileRDS()$namaSken, fixed = TRUE)
-    intEconomy <- gsub(" ","",input$intervensiEcon, fixed = TRUE)
-    intSat <- gsub(" ","",input$intervensiSat, fixed = TRUE)
-    namafileDefine<-paste0(username,"_",namaSken,"_",selectedProv,"_",intEconomy,"_",intSat,"_",simpanSat)
-    saveRDS(satNew_list, file = paste0('_DB/satelitData/',selectedProv,'/',selectedSektor,'/',namafileDefine))
-    
-    inputSektorTampil<-capture.output(cat(input$sektorSat , sep=", ")) #"tanaman pangan"
-    inputBahanBakarTampil <- capture.output(cat(input$pilihBahanBakar , sep=", "))
-    textTampil <- paste0("Satelit akun yang diedit adalah ","sektor: ",inputSektorTampil," - ","tahun: ",
-                         inputTahun," - ","bahan bakar: ",inputBahanBakarTampil)
-    insertUI(selector='#teksSatSave',
-             where = 'afterEnd',
-             ui = tags$div (textTampil))
-    
-  })
-  
-  daftarFileSatellite<-reactiveValues(
-    ListFile = unique(list.files(data$alamatFile))
-  )
-  
-  
-  ### buat tabel daftar nama file reaktif ###
-  
-  ListTableReactSatellite <- reactive({
-    data.frame(
-      Nama_File = c(daftarFile$ListFile))
-  })
-  
-  
-  loadSatelliteRDS<- reactive({
-    selectedRow <- as.numeric(strsplit(input$run_button,"_")[[1]][2])
-    fileName<- ListTableReactSatellite()[selectedRow,1]
-    selectedFile<-readRDS(paste0(data$alamatFile,"/",fileName))
-    
-    selectedFile
   })
   
   # terbentuk 15 tabel proyeksi emisi
-  proyEmisiTabel <- reactive({
+  ########################ini yang di simpen di file rds utk di baca plot
+  #observeEvent(input$closeModalFD,{
+  proyEmisiTabel <-  eventReactive(input$saveModalSat,{
+    #browser()
     proyEmisiSken <- list()
     for (i in 1:(iteration+1)) {
-      proyEmisiSken[[i]]<-as.matrix(proyTabelKonsEnergiTable()[[i]]) %*% data$matEfBau
+      proyEmisiSken[[i]]<-as.matrix(satSave()$satNew[[i]][-c(1,2,3)]) %*% data$matEfBau
     }
     names(proyEmisiSken)<-paste0("y",initialYear:finalYear)
-
+    
     for (i in 1:(iteration+1)) {
       if(i==1){
         rowsumProyEmisiSken <- rowSums(proyEmisiSken[[i]])
@@ -654,7 +589,7 @@ buttonModule <- function(input, output, session, data) {
       }
     }
     colnames(rowsumProyEmisiSken) <- paste0("y",initialYear:finalYear)
-
+    
     #COLSUM proyeksi energi
     colsumProyEmisiSken <- colSums(rowsumProyEmisiSken)
     cumProyEmisiSken <- data.frame(cumsum(colsumProyEmisiSken))
@@ -662,9 +597,9 @@ buttonModule <- function(input, output, session, data) {
     cumProyEmisiSken$year <- rownames(cumProyEmisiSken)
     cumProyEmisiSken <- cumProyEmisiSken[1:length(loadFileRDS()$tahunAwal:loadFileRDS()$tahunAkhir), ]
     cumProyEmisiSken$scenario <- c("SKENARIO")
-
+    
     #BAU
-    totalEmisi <- data$tabelConsum %>% 
+    totalEmisi <- data$tabelEmisi %>% 
       filter(between(year, initialYear, finalYear)) %>% 
       group_by(year) %>% 
       summarise(totalEmisi = sum(Temission))
@@ -675,54 +610,140 @@ buttonModule <- function(input, output, session, data) {
     cumProyEmisi <- cbind(totalEmisi[,1],cumsumTotalEmisi)
     
     
-    cumProyEmisiDF <- cumProyEmisi
-    cumProyEmisiDF <- cumProyEmisiDF[1:length(loadFileRDS()$tahunAwal:loadFileRDS()$tahunAkhir), ]
-    cumProyEmisiDF$year <- paste0("y",cumProyEmisiDF$year)
-    cumProyEmisiDF$scenario <- c("BAU")
-
+    cumProyEmisiBAU <- cumProyEmisi
+    cumProyEmisiBAU <- cumProyEmisiBAU[1:length(loadFileRDS()$tahunAwal:loadFileRDS()$tahunAkhir), ]
+    cumProyEmisiBAU$year <- paste0("y",cumProyEmisiBAU$year)
+    cumProyEmisiBAU$scenario <- c("BAU")
+    
     #gabung BAU dan skenario
-    cumProyEmisiSken <- rbind(cumProyEmisiSken,cumProyEmisiDF)
-
-    cumProyEmisiSken
+    cumProyEmisiSken <- rbind(cumProyEmisiSken,cumProyEmisiBAU)
+    
+    cumProyEmisiSken 
   })
   
-  
+  ##### simpan tabel Sat baru ke dalam folder ####
+  observeEvent(input$saveModalSat,{
+    #browser()
+    dataDefine <-  loadFileRDS()
+    dataDefine$fdSelisih <- FDSave()$fdSelisih
+    dataDefine$satSelisih <- satSave()$satSelisih
+    dataDefine$proyPdrb <- proyPdrbTable()
+    dataDefine$proyEmisi <- proyEmisiTabel()
+    selectedRow <- as.numeric(strsplit(input$select_button,"_")[[1]][2])
+    fileName<- as.character(ListTableReact()[selectedRow,5]) #nama file
+    saveRDS(dataDefine, file = fileName)
+    
+    #tampilan keterangan setiap save tabel konsumsi
+    inputSektorTampil<-capture.output(cat(input$sektorSat , sep=", ")) #"tanaman pangan"
+    inputTahun<-paste0("y",input$pilihtahunSat)
+    inputBahanBakarTampil <- capture.output(cat(input$pilihBahanBakar , sep=", "))
+    textTampil <- paste0("Satelit akun yang diedit adalah ","sektor: ",inputSektorTampil," - ","tahun: ",
+                         inputTahun," - ","bahan bakar: ",inputBahanBakarTampil)
+    insertUI(selector='#teksSatSave',
+             where = 'afterEnd',
+             ui = tags$div (textTampil))
+  })
   
   ### tutup modal dialog Econ ###
   observeEvent(input$closeModalFD,{
     removeModal()
+    shinyjs::js$refresh()
   })
   
+  
+
   ################################################################################
   #                                                                              #
   #                                  BUTTON RUN                                  #
   #                                                                              #
   ################################################################################
-  plotPDRB <- eventReactive(input$modalRUNButton,{
-    ggplot(proyPdrbTable(), aes(x=year, y=totalPDRB, group=scenario))+
-      geom_line(aes(color=scenario))+
-      geom_point(aes(color=scenario))+
-      labs(x="Tahun", y="PDRB")+
-      ggtitle("Grafik Proyeksi PDRB")+
-      theme(plot.title = element_text(hjust = 0.5))
+  loadFileRDSButtonRun <- reactive({
+    selectedRow <- as.numeric(strsplit(input$run_button,"_")[[1]][2])
+    fileName<- as.character(ListTableReact()[selectedRow,5]) #nama file dari ListTableReact ada di col=5
+    selectedFile<-readRDS(fileName)
+    
+    selectedFile
   })
   
+
+  plotPDRB <- eventReactive(input$run_button,{
+    #browser()
+    checkValue <- loadFileRDSButtonRun()$proyPdrb
+    
+    if (is.null(checkValue)) {
+      #BAU
+      colProyPdrbBAU <- colProyPdrbDF
+      colProyPdrbBAU <- colProyPdrbBAU[1:length(loadFileRDSButtonRun()$tahunAwal:loadFileRDSButtonRun()$tahunAkhir), ]
+      
+      ggplot(colProyPdrbBAU, aes(x=year, y=totalPDRB, group=scenario))+
+        geom_line(aes(color=scenario))+
+        geom_point(aes(color=scenario))+
+        labs(x="Tahun", y="PDRB")+
+        ggtitle("Grafik Proyeksi PDRB Data Historis (BAU)")+
+        theme(plot.title = element_text(hjust = 0.5))
+    }else{
+      dataDefine <-  data.frame(checkValue)
+      ggplot(dataDefine, aes(x=year, y=totalPDRB, group=scenario))+
+        geom_line(aes(color=scenario))+
+        geom_point(aes(color=scenario))+
+        labs(x="Tahun", y="PDRB")+
+        ggtitle("Grafik Proyeksi PDRB")+
+        theme(plot.title = element_text(hjust = 0.5))
+      
+    }
+  })
+
   output$hasilRun <- renderPlotly({
     plotPDRB()
-    
+
   })
   
-  plotEmisi <- eventReactive(input$modalRUNButton,{
-    ggplot(proyEmisiTabel(), aes(x=year, y=cumEmisi, group=scenario))+
-      geom_line(aes(color=scenario))+
-      geom_point(aes(color=scenario))+
-      labs(x="Tahun", y="Emisi Kumulatif")+
-      ggtitle("Grafik Emisi Kumulatif")+
-      theme(plot.title = element_text(hjust = 0.5))
+  
+  plotEmisi <- eventReactive(input$run_button,{
+  
+    checkValue <- loadFileRDSButtonRun()$proyEmisi
+    
+    if (is.null(checkValue)) {
+      #BAU
+      totalEmisi <- data$tabelEmisi %>% 
+        filter(between(year, initialYear, finalYear)) %>% 
+        group_by(year) %>% 
+        summarise(totalEmisi = sum(Temission))
+      
+      cumsumTotalEmisi <- cumsum(totalEmisi[,2])
+      colnames(cumsumTotalEmisi) <- "cumEmisi"
+      
+      cumProyEmisi <- cbind(totalEmisi[,1],cumsumTotalEmisi)
+      
+      
+      cumProyEmisiBAU <- cumProyEmisi
+      cumProyEmisiBAU <- cumProyEmisiBAU[1:length(loadFileRDSButtonRun()$tahunAwal:loadFileRDSButtonRun()$tahunAkhir), ]
+      cumProyEmisiBAU$year <- paste0("y",cumProyEmisiBAU$year)
+      cumProyEmisiBAU$scenario <- c("BAU")
+      
+      ggplot(cumProyEmisiBAU, aes(x=year, y=cumEmisi, group=scenario))+
+        geom_line(aes(color=scenario))+
+        geom_point(aes(color=scenario))+
+        labs(x="Tahun", y="Emisi Kumulatif")+
+        ggtitle("Grafik Emisi Kumulatif Data Historis (BAU)")+
+        theme(plot.title = element_text(hjust = 0.5))
+    }else{
+      dataDefine <-  data.frame(loadFileRDSButtonRun()$proyEmisi)
+      ggplot(dataDefine, aes(x=year, y=cumEmisi, group=scenario))+
+          geom_line(aes(color=scenario))+
+          geom_point(aes(color=scenario))+
+          labs(x="Tahun", y="Emisi Kumulatif")+
+          ggtitle("Grafik Emisi Kumulatif")+
+          theme(plot.title = element_text(hjust = 0.5))
+      
+    }
   })
 
   output$plot2 <- renderPlotly({
     plotEmisi()
   })
+  
+  
+  
   
 }
