@@ -51,7 +51,7 @@ faktorEmisi <- as.character(emissionFactorEnergy[,1])  ###energi: nama 26 bahan 
 #4. matriks diagonal faktor emisi
 matEfBau <- emissionFactorEnergyDiagonal
 
-#5. tabel konsumsi energi
+#5. list konsumsi energi
 listConsumBAU <- lapply(bauSeriesOfImpactEnergy, 
                     function(x){
                       x[[1]]
@@ -59,7 +59,7 @@ listConsumBAU <- lapply(bauSeriesOfImpactEnergy,
 listConsumBAU <- listConsumBAU[-1] #tahun 2015 dihilangkan
 
 listConsumZero <- lapply(listConsumBAU, function(x){
-  x[, 4:29] <- 0 #dari kolom tcons sampai bahan bakar terakhir
+  x[, 3:ncol(bauSeriesOfImpactEnergy[[1]][[1]])] <- 0 #dari kolom tcons sampai bahan bakar terakhir
   return(x)
 })
 
@@ -104,7 +104,19 @@ faktorEmisi <- as.character(emissionFactorWaste[,1])  ###energi: nama 26 bahan b
 #4. matriks diagonal faktor emisi
 matEfBau <- emissionFactorWasteDiagonal
 
-#5. tabel konsumsi energi
+#5. list konsumsi energi
+listConsumBAU <- lapply(bauSeriesOfImpactWaste, 
+                        function(x){
+                          x[[1]]
+                        })
+listConsumBAU <- listConsumBAU[-1] #tahun 2015 dihilangkan
+
+listConsumZero <- lapply(listConsumBAU, function(x){
+  x[, 3:ncol(bauSeriesOfImpactWaste[[1]][[1]])] <- 0 #dari kolom tcons sampai bahan bakar terakhir
+  return(x)
+})
+
+#dataframe
 tabelConsumBAU <- resultWasteDisposal
 tabelConsumZero <- tabelConsumBAU 
 tabelConsumZero[,4:30] <- 0
@@ -121,7 +133,8 @@ wasteData <- list(koefisien=koefisien,
                    faktorEmisi=faktorEmisi,
                    matEfBau=matEfBau,
                   tabelEmisi=tabelEmisi,
-                  tabelConsumZero=tabelConsumZero,
+                  listConsumBAU=listConsumBAU,
+                  listConsumZero=listConsumZero,
                   selectedSektor=selectedSektor,
                   alamatFile=alamatFile)
 
@@ -144,7 +157,19 @@ faktorEmisi <- as.character(emissionFactorAgriculture[,1])  ###energi: nama 26 b
 #4. matriks diagonal faktor emisi
 matEfBau <- emissionFactorAgricultureDiagonal
 
-#5. tabel konsumsi energi
+#5. list konsumsi energi
+listConsumBAU <- lapply(bauSeriesOfImpactAgriculture, 
+                        function(x){
+                          x[[1]]
+                        })
+listConsumBAU <- listConsumBAU[-1] #tahun 2015 dihilangkan
+
+listConsumZero <- lapply(listConsumBAU, function(x){
+  x[, 3:ncol(bauSeriesOfImpactAgriculture[[1]][[1]])] <- 0 #dari kolom tcons sampai bahan bakar terakhir
+  return(x)
+})
+
+#dataframe
 tabelConsumBAU <- resultFertilizerUsed
 tabelConsumZero <- tabelConsumBAU 
 tabelConsumZero[,4:30] <- 0
@@ -161,7 +186,8 @@ agriData <- list(koefisien=koefisien,
                   faktorEmisi=faktorEmisi,
                   matEfBau=matEfBau,
                  tabelEmisi=tabelEmisi,
-                 tabelConsumZero=tabelConsumZero,
+                 listConsumBAU=listConsumBAU,
+                 listConsumZero=listConsumZero,
                  selectedSektor=selectedSektor,
                  alamatFile=alamatFile)
 

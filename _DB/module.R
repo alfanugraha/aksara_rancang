@@ -196,7 +196,12 @@ buttonModule <- function(input, output, session, data) {
                                          length(loadRDSAll()),
                               'buttonRun_',
                               label = "Jalankan Analisis",
-                              onclick = sprintf('Shiny.onInputChange("%s",this.id)', ns("run_button")))
+                              onclick = sprintf('Shiny.onInputChange("%s",this.id)', ns("run_button"))),
+          Hapus.skenario = ListButton_fun(actionButton,
+                                             length(loadRDSAll()),
+                                             'buttonDelete_',
+                                             label = "Hapus Skenario",
+                                             onclick = sprintf('Shiny.onInputChange("%s",this.id)', ns("delete_button")))
       )  
   })
 
@@ -744,6 +749,12 @@ buttonModule <- function(input, output, session, data) {
   })
   
   
-  
+  ### hapus file ###
+  observeEvent(input$delete_button, {
+    selectedRow <- as.numeric(strsplit(input$delete_button,"_")[[1]][2])
+    fileName<- as.character(ListTableReact()[selectedRow,5]) #nama file dari ListTableReact ada di col=5
+    file.remove(fileName)
+    shinyjs::js$refresh()
+  })
   
 }
