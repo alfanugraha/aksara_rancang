@@ -10,8 +10,8 @@ library(dplyr)
 library(openxlsx)
 library(plotly)
 
-
-source("_DB/lcd-scenario.R")
+source("_DB/debug_TIN.R")
+#source("_DB/lcd-scenario.R")
 source("_DB/global.R")
 source("_DB/module.R")
 
@@ -47,10 +47,10 @@ ui <- fluidPage(
 
 
 server <- function(input,output,session,data){
-  callModule(buttonModule, "forEnergy", energyData)
-  callModule(buttonModule, "forWaste", wasteData)
-  callModule(buttonModule, "forAgri", agriData)
-  #callModule(buttonModule, "forLand", landData)
+  callModule(buttonModule, "forEnergy", energyData, type="energy")
+  callModule(buttonModule, "forWaste", wasteData, type="waste")
+  callModule(buttonModule, "forAgri", agriData, type="agriculture")
+  #callModule(buttonModule, "forLand", landData, type="land")
   
   #callModule(editSatelliteServer, "forEnergy", energyData)
 }

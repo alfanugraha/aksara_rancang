@@ -34,10 +34,6 @@ colProyPdrbDF$scenario <- c("BAU")
 #                                sektor energi                                 #
 #                                                                              #
 ################################################################################
-
-
-
-
 #1. koefisien 
 koefisien <- as.numeric(analysisCE) #energi
 
@@ -99,7 +95,7 @@ proportionConsumption <- satelliteWaste[, 4:ncol(satelliteWaste)] / satelliteWas
 proportionConsumption[is.na(proportionConsumption)] <- 0
 
 #3. daftar nama FAKTOR EMISI 
-faktorEmisi <- as.character(emissionFactorWaste[,1])  ###energi: nama 26 bahan bakar
+faktorEmisi <- as.character(emissionFactorWaste[,1])  ###limbah: nama2 limbah
 
 #4. matriks diagonal faktor emisi
 matEfBau <- emissionFactorWasteDiagonal
@@ -117,8 +113,7 @@ listConsumZero <- lapply(listConsumBAU, function(x){
 })
 
 #dataframe
-tabelConsumBAU <- resultWasteDisposal
-tabelConsumZero <- tabelConsumBAU 
+tabelConsumZero <- resultWasteDisposal 
 tabelConsumZero[,4:30] <- 0
 
 #6. cumulatif proyeksi emisi untuk plot proyeksi emisi BAU
@@ -152,7 +147,7 @@ proportionConsumption <- satelliteAgriculture[, 4:ncol(satelliteAgriculture)] / 
 proportionConsumption[is.na(proportionConsumption)] <- 0
 
 #3. daftar nama FAKTOR EMISI 
-faktorEmisi <- as.character(emissionFactorAgriculture[,1])  ###energi: nama 26 bahan bakar
+faktorEmisi <- as.character(emissionFactorAgriculture[,1])  ###agri: nama pupuk
 
 #4. matriks diagonal faktor emisi
 matEfBau <- emissionFactorAgricultureDiagonal
@@ -170,8 +165,7 @@ listConsumZero <- lapply(listConsumBAU, function(x){
 })
 
 #dataframe
-tabelConsumBAU <- resultFertilizerUsed
-tabelConsumZero <- tabelConsumBAU 
+tabelConsumZero <- resultFertilizerUsed 
 tabelConsumZero[,4:30] <- 0
 
 #6. cumulatif proyeksi emisi untuk plot proyeksi emisi BAU
