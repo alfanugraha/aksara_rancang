@@ -449,10 +449,11 @@ buttonModule <- function(input, output, session, data, type) {
     #fdSelisih <- fdZero
     if (is.null(loadFileRDS()$fdSelisih)) {
       fdSelisih = fdZero
+      fdSelisih[c(indexSektor), c(inputTahun)] <- fdSelisih[c(indexSektor), c(inputTahun)] + finalDemand$table1[,-1]
     }else{
       fdSelisih =  loadFileRDS()$fdSelisih
+      fdSelisih[c(indexSektor), c(inputTahun)] <- finalDemand$table1[,-1]
     }
-    fdSelisih[c(indexSektor), c(inputTahun)] <- fdSelisih[c(indexSektor), c(inputTahun)] + finalDemand$table1[,-1]
     
     
     fdNew_list<-list(fdBauReal = fdBau,
