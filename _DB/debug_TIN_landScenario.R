@@ -12,7 +12,11 @@
 #example: energyScenario: test dari data mba dewi
 energyScen= readRDS("_DB/skenarioData/Jabar/energi/dw_JaBar_2020-04-20_22-18-22_skenario1")
 scenarioFD=energyScen[["fdSelisih"]]
-scenarioFD=scenarioFD[,2:ncol(scenarioFD)]
+if(is.null(scenarioFD)){
+  scenarioFD=NULL
+} else {
+  scenarioFD=scenarioFD[,2:ncol(scenarioFD)]
+}
 scenarioInputLandCover= NULL
 additionalSatelliteEnergy=energyScen[["satSelisih"]]  
 additionalSatelliteWaste=NULL
@@ -70,7 +74,11 @@ for(step in 1:(iteration+1)){
   # notes on the year
   timeStep <- paste0("y", projectionYear)
   
-  projectionFinalDemand <- bauSeriesOfFinalDemand[,timeStep] + scenarioFD[,timeStep]  # input final demand ditambahkan di sini
+  if(is.null(scenarioFD)){
+    projectionFinalDemand <- bauSeriesOfFinalDemand[,timeStep]
+  } else {
+    projectionFinalDemand <- bauSeriesOfFinalDemand[,timeStep] + scenarioFD[,timeStep]  # input final demand ditambahkan di sini
+  }
   
   scenarioSeriesOfFinalDemand <- cbind(scenarioSeriesOfFinalDemand, projectionFinalDemand)
   projectionOutput <- ioLeontiefInverse %*% projectionFinalDemand 

@@ -631,6 +631,8 @@ buttonModule <- function(input, output, session, data, type) {
   
   observeEvent(input$run_button_trigger, {
     
+    removeUI(selector=paste0('#',ns('scenarioResultVisualization')))
+             
     # reset reactiveValues to NULL
     scenarioSimulation$selectedFile <- NULL
     scenarioSimulation$initialYear <- NULL
@@ -662,7 +664,11 @@ buttonModule <- function(input, output, session, data, type) {
     iteration <- finalYear - initialYear
     ioPeriod <- ioPeriod
     scenarioFD=selectedFile[["fdSelisih"]]
-    scenarioFD=scenarioFD[,2:ncol(scenarioFD)]      
+    if(is.null(scenarioFD)){
+      scenarioFD=NULL
+    } else {
+      scenarioFD=scenarioFD[,2:ncol(scenarioFD)]
+    }   
     inputLRCRate=NULL
     inputPercentageDiagTPM=NULL
     # inputLRCRate=selectedFile[["inputLRCRate"]]
@@ -740,7 +746,11 @@ buttonModule <- function(input, output, session, data, type) {
       # notes on the year
       timeStep <- paste0("y", projectionYear)
       
-      projectionFinalDemand <- bauSeriesOfFinalDemand[,timeStep] + scenarioFD[,timeStep]  # input final demand ditambahkan di sini
+      if(is.null(scenarioFD)){
+        projectionFinalDemand <- bauSeriesOfFinalDemand[,timeStep]
+      } else {
+        projectionFinalDemand <- bauSeriesOfFinalDemand[,timeStep] + scenarioFD[,timeStep]  # input final demand ditambahkan di sini
+      }     
       
       scenarioSeriesOfFinalDemand <- cbind(scenarioSeriesOfFinalDemand, projectionFinalDemand)
       projectionOutput <- ioLeontiefInverse %*% projectionFinalDemand
@@ -1325,7 +1335,7 @@ buttonModule <- function(input, output, session, data, type) {
     #comparison with BAU
     scenarioAllResult$type <- "SCENARIO"
     bauAllResult$type<-"BAU"
-    comparison<-rbind(scenarioAllResult,bauAllResult)
+    comparison<-rbind(scenarioAllResult,bauAllResult[bauAllResult$Year==(initialYear:finalYear),])
     for (i in as.character(colnames(comparison[,-c(1,8)]))){
       eval(parse(text=paste0('plotComparison',i,'<-ggplot(comparison, aes(x=Year, y=',i,', group=type))+
       geom_line(aes(color=type))+
@@ -1364,33 +1374,36 @@ buttonModule <- function(input, output, session, data, type) {
     scenarioSimulation$plotComparisonTotalEmission <- plotComparisonTotalEmission
     scenarioSimulation$plotComparisonCummulativeEmission <- plotComparisonCummulativeEmission
     
-    insertUI(selector=paste0("#",ns("scenarioResultPlaceholder")), 
-             where='afterEnd', 
-             ui= tagList(selectInput(ns('selectScenarioResultPlot'), 
-                                     label="Pilih grafik yang akan ditampilkan",
-                                     choices=c("Proyeksi PDRB Kumulatif", 
-                                               "Proyeksi Emisi Kumulatif",
-                                               "Proyeksi Intensitas Emisi Kumulatif",
-                                               "Proyeksi PDRB",
-                                               "Proyeksi Emisi",
-                                               "Proyeksi Intensitas Emisi")),
-                         plotlyOutput(ns('scenarioResultPlot')),
-                         selectInput(ns('selectScenarioResultTable'), 
-                                     label="Pilih tabel yang akan ditampilkan",
-                                     choices=c("PDRB",
-                                               "Pendapatan", 
-                                               "Tenaga Kerja",
-                                               "Konsumsi Energi",
-                                               "Buangan Limbah",
-                                               "Penggunaan Pupuk",
-                                               "Kebutuhan Lahan",
-                                               "Emisi")
-                         ),
-                         selectInput(ns('selectScenarioResultTableYear'),
-                                     label="Pilih tahun tabel",
-                                     choices=c(initialYear:finalYear)),
-                         dataTableOutput(ns('scenarioResultTable')))
+    insertUI(selector=paste0("#",ns("scenarioResultPlaceholder")),
+             where='afterEnd',
+             ui= uiOutput(ns('scenarioResultVisualization'))
              )
+  })
+  
+  output$scenarioResultVisualization <- renderUI({
+    tagList(selectInput(ns('selectScenarioResultPlot'), 
+                        label="Pilih grafik yang akan ditampilkan",
+                        choices=c("Proyeksi PDRB Kumulatif", 
+                                  "Proyeksi Emisi Kumulatif",
+                                  "Proyeksi Intensitas Emisi Kumulatif",
+                                  "Proyeksi PDRB",
+                                  "Proyeksi Emisi",
+                                  "Proyeksi Intensitas Emisi")),
+            plotlyOutput(ns('scenarioResultPlot')),
+            selectInput(ns('selectScenarioResultTable'), 
+                        label="Pilih tabel yang akan ditampilkan",
+                        choices=c("PDRB",
+                                  "Pendapatan", 
+                                  "Tenaga Kerja",
+                                  "Konsumsi Energi",
+                                  "Buangan Limbah",
+                                  "Penggunaan Pupuk",
+                                  "Kebutuhan Lahan",
+                                  "Emisi")),
+            selectInput(ns('selectScenarioResultTableYear'),
+                        label="Pilih tahun tabel",
+                        choices=c(initialYear:finalYear)),
+            dataTableOutput(ns('scenarioResultTable')))
   })
   
   modalEditLRCRate<-reactive({
@@ -1398,13 +1411,17 @@ buttonModule <- function(input, output, session, data, type) {
     # showModal(
       modalDialog(title="Sunting LRC", 
                           "Perhitungan emisi tidak berhasil dilakukan karena luas lahan yang tersedia tidak dapat memenuhi perubahan permintaan akhir. 
-                            Silakan menyunting kembali permintaan akhir, atau sunting laju land requirement coefficient di bawah ini:", 
-                          rHandsontableOutput(ns('editLRCRate')),
-                          actionButton(ns('saveEditLRCRate'), "simpan tabel"),
-                          footer= tagList(
-                            actionButton(ns("buttonRunCheckLandCover"), "Jalankan Aksi"),
-                            actionButton(ns("buttonClose"), "Batal")
-                          )
+                            Silakan menyunting kembali permintaan akhir, atau sunting laju land requirement coefficient (LRC) di bawah ini:", 
+                  tags$br(),
+                  tags$br(),
+                  rHandsontableOutput(ns('editLRCRate')),
+                  tags$br(),
+                  actionButton(ns('saveEditLRCRate'), "simpan tabel"),
+                  footer= tagList(
+                  actionButton(ns("buttonRunCheckLandCover"), "Jalankan Aksi"),
+                  actionButton(ns("buttonClose"), "Batal"),
+                  size="l"
+                  )
     )
     # )
   })
@@ -1436,8 +1453,8 @@ output$editLRCRate <- renderRHandsontable({
       colnames(showTable)<- "laju LRC"
       rownames(showTable)<- c(Sector, "Sektor yang tidak menghasilkan output")
       showTable
-    },height=400,rowHeaderWidth = 300,colHeaderWidth=200
-  )
+    },height=500, width=500,rowHeaderWidth = 400
+  )%>%hot_cols(format=5,colWidths = 100)
 })
 
 observeEvent(input$saveEditLRCRate,{
