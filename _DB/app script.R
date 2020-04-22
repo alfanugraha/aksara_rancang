@@ -35,12 +35,12 @@ ui <- fluidPage(
              tags$br(),
              buttonUI("forAgri")
     )
-    # ,
-    # tabPanel(h3("lahan"),
-    #          tags$br(),
-    #          tags$br(),
-    #          buttonUI("forLand")
-    # )
+    ,
+    tabPanel(h3("lahan"),
+             tags$br(),
+             tags$br(),
+             buttonUI("forLand")
+    )
   )
 )
 
@@ -50,7 +50,7 @@ server <- function(input,output,session,data){
   callModule(buttonModule, "forEnergy", energyData, type="energy")
   callModule(buttonModule, "forWaste", wasteData, type="waste")
   callModule(buttonModule, "forAgri", agriData, type="agriculture")
-  #callModule(buttonModule, "forLand", landData, type="land")
+  callModule(buttonModule, "forLand", landData, type="land")
   
   #callModule(editSatelliteServer, "forEnergy", energyData)
 }

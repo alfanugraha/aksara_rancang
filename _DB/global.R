@@ -28,6 +28,32 @@ colProyPdrbDF$year <- paste0("y",colProyPdrbDF$year)
 colProyPdrbDF$scenario <- c("BAU")
 
 
+################################################################################
+#                                                                              #
+#                                sektor energi                                 #
+#                                                                              #
+################################################################################
+satelliteLand <- read.table("_DB/jabar_in_redcluwe/inputLandCoverZero.csv", header = T, sep = ",")
+
+colSectorLand <- factor(colnames(LDMProp_his),ordered=T)
+
+#7. alamat rds untuk menampilkan daftar di ListTableReact
+selectedSektor <- "lahan"
+alamatFile <- paste0("_DB/skenarioData/", selectedProv, "/", selectedSektor)
+
+landData <- list(
+  #koefisien=koefisien,
+  #proportionConsumption=proportionConsumption,
+  #faktorEmisi=faktorEmisi,
+  #matEfBau=matEfBau,
+  #tabelEmisi=tabelEmisi,
+  #listConsumBAU=listConsumBAU,
+  listConsumZero=satelliteLand,
+  #selectedSektor=selectedSektor,
+  alamatFile=alamatFile
+)
+
+satLandTemplate <- landData$listConsumZero[,1:2]
 
 ################################################################################
 #                                                                              #
@@ -69,17 +95,19 @@ tabelEmisi <- resultEnergyEmission
 
 #7. alamat rds untuk menampilkan daftar di ListTableReact
 selectedSektor <- "energi"
-alamatFile <- paste0("_DB/skenarioData/", selectedProv, "/", "energi")
+alamatFile <- paste0("_DB/skenarioData/", selectedProv, "/", selectedSektor)
 
-energyData <- list(koefisien=koefisien,
-                   proportionConsumption=proportionConsumption,
-                   faktorEmisi=faktorEmisi,
-                   matEfBau=matEfBau,
-                   tabelEmisi=tabelEmisi,
-                   listConsumBAU=listConsumBAU,
-                   listConsumZero=listConsumZero,
-                   selectedSektor=selectedSektor,
-                   alamatFile=alamatFile)
+energyData <- list(
+  #koefisien=koefisien,
+  #proportionConsumption=proportionConsumption,
+  faktorEmisi=faktorEmisi,
+  #matEfBau=matEfBau,
+  #tabelEmisi=tabelEmisi,
+  listConsumBAU=listConsumBAU,
+  listConsumZero=listConsumZero,
+  #selectedSektor=selectedSektor,
+  alamatFile=alamatFile
+)
 
 ################################################################################
 #                                                                              #
@@ -123,15 +151,17 @@ tabelEmisi <- resultWasteEmission
 selectedSektor <- "limbah"
 alamatFile <- paste0("_DB/skenarioData/", selectedProv, "/", selectedSektor)
 
-wasteData <- list(koefisien=koefisien,
-                   proportionConsumption=proportionConsumption,
-                   faktorEmisi=faktorEmisi,
-                   matEfBau=matEfBau,
-                  tabelEmisi=tabelEmisi,
-                  listConsumBAU=listConsumBAU,
-                  listConsumZero=listConsumZero,
-                  selectedSektor=selectedSektor,
-                  alamatFile=alamatFile)
+wasteData <- list(
+  #koefisien=koefisien,
+  #proportionConsumption=proportionConsumption,
+  faktorEmisi=faktorEmisi,
+  #matEfBau=matEfBau,
+  #tabelEmisi=tabelEmisi,
+  listConsumBAU=listConsumBAU,
+  listConsumZero=listConsumZero,
+  #selectedSektor=selectedSektor,
+  alamatFile=alamatFile
+)
 
 ################################################################################
 #                                                                              #
@@ -175,13 +205,15 @@ tabelEmisi <- resultFertilizerEmission
 selectedSektor <- "pertanian"
 alamatFile <- paste0("_DB/skenarioData/", selectedProv, "/", selectedSektor)
 
-agriData <- list(koefisien=koefisien,
-                  proportionConsumption=proportionConsumption,
-                  faktorEmisi=faktorEmisi,
-                  matEfBau=matEfBau,
-                 tabelEmisi=tabelEmisi,
-                 listConsumBAU=listConsumBAU,
-                 listConsumZero=listConsumZero,
-                 selectedSektor=selectedSektor,
-                 alamatFile=alamatFile)
+agriData <- list(
+  #koefisien=koefisien,
+  #proportionConsumption=proportionConsumption,
+  faktorEmisi=faktorEmisi,
+  #matEfBau=matEfBau,
+  #tabelEmisi=tabelEmisi,
+  listConsumBAU=listConsumBAU,
+  listConsumZero=listConsumZero,
+  #selectedSektor=selectedSektor,
+  alamatFile=alamatFile
+)
 
