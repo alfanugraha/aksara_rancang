@@ -449,7 +449,7 @@ buttonModule <- function(input, output, session, data, type) {
     #fdSelisih <- fdZero
     if (is.null(loadFileRDS()$fdSelisih)) {
       fdSelisih = fdZero
-      fdSelisih[c(indexSektor), c(inputTahun)] <- fdSelisih[c(indexSektor), c(inputTahun)] + finalDemand$table1[,-1]
+      fdSelisih[c(indexSektor), c(inputTahun)] <- finalDemand$table1[,-1]
     }else{
       fdSelisih =  loadFileRDS()$fdSelisih
       fdSelisih[c(indexSektor), c(inputTahun)] <- finalDemand$table1[,-1]
@@ -536,7 +536,9 @@ buttonModule <- function(input, output, session, data, type) {
       tags$br(),
       rHandsontableOutput(ns('editSatLand')),
       tags$br(),
-      actionButton(ns('saveModalSatLand'), 'simpan tabel')
+      actionButton(ns('saveModalSatLand'), 'simpan tabel'), 
+      tags$br(),
+      tags$div(id='teksLandSatSave')
     )
   })
   
@@ -562,41 +564,52 @@ buttonModule <- function(input, output, session, data, type) {
                     paste0("y",input$pilihtahunSatLand))
       satAkun$table1 <- satAkun$table1[ , c(indexCol)]
       satAkun$table1
-    
-    
   })
-  
   
   output$editSatLand <- renderRHandsontable({
     rhandsontable(valSatLand(),
+                  selectCallback = TRUE,
       rowHeaderWidth = 50,
       fixedColumnsLeft = 2,
       height = 200,
-      selectCallback = TRUE,
-      allowInsertRow = T,) %>% 
+      ) %>% 
+      hot_table(contextMenu = TRUE) %>% 
+      hot_context_menu(allowRowEdit = TRUE,allowColEdit = T,
+        customOpts = list(
+          search = list(name = "Search",
+                        callback = htmlwidgets::JS(
+                          "function (key, options) {
+                         var srch = prompt('Search criteria');
+
+                         this.search.query(srch);
+                         this.render();
+                       }")))) %>% 
             hot_col(col = c(colnames(satAkun$table1)[1],colnames(satAkun$table1)[2]),
                    default = "tutupan lahan belum dipilih",
                    type = "dropdown", source = sort(colnames(LDMProp_his))) 
+    
   })
 
   
   ##### simpan tabel Sat baru ke dalam folder ####
+  #landSatSave<-eventReactive(input$saveModalSatLand,{
   observeEvent(input$saveModalSatLand,{
+    browser()
     satEditNew<-as.data.frame(hot_to_r(input$editSatLand))
-    # if (is.null(loadFileRDS()$satSelisih)) {
-    #   satSelisih = data$listConsumZero
-    #   rowbinSat <- dplyr::bind_rows(satSelisih,satEditNew)
-    #   rowbinSat <- rowbinSat[-1,]
-    # }else{
-    #   satSelisih =  loadFileRDS()$satSelisih
-    #   rowbinSat <- dplyr::bind_rows(data$listConsumZero,satSelisih,satEditNew)
-    #   rowbinSat <- rowbinSat[-1,]
-    # }
+    if (is.null(loadFileRDS()$satSelisih)) {
+      satSelisih = data$listConsumZero
+      rowbinSat <- dplyr::bind_rows(satSelisih,satEditNew)
+      
+    }else{
+      satSelisih =  loadFileRDS()$satSelisih
+      rowbinSat <- dplyr::bind_rows(satSelisih,satEditNew)
+      
+    }
     
-    satSelisih <- data$listConsumZero
-    rowbinSat <- dplyr::bind_rows(satSelisih,satEditNew)
+    # satSelisih <- data$listConsumZero
+    # rowbinSat <- dplyr::bind_rows(satSelisih,satEditNew)
+    
     rowbinSat <- rowbinSat[-1,]
-
     rownames(rowbinSat) <- 1:nrow(rowbinSat)
     rowbinSat[is.na(rowbinSat)] <- 0
     
@@ -605,14 +618,28 @@ buttonModule <- function(input, output, session, data, type) {
     )
     satNew_list
     
+  })
+  
+  observeEvent(input$saveModalSatLand,{
+    #browser()
     selectedRow <- as.numeric(strsplit(input$select_button,"_")[[1]][2])
     fileName<- as.character(ListTableReact()[selectedRow,5]) #nama file
     
     dataDefine <-  readRDS(fileName)
     dataDefine[5] <- list(dataDefine$fdSelisih)
-    dataDefine$satSelisih <-  satNew_list$satSelisih
+    dataDefine$satSelisih <- landSatSave()$satSelisih
+    
     
     saveRDS(dataDefine, file = fileName)
+    
+    # tampilan keterangan setiap save tabel konsumsi
+    # inputSektorTampil<-capture.output(cat(input$sektorSat , sep=", ")) #"tanaman pangan"
+    # inputTahun<-paste0("y",input$pilihtahunSat)
+    # inputBahanBakarTampil <- capture.output(cat(input$pilihBahanBakar , sep=", "))
+    textTampil <- paste0("tabel diatas sudah disimpan")
+    insertUI(selector='#teksLandSatSave',
+             where = 'afterEnd',
+             ui = tags$div (textTampil))
   })
   
 
@@ -706,15 +733,15 @@ buttonModule <- function(input, output, session, data, type) {
     
     if (is.null(loadFileRDS()$satSelisih)) {
       satSelisih = data$listConsumZero
-      satSelisih[[inputTahun]][indexSektor,inputBahanBakar]<-satSelisih[[inputTahun]][indexSektor,inputBahanBakar] + satAkun$table1[-1]
+      satSelisih[[inputTahun]][indexSektor,inputBahanBakar]<-satAkun$table1[-1]
     }else{
       satSelisih =  loadFileRDS()$satSelisih
       satSelisih[[inputTahun]][indexSektor,inputBahanBakar]<-satAkun$table1[-1]
     }
     
     satSelisih <- lapply(satSelisih, function(x){
-      rsum <- rowSums(x[4:ncol(x)]) 
-      x[3] <- rsum
+      tconsum <- rowSums(x[4:ncol(x)]) 
+      x[3] <- tconsum
       x
       })
     
