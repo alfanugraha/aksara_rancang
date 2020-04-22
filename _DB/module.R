@@ -549,7 +549,8 @@ buttonModule <- function(input, output, session, data, type) {
       
     }else{
       #satAkun$table1 = loadFileRDS()$satSelisih
-      satAkun$table1 = rbind(loadFileRDS()$satSelisih,data$listConsumZero)
+      #satAkun$table1 = rbind(loadFileRDS()$satSelisih,data$listConsumZero)
+      satAkun$table1 = loadFileRDS()$satSelisih
     } 
   })
   
@@ -581,18 +582,21 @@ buttonModule <- function(input, output, session, data, type) {
   
   ##### simpan tabel Sat baru ke dalam folder ####
   observeEvent(input$saveModalSatLand,{
-    #browser()
     satEditNew<-as.data.frame(hot_to_r(input$editSatLand))
-    if (is.null(loadFileRDS()$satSelisih)) {
-      satSelisih = data$listConsumZero
-    }else{
-      satSelisih =  loadFileRDS()$satSelisih
-    }
-
+    # if (is.null(loadFileRDS()$satSelisih)) {
+    #   satSelisih = data$listConsumZero
+    #   rowbinSat <- dplyr::bind_rows(satSelisih,satEditNew)
+    #   rowbinSat <- rowbinSat[-1,]
+    # }else{
+    #   satSelisih =  loadFileRDS()$satSelisih
+    #   rowbinSat <- dplyr::bind_rows(data$listConsumZero,satSelisih,satEditNew)
+    #   rowbinSat <- rowbinSat[-1,]
+    # }
+    
+    satSelisih <- data$listConsumZero
     rowbinSat <- dplyr::bind_rows(satSelisih,satEditNew)
-    #library(gtools)
-    #smartbind(data$listConsumZero, satEditNew)
     rowbinSat <- rowbinSat[-1,]
+
     rownames(rowbinSat) <- 1:nrow(rowbinSat)
     rowbinSat[is.na(rowbinSat)] <- 0
     
@@ -702,11 +706,11 @@ buttonModule <- function(input, output, session, data, type) {
     
     if (is.null(loadFileRDS()$satSelisih)) {
       satSelisih = data$listConsumZero
+      satSelisih[[inputTahun]][indexSektor,inputBahanBakar]<-satSelisih[[inputTahun]][indexSektor,inputBahanBakar] + satAkun$table1[-1]
     }else{
       satSelisih =  loadFileRDS()$satSelisih
+      satSelisih[[inputTahun]][indexSektor,inputBahanBakar]<-satAkun$table1[-1]
     }
-    
-    satSelisih[[inputTahun]][indexSektor,inputBahanBakar]<-satSelisih[[inputTahun]][indexSektor,inputBahanBakar] + satAkun$table1[-1]
     
     satSelisih <- lapply(satSelisih, function(x){
       rsum <- rowSums(x[4:ncol(x)]) 
