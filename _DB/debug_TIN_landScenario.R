@@ -10,7 +10,7 @@
 # additionalEmissionFactorAgriculture=NULL
 
 #example: energyScenario: test dari data mba dewi
-energyScen= readRDS("_TIN/debug/test_energyScen")
+energyScen= readRDS("_DB/skenarioData/Jabar/energi/dw_JaBar_2020-04-20_22-18-22_skenario1")
 scenarioFD=energyScen[["fdSelisih"]]
 scenarioFD=scenarioFD[,2:ncol(scenarioFD)]
 scenarioInputLandCover= NULL
@@ -436,15 +436,15 @@ for(t in 0:iteration){
 # scenarioResultTotalGDP <- colSums(scenarioSeriesOfGDP[,2:(ncol(scenarioSeriesOfGDP)-1)])
 scenarioAllResult <- subset(scenarioResultTotalEmission, select=c(Year, TotalEmission, CummulativeEmission))
 # scenarioAllResult <- cbind(scenarioAllResult, scenarioResultTotalGDP)
-scenarioAllResult$resultTotalGDP<-colSums(scenarioSeriesOfGDP[,2:(ncol(scenarioSeriesOfGDP)-1)])
-scenarioAllResult$CummulativeGDP <- cumsum(scenarioAllResult$resultTotalGDP)
-scenarioAllResult$EmissionIntensity <- scenarioAllResult$TotalEmission / scenarioAllResult$resultTotalGDP
+scenarioAllResult$ResultTotalGDP<-colSums(scenarioSeriesOfGDP[,2:(ncol(scenarioSeriesOfGDP)-1)])
+scenarioAllResult$CummulativeGDP <- cumsum(scenarioAllResult$ResultTotalGDP)
+scenarioAllResult$EmissionIntensity <- scenarioAllResult$TotalEmission / scenarioAllResult$ResultTotalGDP
 scenarioAllResult$CummulativeEmissionIntensity <-cumsum(scenarioAllResult$EmissionIntensity)
 
 ggplot(data=scenarioAllResult, aes(x=Year, y=TotalEmission, group=1)) + geom_line() + geom_point()
 ggplot(data=scenarioAllResult, aes(x=Year, y=CummulativeEmission, group=1)) + geom_line() + geom_point()
 ggplot(data=scenarioAllResult, aes(x=Year, y=EmissionIntensity, group=1)) + geom_line() + geom_point()
-ggplot(data=scenarioAllResult, aes(x=Year, y=scenarioResultTotalGDP, group=1)) + geom_line() + geom_point()
+ggplot(data=scenarioAllResult, aes(x=Year, y=ResultTotalGDP, group=1)) + geom_line() + geom_point()
 ggplot(data=scenarioAllResult, aes(x=Year, y=CummulativeGDP, group=1)) + geom_line() + geom_point()
 ggplot(data=scenarioAllResult, aes(x=Year, y=CummulativeEmissionIntensity, group=1)) + geom_line() + geom_point()
 

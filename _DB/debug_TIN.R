@@ -43,6 +43,7 @@ LDMProp_his<-read.csv(paste0(datapathTin, "LDMProp.csv"))
 LUTMTemplate_his<-read.csv(paste0(datapathTin,"LUTM_template.csv"))
 LRCRate_his<-read.csv(paste0(datapathTin,"LRCRate.csv"),header = FALSE)
 LRCRate_2<-read.csv(paste0(datapathTin,"LRCRate_2.csv"),header=FALSE)
+# LRCRate_2<-read.csv(paste0(datapathTin,"LRCRate.csv"),header=FALSE)  #delete after use
 carbonStock_his<-data.matrix(read.csv(paste0(datapathTin,"carbonStock.csv")))
 carbonStock_his<-as.matrix(carbonStock_his[,3])
 
@@ -140,8 +141,10 @@ functionSatelliteImpact <- function(type = "energy",
 functionSatelliteLand1<-function(type=NULL, 
                                  matrix_output=NULL, 
                                  advanceMode = FALSE,
+                                 currYear= NULL,
                                  runNum = NULL, # input for advanceMode = FALSE, runNUm 1 to 2
-                                 LRCRate= NULL){   # input for advanceMode = TRUE, LRCRate sebagai reactive value yang by default diisi LRC historis 
+                                 LRCRate= NULL){ # input for advanceMode = TRUE, LRCRate sebagai reactive value yang by default diisi LRC historis 
+                                   
   impact<-list()
   
   if(type=="historis"){
@@ -150,12 +153,12 @@ functionSatelliteLand1<-function(type=NULL,
     impact$landCover<-landCover_his
   } else{
     if(advanceMode== TRUE){
-      impact$LRC<-analysisLRC*LRCRate^(projectionYear-ioPeriod)
+      impact$LRC<-analysisLRC*LRCRate^(currYear-ioPeriod)
     } else{
       if (runNum == 1 ){
-        impact$LRC<-analysisLRC*LRCRate_his^(projectionYear-ioPeriod)
+        impact$LRC<-analysisLRC*(LRCRate_his^(currYear-ioPeriod))
       } else if (runNum ==2 ){
-        impact$LRC<-analysisLRC*LRCRate_2^(projectionYear-ioPeriod)
+        impact$LRC<-analysisLRC*(LRCRate_2^(currYear-ioPeriod))
       }
     }
     # Land Requirement
@@ -679,6 +682,7 @@ for (i in 1:2){
     eval(parse(text= paste0("bauSeriesOfImpactLand1$", timeStep, " <- functionSatelliteLand1(type= 'projection', 
                                                                                           matrix_output= as.matrix(bauSeriesOfOutput[,'",timeStep,"']), 
                                                                                           advanceMode = FALSE,
+                                                                                          currYear=projectionYear,
                                                                                           runNum = ",i,", # input for advanceMode = FALSE
                                                                                           LRCRate= NULL)")))
     listYear <- c(listYear, timeStep)
@@ -983,16 +987,16 @@ for(t in 0:iteration){
 # resultTotalGDP <- colSums(bauSeriesOfGDP[,2:(ncol(bauSeriesOfGDP)-1)])
 bauAllResult <- subset(resultTotalEmission, select=c(Year, TotalEmission, CummulativeEmission))
 # bauAllResult <- cbind(bauAllResult, resultTotalGDP)
-bauAllResult$resultTotalGDP<-colSums(bauSeriesOfGDP[,2:(ncol(bauSeriesOfGDP)-1)])
-bauAllResult$CummulativeGDP <- cumsum(bauAllResult$resultTotalGDP)
-bauAllResult$EmissionIntensity <- bauAllResult$TotalEmission / bauAllResult$resultTotalGDP
+bauAllResult$ResultTotalGDP<-colSums(bauSeriesOfGDP[,2:(ncol(bauSeriesOfGDP)-1)])
+bauAllResult$CummulativeGDP <- cumsum(bauAllResult$ResultTotalGDP)
+bauAllResult$EmissionIntensity <- bauAllResult$TotalEmission / bauAllResult$ResultTotalGDP
 bauAllResult$CummulativeEmissionIntensity <-cumsum(bauAllResult$EmissionIntensity)
 
 
 ggplot(data=bauAllResult, aes(x=Year, y=TotalEmission, group=1)) + geom_line() + geom_point()
 ggplot(data=bauAllResult, aes(x=Year, y=CummulativeEmission, group=1)) + geom_line() + geom_point()
 ggplot(data=bauAllResult, aes(x=Year, y=EmissionIntensity, group=1)) + geom_line() + geom_point()
-ggplot(data=bauAllResult, aes(x=Year, y=resultTotalGDP, group=1)) + geom_line() + geom_point()
+ggplot(data=bauAllResult, aes(x=Year, y=ResultTotalGDP, group=1)) + geom_line() + geom_point()
 ggplot(data=bauAllResult, aes(x=Year, y=CummulativeGDP, group=1)) + geom_line() + geom_point()
 ggplot(data=bauAllResult, aes(x=Year, y=CummulativeEmissionIntensity, group=1)) + geom_line() + geom_point()
 
