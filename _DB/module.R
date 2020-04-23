@@ -218,7 +218,6 @@ buttonModule <- function(input, output, session, data, type) {
   
   if(type=="land"){
     observeEvent(input$select_button_trigger,{
-      #browser()
       showModal(
         modalDialog( 
           footer=tagList(
@@ -257,11 +256,14 @@ buttonModule <- function(input, output, session, data, type) {
               h2("Satelit akun lahan"),
               sidebarLayout(
                 sidebarPanel(
-                  fluidRow(
+                  fluidPage(
                     pickerInput(ns("pilihtahunSatLand"),
                                 label="pilih tahun intervensi", selected = loadFileRDS()$tahunAwal,
                                 choices=c(loadFileRDS()$tahunAwal : loadFileRDS()$tahunAkhir),
-                                options = list(`actions-box` = TRUE),multiple = T)
+                                options = list(`actions-box` = TRUE),multiple = T),
+                    selectInput(ns("banyakTupla"),
+                                label="banyaknya perubahan tutupan lahan",
+                                choices=c(1:10))
                     ),
                   tags$br(),
                   actionButton(ns("satLandHit"),"tampilkan tabel"),
@@ -357,7 +359,6 @@ buttonModule <- function(input, output, session, data, type) {
   #                                                                              #
   ################################################################################
   loadFileRDS <- reactive({
-  #loadFileRDS <- eventReactive(c(input$econHit,input$saveModalFD,input$saveModalSatLand,input$satHit,input$saveModalSat),{
     selectedRow <- as.numeric(strsplit(input$select_button,"_")[[1]][2])
     fileName<- as.character(ListTableReact()[selectedRow,5]) #nama file dari ListTableReact ada di col=5
     selectedFile<-readRDS(fileName)
@@ -409,10 +410,6 @@ buttonModule <- function(input, output, session, data, type) {
     table1 = NULL
   )
   
-  # fdBauReact <- reactiveValues(
-  #   isi = fdZero
-  # )
-  
   FDdata <- reactive({
     if (is.null(loadFileRDS()$fdSelisih)) {
       finalDemand$table1 = fdZero
@@ -422,10 +419,8 @@ buttonModule <- function(input, output, session, data, type) {
   })
   
   valFD<- eventReactive(c(input$showYearEco),{
-    #browser()
     finalDemand$table1 <- FDdata()
     finalDemand$table1 <- filter(finalDemand$table1, finalDemand$table1$Sektor %in% c(input$sektorEcon))
-    #rownames(finalDemand$table1) <- c(input$sektorEcon)
     finalDemand$table1 <- finalDemand$table1[,c("Sektor",paste0("y",input$pilihtahunFD))]
     finalDemand$table1
   })
@@ -441,7 +436,7 @@ buttonModule <- function(input, output, session, data, type) {
   #### masukkan nilai sel baru ke dalam kolom fdNew 
   FDSave<-eventReactive(input$saveModalFD,{
     finalDemand$table1 <- as.data.frame(hot_to_r(input$editFD))
-    inputSektor<-input$sektorEcon #"tanaman pangan"
+    inputSektor<-input$sektorEcon 
     inputTahun<-paste0("y",input$pilihtahunFD)
     indexSektor <- as.numeric(which(sapply(Sector,function(x) any(x==c(inputSektor)))))
     
@@ -489,7 +484,6 @@ buttonModule <- function(input, output, session, data, type) {
 
 
   observeEvent(input$downloadFD,{
-    #browser()
     selectedRow <- as.numeric(strsplit(input$select_button,"_")[[1]][2])
     fileName <- as.character(ListTableReact()[selectedRow,5]) #nama file
     fileName <- strsplit(fileName,"/")[[1]][5]
@@ -522,6 +516,7 @@ buttonModule <- function(input, output, session, data, type) {
   
   
   output$satLandUIManual<- renderUI({
+    
     tagList(
       tags$b('Sunting secara manual'),
       tags$br(),
@@ -529,9 +524,10 @@ buttonModule <- function(input, output, session, data, type) {
       tags$br(),
       rHandsontableOutput(ns('editSatLand')),
       tags$br(),
-      tags$h6("untuk menambahkan baris baru, silakan klik kanan pada area tabel, lalu pilih insert row below/above "),
-      tags$h6("untuk menghapus baris, silakan klik kanan pada area tabel, lalu pilih remove row "),
+      tags$h6("untuk memilih tipe tutupan lahan disediakan menu dropdown pada kolom 1 dan 2"),
+      tags$br(),
       actionButton(ns('saveModalSatLand'), 'simpan tabel'), 
+      tags$br(), 
       tags$br(),
       tags$div(id='teksLandSatSave')
     )
@@ -539,34 +535,40 @@ buttonModule <- function(input, output, session, data, type) {
   
   
   landSatData <- reactive({
-    #observeEvent(input$satLandHit,{
-    #browser()
-    if (is.null(loadFileRDS()$satSelisih) & type == "land") {
+    if (is.null(loadFileRDS()$satSelisih)) {
       satAkun$table1 = data$listConsumZero
-      
+      satAkun$table1
     }else{
-      satAkun$table1 = loadFileRDS()$satSelisih
-    } 
+      selectedRow <- as.numeric(strsplit(input$select_button,"_")[[1]][2])
+      fileName<- as.character(ListTableReact()[selectedRow,5]) #nama file
+      dataDefine <-  readRDS(fileName)
+      satAkun$table1 <- data$listConsumZero
+      tupla <- ordered(factor(sort(colnames(LDMProp_his)[landCover_his!=0])))
+      satAkun$table1[,1] <- tupla[1]
+      satAkun$table1[,2] <- tupla[1]
+      satAkun$table1 = dplyr::bind_rows(dataDefine$satSelisih,satAkun$table1)
+      satAkun$table1
+    }
   })
   
   valSatLand <- eventReactive(input$satLandHit,{
-    satAkun$table1 <-  landSatData()
+    satAkun$table1 = landSatData()
+    
     indexCol <- c(colnames(satAkun$table1)[1],colnames(satAkun$table1)[2],
                   paste0("y",input$pilihtahunSatLand))
-    satAkun$table1 <- satAkun$table1[ , c(indexCol)]
+    indexRow <- input$banyakTupla
+    satAkun$table1 <- satAkun$table1[1:indexRow,c(indexCol)]
     satAkun$table1
   })
   
   output$editSatLand <- renderRHandsontable({
     rhandsontable(valSatLand(),
-                  selectCallback = TRUE,
                   rowHeaderWidth = 50,
                   fixedColumnsLeft = 2,
                   height = 200,
     ) %>% 
       hot_table(contextMenu = TRUE) %>% 
-      hot_context_menu(allowRowEdit = TRUE,allowColEdit = T,
-                       customOpts = list(
+      hot_context_menu(customOpts = list(
                          search = list(name = "Search",
                                        callback = htmlwidgets::JS(
                                          "function (key, options) {
@@ -575,56 +577,48 @@ buttonModule <- function(input, output, session, data, type) {
                          this.render();
                        }")))) %>% 
       hot_col(col = c(colnames(satAkun$table1)[1],colnames(satAkun$table1)[2]),
-              default = "tutupan lahan belum dipilih",
-              type = "dropdown", source = sort(colnames(LDMProp_his))) 
+              type = "dropdown", source = sort(colnames(LDMProp_his)[landCover_his!=0])) 
     
   })
   
   
   ##### simpan tabel Sat baru ke dalam folder ####
-  landSatSave<-eventReactive(input$saveModalSatLand,{
-  #observeEvent(input$saveModalSatLand,{
-    #browser()
-    satEditNew<-as.data.frame(hot_to_r(input$editSatLand))
-    if (is.null(loadFileRDS()$satSelisih)) {
-      satSelisih = data$listConsumZero
-      rowbinSat <- dplyr::bind_rows(satSelisih,satEditNew)
-      
-    }else{
-      satSelisih =  loadFileRDS()$satSelisih
-      rowbinSat <- dplyr::bind_rows(satSelisih,satEditNew)
-      
-    }
-    
-    rowbinSat <- rowbinSat[-1,]
-    rownames(rowbinSat) <- 1:nrow(rowbinSat)
-    rowbinSat[is.na(rowbinSat)] <- 0
-    
-    satNew_list<-list(satEditNew = satEditNew, # 1 data.frame = tabel yang diedit (partial) yang tampilkan di modal dialog UI
-                      satSelisih = rowbinSat  
-    )
-    satNew_list
-    
-  })
-  
   observeEvent(input$saveModalSatLand,{
-    #browser()
-    selectedRow <- as.numeric(strsplit(input$select_button,"_")[[1]][2])
-    fileName<- as.character(ListTableReact()[selectedRow,5]) #nama file
+    removeUI(selector='#textInvalid')
+    removeUI(selector='#textTampil')
     
-    dataDefine <-  readRDS(fileName)
-    dataDefine[5] <- list(dataDefine$fdSelisih)
-    dataDefine$satSelisih <- landSatSave()$satSelisih
+    satEditNew<-as.data.frame(hot_to_r(input$editSatLand))
+    satInvalid <- satEditNew[-2,]
+    tupla <- ordered(factor(sort(colnames(LDMProp_his)[landCover_his!=0])))
+    satZero = data$listConsumZero
+    satZero[,1] <- tupla[1]
+    satZero[,2] <- tupla[1]
+    satSelisih <- dplyr::bind_rows(satZero,satEditNew)
+    satSelisih <- satSelisih[-(1:nrow(data$listConsumZero)),]
+    rownames(satSelisih) <- 1:nrow(satSelisih)
+    satSelisih[is.na(satSelisih)] <- 0
     
-    
-    saveRDS(dataDefine, file = fileName)
-    textTampil <- paste0("tabel diatas sudah tersimpan")
-    insertUI(selector='#teksLandSatSave',
-             where = 'afterEnd',
-             ui = tags$div (textTampil))
-  })
-  
+    if (nlevels(satSelisih[,1])==length(colnames(LDMProp_his)[landCover_his!=0]) & nlevels(satSelisih[,2])==length(colnames(LDMProp_his)[landCover_his!=0]) ) {
+        selectedRow <- as.numeric(strsplit(input$select_button,"_")[[1]][2])
+        fileName<- as.character(ListTableReact()[selectedRow,5]) #nama file
 
+        dataDefine <-  readRDS(fileName)
+        dataDefine[5] <- list(dataDefine$fdSelisih)
+        dataDefine$satSelisih <- satSelisih
+
+        saveRDS(dataDefine, file = fileName)
+        
+        insertUI(selector='#teksLandSatSave',
+                 where = 'afterEnd',
+                 ui = tags$div(id="textTampil","tabel di atas sudah tersimpan"))
+    }else{
+      
+      insertUI(selector='#teksLandSatSave',
+               where = 'afterEnd',
+               ui =tags$h4(id='textInvalid', 
+                            "masih ada tutupan lahan yang belum dipilih, tabel tidak dapat disimpan"))
+    }
+  })
 # ## END Land -------------------------------------------------------------
   
   observeEvent(input$satHit, {
@@ -671,8 +665,6 @@ buttonModule <- function(input, output, session, data, type) {
     )
   })
   
-
-  
   SatData <- reactive({
     if (is.null(loadFileRDS()$satSelisih)) {
       satAkun$table1 = data$listConsumZero
@@ -681,9 +673,7 @@ buttonModule <- function(input, output, session, data, type) {
     }
   })
   
-  #observeEvent(input$showYearSat,{
   valSat<- eventReactive(c(input$showYearSat),{
-    #browser()
     #bentuk list
     indexAwal <- paste0("y",input$pilihtahunSat)
     satAkun$table1 <- SatData()[indexAwal]
@@ -692,7 +682,6 @@ buttonModule <- function(input, output, session, data, type) {
     satAkun$table1 <- cbind(Sector,satAkun$table1)
     satAkun$table1 <- filter(satAkun$table1, satAkun$table1$Sector %in% c(input$sektorSat))
     satAkun$table1 <- satAkun$table1[,c("Sector",paste0("y",input$pilihtahunSat,".",input$pilihBahanBakar))]
-    #rownames(satAkun$table1) <- c(input$sektorSat)
     satAkun$table1
   })
   
@@ -705,8 +694,6 @@ buttonModule <- function(input, output, session, data, type) {
   
   #### masukkan nilai sel baru ke dalam kolom satNew 
   satSave<-eventReactive(input$saveModalSat,{
-    #observeEvent(input$saveModalSat,{
-    #browser()
     satAkun$table1<-as.data.frame(hot_to_r(input$editSat))
     inputSektor<-input$sektorSat 
     indexSektor <- as.numeric(which(sapply(Sector,function(x) any(x==c(inputSektor)))))
@@ -738,7 +725,6 @@ buttonModule <- function(input, output, session, data, type) {
   
   ##### simpan tabel Sat baru ke dalam folder ####
   observeEvent(input$saveModalSat,{
-    #browser()
     selectedRow <- as.numeric(strsplit(input$select_button,"_")[[1]][2])
     fileName<- as.character(ListTableReact()[selectedRow,5]) #nama file
     
@@ -1733,7 +1719,7 @@ buttonModule <- function(input, output, session, data, type) {
   ### hapus file ###
   observeEvent(input$delete_button_trigger, {
     selectedRow <- as.numeric(strsplit(input$delete_button,"_")[[1]][2])
-    fileName<- as.character(ListTableReact()[selectedRow,5]) #nama file dari ListTableReact ada di col=5
+    fileName<- as.character(ListTableReact()[selectedRow,5]) #nama file
     file.remove(fileName)
     shinyjs::js$refresh()
   })
