@@ -250,7 +250,7 @@ buttonModule <- function(input, output, session, data, type) {
             
             ################################################################################
             #                                                                              #
-            #                        BUTTON KONSTRUKSI SATELIT AKUN                        #
+            #                        BUTTON KONSTRUKSI SATELIT AKUN LAHAN                  #
             #                                                                              #
             ################################################################################
             tabPanel(
@@ -396,6 +396,8 @@ buttonModule <- function(input, output, session, data, type) {
     tagList(
       tags$b('Sunting secara manual'),
       tags$br(),
+      tags$h6("Nilai yang diinputkan adalah selisih dari BAU"),
+      tags$br(),
       rHandsontableOutput(ns('editFD')),
       tags$br(),
       actionButton(ns('saveModalFD'),' simpan tabel '),
@@ -443,10 +445,6 @@ buttonModule <- function(input, output, session, data, type) {
     inputTahun<-paste0("y",input$pilihtahunFD)
     indexSektor <- as.numeric(which(sapply(Sector,function(x) any(x==c(inputSektor)))))
     
-    # fdBauReact$isi <- fdBau
-    # fdBauReact$isi[c(indexSektor), c(inputTahun)] <- fdBauReact$isi[c(indexSektor), c(inputTahun)] + finalDemand$table1[,-1]
-     
-    #fdSelisih <- fdZero
     if (is.null(loadFileRDS()$fdSelisih)) {
       fdSelisih = fdZero
       fdSelisih[c(indexSektor), c(inputTahun)] <- finalDemand$table1[,-1]
@@ -457,7 +455,6 @@ buttonModule <- function(input, output, session, data, type) {
     
     
     fdNew_list<-list(fdBauReal = fdBau,
-                     #fdNew = fdBauReact$isi,
                      fdEditNew = finalDemand$table1,
                      fdSelisih = fdSelisih
     )
@@ -474,13 +471,6 @@ buttonModule <- function(input, output, session, data, type) {
     
     dataDefine <-  readRDS(fileName)
     dataDefine$fdSelisih <- FDSave()$fdSelisih
-    
-    # dataDefine <-  loadFileRDS()
-    # dataDefine$fdSelisih <- FDSave()$fdSelisih
-    # selectedRow <- as.numeric(strsplit(input$select_button,"_")[[1]][2])
-    # fileName<- as.character(ListTableReact()[selectedRow,5]) #nama file
-    
-    
     saveRDS(dataDefine, file = fileName)
   
     insertUI(selector='#objDownloadFD',
@@ -491,6 +481,8 @@ buttonModule <- function(input, output, session, data, type) {
 
   output$downButtonFD<- renderUI({
     tagList(tags$br(),
+            renderText("tabel diatas sudah tersimpan"),
+            tags$br(),
             actionButton(ns('downloadFD'),'download tabel')
     )
   })
@@ -527,15 +519,18 @@ buttonModule <- function(input, output, session, data, type) {
              ui= uiOutput(ns('satLandUIManual'))
     )
   })
-
+  
   
   output$satLandUIManual<- renderUI({
     tagList(
       tags$b('Sunting secara manual'),
       tags$br(),
+      tags$h6("Nilai yang diinputkan adalah selisih dari BAU"),
       tags$br(),
       rHandsontableOutput(ns('editSatLand')),
       tags$br(),
+      tags$h6("untuk menambahkan baris baru, silakan klik kanan pada area tabel, lalu pilih insert row below/above "),
+      tags$h6("untuk menghapus baris, silakan klik kanan pada area tabel, lalu pilih remove row "),
       actionButton(ns('saveModalSatLand'), 'simpan tabel'), 
       tags$br(),
       tags$div(id='teksLandSatSave')
@@ -544,57 +539,52 @@ buttonModule <- function(input, output, session, data, type) {
   
   
   landSatData <- reactive({
-  #observeEvent(input$satLandHit,{
+    #observeEvent(input$satLandHit,{
     #browser()
     if (is.null(loadFileRDS()$satSelisih) & type == "land") {
       satAkun$table1 = data$listConsumZero
       
     }else{
-      #satAkun$table1 = loadFileRDS()$satSelisih
-      #satAkun$table1 = rbind(loadFileRDS()$satSelisih,data$listConsumZero)
       satAkun$table1 = loadFileRDS()$satSelisih
     } 
   })
   
   valSatLand <- eventReactive(input$satLandHit,{
-   #observeEvent(input$satLandHit,{
-    #browser()
-      satAkun$table1 <-  landSatData()
-      indexCol <- c(colnames(satAkun$table1)[1],colnames(satAkun$table1)[2],
-                    paste0("y",input$pilihtahunSatLand))
-      satAkun$table1 <- satAkun$table1[ , c(indexCol)]
-      satAkun$table1
+    satAkun$table1 <-  landSatData()
+    indexCol <- c(colnames(satAkun$table1)[1],colnames(satAkun$table1)[2],
+                  paste0("y",input$pilihtahunSatLand))
+    satAkun$table1 <- satAkun$table1[ , c(indexCol)]
+    satAkun$table1
   })
   
   output$editSatLand <- renderRHandsontable({
     rhandsontable(valSatLand(),
                   selectCallback = TRUE,
-      rowHeaderWidth = 50,
-      fixedColumnsLeft = 2,
-      height = 200,
-      ) %>% 
+                  rowHeaderWidth = 50,
+                  fixedColumnsLeft = 2,
+                  height = 200,
+    ) %>% 
       hot_table(contextMenu = TRUE) %>% 
       hot_context_menu(allowRowEdit = TRUE,allowColEdit = T,
-        customOpts = list(
-          search = list(name = "Search",
-                        callback = htmlwidgets::JS(
-                          "function (key, options) {
+                       customOpts = list(
+                         search = list(name = "Search",
+                                       callback = htmlwidgets::JS(
+                                         "function (key, options) {
                          var srch = prompt('Search criteria');
-
                          this.search.query(srch);
                          this.render();
                        }")))) %>% 
-            hot_col(col = c(colnames(satAkun$table1)[1],colnames(satAkun$table1)[2]),
-                   default = "tutupan lahan belum dipilih",
-                   type = "dropdown", source = sort(colnames(LDMProp_his))) 
+      hot_col(col = c(colnames(satAkun$table1)[1],colnames(satAkun$table1)[2]),
+              default = "tutupan lahan belum dipilih",
+              type = "dropdown", source = sort(colnames(LDMProp_his))) 
     
   })
-
+  
   
   ##### simpan tabel Sat baru ke dalam folder ####
-  #landSatSave<-eventReactive(input$saveModalSatLand,{
-  observeEvent(input$saveModalSatLand,{
-    browser()
+  landSatSave<-eventReactive(input$saveModalSatLand,{
+  #observeEvent(input$saveModalSatLand,{
+    #browser()
     satEditNew<-as.data.frame(hot_to_r(input$editSatLand))
     if (is.null(loadFileRDS()$satSelisih)) {
       satSelisih = data$listConsumZero
@@ -605,9 +595,6 @@ buttonModule <- function(input, output, session, data, type) {
       rowbinSat <- dplyr::bind_rows(satSelisih,satEditNew)
       
     }
-    
-    # satSelisih <- data$listConsumZero
-    # rowbinSat <- dplyr::bind_rows(satSelisih,satEditNew)
     
     rowbinSat <- rowbinSat[-1,]
     rownames(rowbinSat) <- 1:nrow(rowbinSat)
@@ -631,12 +618,7 @@ buttonModule <- function(input, output, session, data, type) {
     
     
     saveRDS(dataDefine, file = fileName)
-    
-    # tampilan keterangan setiap save tabel konsumsi
-    # inputSektorTampil<-capture.output(cat(input$sektorSat , sep=", ")) #"tanaman pangan"
-    # inputTahun<-paste0("y",input$pilihtahunSat)
-    # inputBahanBakarTampil <- capture.output(cat(input$pilihBahanBakar , sep=", "))
-    textTampil <- paste0("tabel diatas sudah disimpan")
+    textTampil <- paste0("tabel diatas sudah tersimpan")
     insertUI(selector='#teksLandSatSave',
              where = 'afterEnd',
              ui = tags$div (textTampil))
@@ -678,6 +660,7 @@ buttonModule <- function(input, output, session, data, type) {
     tagList(
       tags$b('Sunting secara manual'),
       tags$br(),
+      tags$h6("Nilai yang diinputkan adalah selisih dari BAU"),
       tags$br(),
       rHandsontableOutput(ns('editSat')),
       tags$br(),
@@ -1671,6 +1654,13 @@ buttonModule <- function(input, output, session, data, type) {
   
   observeEvent(input$saveEditLRCRate,{
     scenarioSimulation$inputLRCRate<-as.matrix(hot_to_r(input$editLRCRate))
+    # coding u/save input$editLRCRate ke RDS
+    
+  })
+  
+  observeEvent(input$saveEditPercentageDiagTPM,{
+    scenarioSimulation$sliderPercentageDiagTPM<-input$sliderPercentageDiagTPM
+    # coding u/ save input$sliderPercentageDiagTPM ke RDDS
   })
   
   observeEvent(input$buttonRunCheckLandCover,{
@@ -1739,7 +1729,6 @@ buttonModule <- function(input, output, session, data, type) {
       scenarioResultTotalEmission[scenarioResultTotalEmission$Year==input$selectScenarioResultTableYear,] 
     } 
   })
-  
   
   ### hapus file ###
   observeEvent(input$delete_button_trigger, {

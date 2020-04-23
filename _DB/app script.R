@@ -34,8 +34,7 @@ ui <- fluidPage(
              tags$br(),
              tags$br(),
              buttonUI("forAgri")
-    )
-    ,
+    ),
     tabPanel(h3("lahan"),
              tags$br(),
              tags$br(),
