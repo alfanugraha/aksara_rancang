@@ -1459,6 +1459,12 @@ output$editLRCRate <- renderRHandsontable({
 
 observeEvent(input$saveEditLRCRate,{
   scenarioSimulation$inputLRCRate<-as.matrix(hot_to_r(input$editLRCRate))
+  # coding u/save input$editLRCRate ke RDS
+})
+
+observeEvent(input$saveEditPercentageDiagTPM,{
+  scenarioSimulation$sliderPercentageDiagTPM<-input$sliderPercentageDiagTPM
+  # coding u/ save input$sliderPercentageDiagTPM ke RDDS
 })
 
 observeEvent(input$buttonRunCheckLandCover,{
