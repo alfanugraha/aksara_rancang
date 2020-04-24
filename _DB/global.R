@@ -1,7 +1,6 @@
 ### global variable
 
 #ID
-selectedSektor <- "energi"
 username<-"dw"
 
 
