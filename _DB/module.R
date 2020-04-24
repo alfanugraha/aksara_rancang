@@ -409,17 +409,18 @@ buttonModule <- function(input, output, session, data, type) {
   finalDemand <- reactiveValues(
     table1 = NULL
   )
-  
-  FDdata <- reactive({
-    if (is.null(loadFileRDS()$fdSelisih)) {
-      finalDemand$table1 = fdZero
-    }else{
-      finalDemand$table1 =  loadFileRDS()$fdSelisih
-    }
-  })
+
   
   valFD<- eventReactive(c(input$showYearEco),{
-    finalDemand$table1 <- FDdata()
+    selectedRow <- as.numeric(strsplit(input$select_button,"_")[[1]][2])
+    fileName<- as.character(ListTableReact()[selectedRow,5]) #nama file
+    dataDefine <-  readRDS(fileName)
+    
+      if (is.null(dataDefine$fdSelisih)) {
+        finalDemand$table1 = fdZero
+      }else{
+        finalDemand$table1 =  dataDefine$fdSelisih
+      }
     finalDemand$table1 <- filter(finalDemand$table1, finalDemand$table1$Sektor %in% c(input$sektorEcon))
     finalDemand$table1 <- finalDemand$table1[,c("Sektor",paste0("y",input$pilihtahunFD))]
     finalDemand$table1
@@ -433,45 +434,33 @@ buttonModule <- function(input, output, session, data, type) {
     
   })
   
-  #### masukkan nilai sel baru ke dalam kolom fdNew 
-  FDSave<-eventReactive(input$saveModalFD,{
+  #### masukkan nilai sel baru ke dalam kolom fdNew
+  observeEvent(input$saveModalFD,{
+    selectedRow <- as.numeric(strsplit(input$select_button,"_")[[1]][2])
+    fileName<- as.character(ListTableReact()[selectedRow,5]) #nama file
+    dataDefine <-  readRDS(fileName)
+    
     finalDemand$table1 <- as.data.frame(hot_to_r(input$editFD))
     inputSektor<-input$sektorEcon 
     inputTahun<-paste0("y",input$pilihtahunFD)
     indexSektor <- as.numeric(which(sapply(Sector,function(x) any(x==c(inputSektor)))))
     
-    if (is.null(loadFileRDS()$fdSelisih)) {
+    if (is.null(dataDefine$fdSelisih)) {
       fdSelisih = fdZero
       fdSelisih[c(indexSektor), c(inputTahun)] <- finalDemand$table1[,-1]
     }else{
-      fdSelisih =  loadFileRDS()$fdSelisih
+      fdSelisih = dataDefine$fdSelisih
       fdSelisih[c(indexSektor), c(inputTahun)] <- finalDemand$table1[,-1]
     }
     
-    
-    fdNew_list<-list(fdBauReal = fdBau,
-                     fdEditNew = finalDemand$table1,
-                     fdSelisih = fdSelisih
-    )
-    fdNew_list
+      dataDefine$fdSelisih <- fdSelisih
+      saveRDS(dataDefine, file = fileName)
 
-  })
-  
- 
-  
-  ##### simpan tabel FD baru ke dalam folder ####
-  observeEvent(input$saveModalFD,{
-    selectedRow <- as.numeric(strsplit(input$select_button,"_")[[1]][2])
-    fileName<- as.character(ListTableReact()[selectedRow,5]) #nama file
-    
-    dataDefine <-  readRDS(fileName)
-    dataDefine$fdSelisih <- FDSave()$fdSelisih
-    saveRDS(dataDefine, file = fileName)
-  
-    insertUI(selector='#objDownloadFD',
-             where='afterEnd',
-             ui= uiOutput(ns('downButtonFD'))
-    )
+      insertUI(selector='#objDownloadFD',
+               where='afterEnd',
+               ui= uiOutput(ns('downButtonFD')))
+      
+
   })
 
   output$downButtonFD<- renderUI({
@@ -485,12 +474,22 @@ buttonModule <- function(input, output, session, data, type) {
 
   observeEvent(input$downloadFD,{
     selectedRow <- as.numeric(strsplit(input$select_button,"_")[[1]][2])
-    fileName <- as.character(ListTableReact()[selectedRow,5]) #nama file
-    fileName <- strsplit(fileName,"/")[[1]][5]
-    namaSheet <- names(FDSave())
+    fileName<- as.character(ListTableReact()[selectedRow,5]) #nama file
+    dataDefine <-  readRDS(fileName)
     
-    dirFile <- paste0(data$alamatFile,"/","Excel_",fileName,".xlsx")
-    write.xlsx(FDSave(),
+    fdNew_list<-list(fdBauReal = fdBau,
+                     fdEditNew = finalDemand$table1,
+                     fdSelisih = dataDefine$fdSelisih
+    )
+    fdNew_list
+    
+    fileNameDownload <- strsplit(fileName,"/")[[1]][5]
+    namaSheet <- names(fdNew_list)
+    
+    
+    
+    dirFile <- paste0(data$alamatFile,"/","Excel_",fileNameDownload,".xlsx")
+    write.xlsx(fdNew_list,
                file = dirFile,
                sheetName = namaSheet)
   })
@@ -533,9 +532,12 @@ buttonModule <- function(input, output, session, data, type) {
     )
   })
   
-  
-  landSatData <- reactive({
-    if (is.null(loadFileRDS()$satSelisih)) {
+  valSatLand <- eventReactive(input$satLandHit,{
+    selectedRow <- as.numeric(strsplit(input$select_button,"_")[[1]][2])
+    fileName<- as.character(ListTableReact()[selectedRow,5]) #nama file
+    dataDefine <-  readRDS(fileName)
+    
+    if (is.null(dataDefine$satSelisih)) {
       satAkun$table1 = data$listConsumZero
       satAkun$table1
     }else{
@@ -547,12 +549,7 @@ buttonModule <- function(input, output, session, data, type) {
       satAkun$table1[,1] <- tupla[1]
       satAkun$table1[,2] <- tupla[1]
       satAkun$table1 = dplyr::bind_rows(dataDefine$satSelisih,satAkun$table1)
-      satAkun$table1
     }
-  })
-  
-  valSatLand <- eventReactive(input$satLandHit,{
-    satAkun$table1 = landSatData()
     
     indexCol <- c(colnames(satAkun$table1)[1],colnames(satAkun$table1)[2],
                   paste0("y",input$pilihtahunSatLand))
@@ -665,18 +662,20 @@ buttonModule <- function(input, output, session, data, type) {
     )
   })
   
-  SatData <- reactive({
-    if (is.null(loadFileRDS()$satSelisih)) {
-      satAkun$table1 = data$listConsumZero
-    }else{
-      satAkun$table1 =  loadFileRDS()$satSelisih
-    }
-  })
   
   valSat<- eventReactive(c(input$showYearSat),{
-    #bentuk list
+    selectedRow <- as.numeric(strsplit(input$select_button,"_")[[1]][2])
+    fileName<- as.character(ListTableReact()[selectedRow,5]) #nama file
+    dataDefine <-  readRDS(fileName)
+    
+    if (is.null(dataDefine$satSelisih)) {
+      satAkun$table1 = data$listConsumZero
+    }else{
+      satAkun$table1 =  dataDefine$satSelisih
+    }
+    
     indexAwal <- paste0("y",input$pilihtahunSat)
-    satAkun$table1 <- SatData()[indexAwal]
+    satAkun$table1 <- satAkun$table1[indexAwal]
     satAkun$table1 <- data.frame(satAkun$table1)
     satAkun$table1 <- satAkun$table1[,c(-1,-2,-3)]
     satAkun$table1 <- cbind(Sector,satAkun$table1)
@@ -693,19 +692,24 @@ buttonModule <- function(input, output, session, data, type) {
   })
   
   #### masukkan nilai sel baru ke dalam kolom satNew 
-  satSave<-eventReactive(input$saveModalSat,{
+  #satSave<-eventReactive(input$saveModalSat,{
+  observeEvent(input$saveModalSat,{
+    #browser()
+    selectedRow <- as.numeric(strsplit(input$select_button,"_")[[1]][2])
+    fileName<- as.character(ListTableReact()[selectedRow,5]) #nama file
+    dataDefine <-  readRDS(fileName)
+    
     satAkun$table1<-as.data.frame(hot_to_r(input$editSat))
     inputSektor<-input$sektorSat 
     indexSektor <- as.numeric(which(sapply(Sector,function(x) any(x==c(inputSektor)))))
     inputTahun<-paste0("y",input$pilihtahunSat)
     inputBahanBakar <- input$pilihBahanBakar
     
-    
-    if (is.null(loadFileRDS()$satSelisih)) {
+    if (is.null(dataDefine$satSelisih)) {
       satSelisih = data$listConsumZero
       satSelisih[[inputTahun]][indexSektor,inputBahanBakar]<-satAkun$table1[-1]
     }else{
-      satSelisih =  loadFileRDS()$satSelisih
+      satSelisih =  dataDefine$satSelisih
       satSelisih[[inputTahun]][indexSektor,inputBahanBakar]<-satAkun$table1[-1]
     }
     
@@ -715,36 +719,22 @@ buttonModule <- function(input, output, session, data, type) {
       x
       })
     
-    satNew_list<-list(satEditNew = satAkun$table1, # 1 data.frame = tabel yang diedit (partial) yang tampilkan di modal dialog UI
-                      satSelisih = satSelisih  #list selisih (15 tabel)
-    )
-    satNew_list
-  })
-  
-  
-  
-  ##### simpan tabel Sat baru ke dalam folder ####
-  observeEvent(input$saveModalSat,{
-    selectedRow <- as.numeric(strsplit(input$select_button,"_")[[1]][2])
-    fileName<- as.character(ListTableReact()[selectedRow,5]) #nama file
-    
-    dataDefine <-  readRDS(fileName)
-    dataDefine[5] <- list(dataDefine$fdSelisih)
-    dataDefine$satSelisih <- satSave()$satSelisih
-    
+      dataDefine[5] <- list(dataDefine$fdSelisih)
+      dataDefine$satSelisih <- satSelisih
+      saveRDS(dataDefine, file = fileName)
 
-    saveRDS(dataDefine, file = fileName)
-    
-    #tampilan keterangan setiap save tabel konsumsi
-    inputSektorTampil<-capture.output(cat(input$sektorSat , sep=", ")) #"tanaman pangan"
-    inputTahun<-paste0("y",input$pilihtahunSat)
-    inputBahanBakarTampil <- capture.output(cat(input$pilihBahanBakar , sep=", "))
-    textTampil <- paste0("Satelit akun yang diedit adalah ","sektor: ",inputSektorTampil," - ","tahun: ",
-                         inputTahun," - ","bahan bakar: ",inputBahanBakarTampil)
-    insertUI(selector='#teksSatSave',
-             where = 'afterEnd',
-             ui = tags$div (textTampil))
+      #tampilan keterangan setiap save tabel konsumsi
+      inputSektorTampil<-capture.output(cat(input$sektorSat , sep=", ")) #"tanaman pangan"
+      inputTahun<-paste0("y",input$pilihtahunSat)
+      inputBahanBakarTampil <- capture.output(cat(input$pilihBahanBakar , sep=", "))
+      textTampil <- paste0("Satelit akun yang diedit adalah ","sektor: ",inputSektorTampil," - ","tahun: ",
+                           inputTahun," - ","bahan bakar: ",inputBahanBakarTampil)
+      insertUI(selector='#teksSatSave',
+               where = 'afterEnd',
+               ui = tags$div (textTampil))
   })
+  
+  
   
   ### tutup modal dialog Econ ###
   observeEvent(input$closeModalFD,{
@@ -1640,13 +1630,27 @@ buttonModule <- function(input, output, session, data, type) {
   
   observeEvent(input$saveEditLRCRate,{
     scenarioSimulation$inputLRCRate<-as.matrix(hot_to_r(input$editLRCRate))
+    
     # coding u/save input$editLRCRate ke RDS
+    selectedRow <- as.numeric(strsplit(input$select_button,"_")[[1]][2])
+    fileName<- as.character(ListTableReact()[selectedRow,5]) #nama file
+    
+    dataDefine <-  readRDS(fileName)
+    dataDefine$inputLRCRate <- as.matrix(hot_to_r(input$editLRCRate))
+    saveRDS(dataDefine, file = fileName)
     
   })
   
   observeEvent(input$saveEditPercentageDiagTPM,{
     scenarioSimulation$sliderPercentageDiagTPM<-input$sliderPercentageDiagTPM
+    
     # coding u/ save input$sliderPercentageDiagTPM ke RDDS
+    selectedRow <- as.numeric(strsplit(input$select_button,"_")[[1]][2])
+    fileName<- as.character(ListTableReact()[selectedRow,5]) #nama file
+    
+    dataDefine <-  readRDS(fileName)
+    dataDefine$inputPercentageDiagTPM <- input$sliderPercentageDiagTPM
+    saveRDS(dataDefine, file = fileName)
   })
   
   observeEvent(input$buttonRunCheckLandCover,{
