@@ -19,7 +19,7 @@ ui <- fluidPage(
   titlePanel("SEKTOR"),
   tabsetPanel(
     tabPanel(
-      h3("energi & transportasi"),
+      h5("energi & transportasi"),
       tags$br(),
       tags$br(),
       buttonUI("forEnergy"),

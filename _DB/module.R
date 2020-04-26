@@ -608,7 +608,7 @@ buttonModule <- function(input, output, session, data, type) {
         insertUI(selector='#teksLandSatSave',
                  where = 'afterEnd',
                  ui = tags$div(id="textTampil","tabel di atas sudah tersimpan"))
-    }else{
+    }else {
       
       insertUI(selector='#teksLandSatSave',
                where = 'afterEnd',
@@ -999,6 +999,7 @@ buttonModule <- function(input, output, session, data, type) {
     
     # masukkan semua variabel ke reactiveValues
     scenarioSimulation$selectedFile <- selectedFile
+    scenarioSimulation$fileName <- fileName
     scenarioSimulation$initialYear <-initialYear
     scenarioSimulation$finalYear <- finalYear
     scenarioSimulation$iteration <- iteration
@@ -1254,6 +1255,7 @@ buttonModule <- function(input, output, session, data, type) {
   
   runScenarioVisualization<-reactive({
     selectedFile = scenarioSimulation$selectedFile
+    fileName = scenarioSimulation$fileName
     initialYear = scenarioSimulation$initialYear
     finalYear = scenarioSimulation$finalYear
     iteration = scenarioSimulation$iteration
@@ -1517,6 +1519,28 @@ buttonModule <- function(input, output, session, data, type) {
       )))
     }
     
+    # save tables to RDS
+    # coding u/save input$editLRCRate ke RDS
+    
+    dataDefine <-  readRDS(fileName)
+    dataDefine$scenarioResultGDP <- scenarioResultGDP
+    dataDefine$scenarioResultIncome <- scenarioResultIncome
+    dataDefine$scenarioResultLabour <- scenarioResultLabour
+    dataDefine$scenarioResultEnergyConsumption <- scenarioResultEnergyConsumption
+    dataDefine$scenarioResultEnergyEmission <- scenarioResultEnergyEmission
+    dataDefine$scenarioResultWasteDisposal <- scenarioResultWasteDisposal
+    dataDefine$scenarioResultWasteEmission <- scenarioResultWasteEmission
+    dataDefine$scenarioResultFertilizerUsed <- scenarioResultFertilizerUsed
+    dataDefine$scenarioResultFertilizerEmission <- scenarioResultFertilizerEmission
+    dataDefine$scenarioResultLandReq <- scenarioResultLandReq
+    dataDefine$scenarioResultLandCover <- scenarioResultLandCover
+    dataDefine$scenarioResultLUTM <- scenarioResultLUTM
+    dataDefine$scenarioResultLandEmission <- scenarioResultLandEmission
+    dataDefine$scenarioResultTotalEmission <- scenarioResultTotalEmission
+    dataDefine$scenarioAllResult <- scenarioAllResult
+    saveRDS(dataDefine, file = fileName)
+    
+    
     scenarioSimulation$scenarioResultGDP <- scenarioResultGDP
     scenarioSimulation$scenarioResultIncome <- scenarioResultIncome
     scenarioSimulation$scenarioResultLabour <- scenarioResultLabour
@@ -1570,7 +1594,11 @@ buttonModule <- function(input, output, session, data, type) {
                                   "Buangan Limbah",
                                   "Penggunaan Pupuk",
                                   "Kebutuhan Lahan",
-                                  "Emisi")),
+                                  "Emisi Sektor Energi", 
+                                  "Emisi Sektor Limbah", 
+                                  "Emisi Sektor Pertanian", 
+                                  "Emisi Sektor Lahan", 
+                                  "Emisi Total")),
             selectInput(ns('selectScenarioResultTableYear'),
                         label="Pilih tahun tabel",
                         choices=c(initialYear:finalYear)),
@@ -1629,11 +1657,11 @@ buttonModule <- function(input, output, session, data, type) {
   })
   
   observeEvent(input$saveEditLRCRate,{
+    fileName<-  scenarioSimulation$fileName 
+    
     scenarioSimulation$inputLRCRate<-as.matrix(hot_to_r(input$editLRCRate))
     
     # coding u/save input$editLRCRate ke RDS
-    selectedRow <- as.numeric(strsplit(input$select_button,"_")[[1]][2])
-    fileName<- as.character(ListTableReact()[selectedRow,5]) #nama file
     
     dataDefine <-  readRDS(fileName)
     dataDefine$inputLRCRate <- as.matrix(hot_to_r(input$editLRCRate))
@@ -1642,12 +1670,11 @@ buttonModule <- function(input, output, session, data, type) {
   })
   
   observeEvent(input$saveEditPercentageDiagTPM,{
+    fileName<-  scenarioSimulation$fileName 
+    
     scenarioSimulation$sliderPercentageDiagTPM<-input$sliderPercentageDiagTPM
     
     # coding u/ save input$sliderPercentageDiagTPM ke RDDS
-    selectedRow <- as.numeric(strsplit(input$select_button,"_")[[1]][2])
-    fileName<- as.character(ListTableReact()[selectedRow,5]) #nama file
-    
     dataDefine <-  readRDS(fileName)
     dataDefine$inputPercentageDiagTPM <- input$sliderPercentageDiagTPM
     saveRDS(dataDefine, file = fileName)
@@ -1689,10 +1716,15 @@ buttonModule <- function(input, output, session, data, type) {
     scenarioResultIncome <- scenarioSimulation$scenarioResultIncome
     scenarioResultLabour <- scenarioSimulation$scenarioResultLabour
     scenarioResultEnergyConsumption <- scenarioSimulation$scenarioResultEnergyConsumption
+    scenarioResultEnergyEmission <- scenarioSimulation$scenarioResultEnergyEmission
     scenarioResultWasteDisposal <- scenarioSimulation$scenarioResultWasteDisposal
+    scenarioResultWasteEmission <- scenarioSimulation$scenarioResultWasteEmission
     scenarioResultFertilizerUsed <- scenarioSimulation$scenarioResultFertilizerUsed
+    scenarioResultFertilizerEmission <- scenarioSimulation$scenarioResultFertilizerEmission
     scenarioResultLandReq <- scenarioSimulation$scenarioResultLandReq
+    scenarioResultLandEmission <-scenarioSimulation$scenarioResultLandEmission
     scenarioResultTotalEmission  <- scenarioSimulation$scenarioResultTotalEmission 
+    
     
     if(input$selectScenarioResultTable=="PDRB"){
       scenarioResultGDP[scenarioResultGDP$year==input$selectScenarioResultTableYear,]
@@ -1715,7 +1747,19 @@ buttonModule <- function(input, output, session, data, type) {
     } else if (input$selectScenarioResultTable=="Kebutuhan Lahan"){
       scenarioResultLandReq[scenarioResultLandReq$year==input$selectScenarioResultTableYear,] 
       
-    } else if (input$selectScenarioResultTable=="Emisi"){
+    } else if (input$selectScenarioResultTable=="Emisi Sektor Energi"){
+      scenarioResultEnergyEmission[scenarioResultEnergyEmission$year==input$selectScenarioResultTableYear,] 
+      
+    } else if (input$selectScenarioResultTable=="Emisi Sektor Limbah"){
+      scenarioResultWasteEmission[scenarioResultWasteEmission$year==input$selectScenarioResultTableYear,] 
+      
+    } else if (input$selectScenarioResultTable=="Emisi Sektor Pertanian"){
+      scenarioResultFertilizerEmission[scenarioResultFertilizerEmission$year==input$selectScenarioResultTableYear,] 
+      
+    } else if (input$selectScenarioResultTable=="Emisi Sektor Lahan"){
+      scenarioResultLandEmission[scenarioResultLandEmission$year==input$selectScenarioResultTableYear,] 
+      
+    } else if (input$selectScenarioResultTable=="Emisi Total"){
       scenarioResultTotalEmission[scenarioResultTotalEmission$Year==input$selectScenarioResultTableYear,] 
     } 
   })
