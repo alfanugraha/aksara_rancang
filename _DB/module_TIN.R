@@ -95,31 +95,31 @@ buttonModule <- function(input, output, session, data, type) {
   
   output$editDefine <- renderRHandsontable({
     rhandsontable(valDef(),
+                  readOnly = T,
                   rowHeaderWidth = 160,
-    )%>%hot_cols(format=3)
+    )%>%hot_cols(colWidths = 150)
   })
   
   listValDef <- reactive({
     newTableDef <- as.data.frame(hot_to_r(input$editDefine))
-
+    
     namaSken <- as.character(newTableDef[1,]) #2
     tahunAwal <- as.numeric(trimws(newTableDef[2,])) #3
     tahunAkhir <- as.numeric(trimws(newTableDef[3,])) #4
     deskrip <- as.character(newTableDef[4,]) #5
     fdSelisih <- NULL #6
     satSelisih <- NULL #7
-    # proyPdrb <- NULL #8
-    # proyEmisi <- NULL #9
     
-    #tambahkan faktor emisi
-    emissionFactor <- NULL
-    
+    emissionFactor <- NULL #8
+    inputLRCRate <- NULL    #9
+    inputPercentageDiagTPM <- NULL #10
     
     combineDef <- list(namaSken=namaSken,tahunAwal=tahunAwal,tahunAkhir=tahunAkhir, deskrip=deskrip,
-                       fdSelisih=fdSelisih, satSelisih=satSelisih, 
-                       #proyPdrb = proyPdrb,proyEmisi=proyEmisi,
-                       emissionFactor=emissionFactor)
-
+                       fdSelisih=fdSelisih, satSelisih=satSelisih,
+                       emissionFactor=emissionFactor,
+                       inputLRCRate=inputLRCRate,
+                       inputPercentageDiagTPM=inputPercentageDiagTPM)
+    
     combineDef
   })
   
@@ -138,7 +138,7 @@ buttonModule <- function(input, output, session, data, type) {
   observeEvent(input$cancelModalDef,{
     removeModal()
   })
-
+  
   
   ListButton_fun <- function(FUN, len, id, ...) {
     inputs <- character(len)
@@ -151,11 +151,21 @@ buttonModule <- function(input, output, session, data, type) {
   loadRDSAll <- reactive({
     nameFiles <- list.files(path = data$alamatFile,
                             pattern = paste0("^", username))
-    dirFile <- paste0(data$alamatFile, "/",
-                      nameFiles)
+    dirFile <- paste0(data$alamatFile, "/",nameFiles)
+    funcFile <- function(x){
+      a <- readRDS(x)
+      b <- c(x,a)
+      b}
     
-    if(identical(nameFiles,character(0))){
-      r <- data.frame(
+    r <- lapply(dirFile, funcFile)
+    r
+  })
+  
+  
+  ### buat tabel daftar nama file reaktif ###
+  ListTableReact <- reactive({
+    if(identical(list.files(path = data$alamatFile,pattern = paste0("^", username)),character(0))){
+      data.frame(
         Nama.Skenario =  "file tidak tersedia",
         Tahun.Awal = "file tidak tersedia", 
         Tahun.Akhir = "file tidak tersedia",
@@ -164,51 +174,40 @@ buttonModule <- function(input, output, session, data, type) {
         satSelisih = "file tidak tersedia",
         Nama.File = "file tidak tersedia", 
         Sunting.Skenario = "file tidak tersedia",
-        Jalankan.analisis = "file tidak tersedia"
+        Jalankan.analisis = "file tidak tersedia",
+        Hapus.skenario = "file tidak tersedia"
       )
-      o <- list(r)
     } else {
-      funcFile <- function(x){
-        a <- readRDS(x)
-        b <- c(x,a)
-        b
-      }
-      
-      r <- lapply(dirFile, funcFile)
-      r
+      data.frame(
+        Nama.Skenario =  unlist(lapply(loadRDSAll(), function(x)x[[2]])),
+        Tahun.Awal = unlist(lapply(loadRDSAll(), function(x)x[[3]])), 
+        Tahun.Akhir = unlist(lapply(loadRDSAll(), function(x)x[[4]])),
+        Deskripsi.Skenario = unlist(lapply(loadRDSAll(), function(x)x[[5]])),
+        Nama.File = unlist(lapply(loadRDSAll(), function(x)x[[1]])), #nama file dr listValDef ada di index terakhir = 6
+        Sunting.Skenario = ListButton_fun(actionButton,
+                                          length(loadRDSAll()),
+                                          'button_',
+                                          label = "Sunting Konstruksi Ekonomi dan Satelit Akun",
+                                          onclick = sprintf('Shiny.onInputChange("%s", Math.random());Shiny.onInputChange("%s",this.id)',
+                                                            ns("select_button_trigger"), ns("select_button"))),
+        Jalankan.analisis = ListButton_fun(actionButton,
+                                           length(loadRDSAll()),
+                                           'buttonRun_',
+                                           label = "Jalankan Analisis",
+                                           onclick = sprintf('Shiny.onInputChange("%s", Math.random());Shiny.onInputChange("%s",this.id)',
+                                                             ns("run_button_trigger"), ns("run_button"))),
+        Hapus.skenario = ListButton_fun(actionButton,
+                                        length(loadRDSAll()),
+                                        'buttonDelete_',
+                                        label = "Hapus Skenario",
+                                        onclick = sprintf('Shiny.onInputChange("%s", Math.random());Shiny.onInputChange("%s",this.id)',
+                                                          ns("delete_button_trigger"), ns("delete_button")))
+      )
     }
+    
     
   })
   
-  
-  ### buat tabel daftar nama file reaktif ###
-  ListTableReact <- reactive({
-    data.frame(
-          Nama.Skenario =  unlist(lapply(loadRDSAll(), function(x)x[[2]])),
-          Tahun.Awal = unlist(lapply(loadRDSAll(), function(x)x[[3]])), 
-          Tahun.Akhir = unlist(lapply(loadRDSAll(), function(x)x[[4]])),
-          Deskripsi.Skenario = unlist(lapply(loadRDSAll(), function(x)x[[5]])),
-          Nama.File = unlist(lapply(loadRDSAll(), function(x)x[[1]])), #nama file dr listValDef ada di index terakhir = 6
-          Sunting.Skenario = ListButton_fun(actionButton,
-                                            length(loadRDSAll()),
-                                            ns('button_'),
-                                            label = "Sunting Konstruksi Ekonomi dan Satelit Akun",
-                                            onclick = sprintf('Shiny.onInputChange("%s", Math.random());Shiny.onInputChange("%s",this.id)',ns("select_button_trigger"), ns("select_button"))
-                                           # onclick=  paste0('Shiny.onInputChange(\"' , ns("select_button"), '\", this.id)')
-                                            ),
-          Jalankan.analisis = ListButton_fun(actionButton,
-                                             length(loadRDSAll()),
-                                            ns('buttonRun_'),
-                                            label = "Jalankan Analisis",
-                                            onclick = sprintf('Shiny.onInputChange("%s", Math.random());Shiny.onInputChange("%s",this.id)',ns("run_button_trigger"), ns("run_button"))),
-          Hapus.skenario = ListButton_fun(actionButton,
-                                          length(loadRDSAll()),
-                                          ns('buttonDelete_'),
-                                          label = "Hapus Skenario",
-                                          onclick = sprintf('Shiny.onInputChange("%s", Math.random());Shiny.onInputChange("%s",this.id)',ns("delete_button_trigger"), ns("delete_button")))
-      ) 
-  })
-
   ###tampilkan tabel list ###
   output$ListTable <- renderDataTable({
     ListTableReact()
@@ -216,68 +215,139 @@ buttonModule <- function(input, output, session, data, type) {
   
   
   
-  observeEvent(input$select_button_trigger,{
-    #browser()
-    showModal(
-      modalDialog( 
-        footer=tagList(
-          actionButton(ns("closeModalFD"), "Tutup")
-        ),
-        tabsetPanel(
-          tabPanel(
-            h2("Ekonomi"),
-            sidebarLayout(
-              sidebarPanel(
+  
+  if(type=="land"){
+    observeEvent(input$select_button_trigger,{
+      showModal(
+        modalDialog( 
+          footer=tagList(
+            actionButton(ns("closeModalFD"), "Tutup")
+          ),
+          tabsetPanel(
+            tabPanel(
+              h2("Ekonomi"),
+              sidebarLayout(
+                sidebarPanel(
+                  fluidRow(
+                    selectInput(ns("intervensiEcon"),
+                                label="pilih intervensi",
+                                choices=c("Final Demand","AV","Input-Output")),
+                    pickerInput(ns("sektorEcon"),
+                                label="pilih sektor", selected = Sector[1],
+                                choices=Sector,options = list(`actions-box` = TRUE),multiple = T)),
+                  tags$br(),
+                  actionButton(ns("econHit"),"tentukan tahun intervensi"),
+                  width=5
+                ),
+                mainPanel(
+                  tags$div(id = ns('FDPlaceholder')),
+                  width=7)
+              ),
+              title="Sunting Intervensi Ekonomi"
+            ),
+            
+            
+            ################################################################################
+            #                                                                              #
+            #                        BUTTON KONSTRUKSI SATELIT AKUN LAHAN                  #
+            #                                                                              #
+            ################################################################################
+            tabPanel(
+              h2("Satelit akun lahan"),
+              sidebarLayout(
+                sidebarPanel(
+                  fluidPage(
+                    pickerInput(ns("pilihtahunSatLand"),
+                                label="pilih tahun intervensi", selected = loadFileRDS()$tahunAwal,
+                                choices=c(loadFileRDS()$tahunAwal : loadFileRDS()$tahunAkhir),
+                                options = list(`actions-box` = TRUE),multiple = T),
+                    selectInput(ns("banyakTupla"),
+                                label="banyaknya perubahan tutupan lahan",
+                                choices=c(1:10))
+                  ),
+                  tags$br(),
+                  actionButton(ns("satLandHit"),"tampilkan tabel"),
+                  width=5
+                ),
+                mainPanel(
+                  tags$div(id = ns('satLandPlaceholder')),
+                  width=12)
+              ),
+              title="Sunting Intervensi Satelit Akun"
+            ))
+          ,
+          size="l",
+          easyClose = FALSE)
+      )
+      
+    })
+  }else{
+    observeEvent(input$select_button_trigger,{
+      #browser()
+      showModal(
+        modalDialog( 
+          footer=tagList(
+            actionButton(ns("closeModalFD"), "Tutup")
+          ),
+          tabsetPanel(
+            tabPanel(
+              h2("Ekonomi"),
+              sidebarLayout(
+                sidebarPanel(
+                  fluidRow(
+                    selectInput(ns("intervensiEcon"),
+                                label="pilih intervensi",
+                                choices=c("Final Demand","AV","Input-Output")),
+                    pickerInput(ns("sektorEcon"),
+                                label="pilih sektor", selected = Sector[1],
+                                choices=Sector,options = list(`actions-box` = TRUE),multiple = T)),
+                  tags$br(),
+                  actionButton(ns("econHit"),"tentukan tahun intervensi"),
+                  width=5
+                ),
+                mainPanel(
+                  tags$div(id = ns('FDPlaceholder')),
+                  width=7)
+              ),
+              title="Sunting Intervensi Ekonomi"
+            ),
+            
+            
+            ################################################################################
+            #                                                                              #
+            #                        BUTTON KONSTRUKSI SATELIT AKUN                        #
+            #                                                                              #
+            ################################################################################
+            tabPanel(
+              h2("Satelit akun"),
+              sidebarLayout(sidebarPanel(
                 fluidRow(
-                  selectInput(ns("intervensiEcon"),
+                  selectInput(ns("intervensiSat"),
                               label="pilih intervensi",
-                              choices=c("Final Demand","AV","Input-Output")),
-                  pickerInput(ns("sektorEcon"),
-                              label="pilih sektor", selected = Sector[1],
-                              choices=Sector,options = list(`actions-box` = TRUE),multiple = T)),
+                              choices=c("konsumsi energi","faktor emisi")),
+                  pickerInput(ns("sektorSat"),
+                              label="pilih sektor",selected = Sector[1],
+                              choices=Sector,options = list(`actions-box` = TRUE),multiple = T)
+                ),
                 tags$br(),
-                actionButton(ns("econHit"),"tentukan tahun intervensi"),
+                actionButton(ns("satHit"),"tentukan tahun intervensi"),
                 width=5
               ),
               mainPanel(
-                tags$div(id = ns('FDPlaceholder')),
+                tags$div(id = ns('satPlaceholder')),
                 width=7)
-            ),
-            title="Sunting Intervensi Ekonomi"
-          ),
-          
-          
-          ################################################################################
-          #                                                                              #
-          #                        BUTTON KONSTRUKSI SATELIT AKUN                        #
-          #                                                                              #
-          ################################################################################
-          tabPanel(
-            h2("Satelit akun"),
-            sidebarLayout(sidebarPanel(
-              fluidRow(
-                selectInput(ns("intervensiSat"),
-                            label="pilih intervensi",
-                            choices=c("konsumsi energi","faktor emisi")),
-                pickerInput(ns("sektorSat"),
-                            label="pilih sektor",selected = Sector[1],
-                            choices=Sector,options = list(`actions-box` = TRUE),multiple = T)),
-              tags$br(),
-              actionButton(ns("satHit"),"tentukan tahun intervensi"),
-              width=5
-            ),
-            mainPanel(
-              tags$div(id = ns('satPlaceholder')),
-              width=7)
-            ),
-            title="Sunting Intervensi Satelit Akun"
-          ))
-        ,
-        size="l",
-        easyClose = FALSE)
-    )
-
-  })
+              ),
+              title="Sunting Intervensi Satelit Akun"
+            ))
+          ,
+          size="l",
+          easyClose = FALSE)
+      )
+      
+    })
+  }
+  
+  
   
   
   
@@ -327,6 +397,8 @@ buttonModule <- function(input, output, session, data, type) {
     tagList(
       tags$b('Sunting secara manual'),
       tags$br(),
+      tags$h6("Nilai yang diinputkan adalah selisih dari BAU"),
+      tags$br(),
       rHandsontableOutput(ns('editFD')),
       tags$br(),
       actionButton(ns('saveModalFD'),' simpan tabel '),
@@ -338,95 +410,86 @@ buttonModule <- function(input, output, session, data, type) {
     table1 = NULL
   )
   
-  # fdBauReact <- reactiveValues(
-  #   isi = fdZero
-  # )
-  
-  FDdata <- reactive({
-    if (is.null(loadFileRDS()$fdSelisih)) {
-      finalDemand$table1 = fdZero
-    }else{
-      finalDemand$table1 =  loadFileRDS()$fdSelisih
-    }
-  })
   
   valFD<- eventReactive(c(input$showYearEco),{
-    #browser()
-    finalDemand$table1 <- FDdata()
+    selectedRow <- as.numeric(strsplit(input$select_button,"_")[[1]][2])
+    fileName<- as.character(ListTableReact()[selectedRow,5]) #nama file
+    dataDefine <-  readRDS(fileName)
+    
+    if (is.null(dataDefine$fdSelisih)) {
+      finalDemand$table1 = fdZero
+    }else{
+      finalDemand$table1 =  dataDefine$fdSelisih
+    }
     finalDemand$table1 <- filter(finalDemand$table1, finalDemand$table1$Sektor %in% c(input$sektorEcon))
-    rownames(finalDemand$table1) <- c(input$sektorEcon)
     finalDemand$table1 <- finalDemand$table1[,c("Sektor",paste0("y",input$pilihtahunFD))]
     finalDemand$table1
   })
   
   output$editFD <- renderRHandsontable({
     rhandsontable(valFD(),
-                  rowHeaderWidth = 160,
-    )%>%hot_cols(format=3)
+                  rowHeaderWidth = 50,
+                  fixedColumnsLeft = 1
+    )%>%hot_cols(colWidths = 100)
     
   })
   
-  #### masukkan nilai sel baru ke dalam kolom fdNew 
-  FDSave<-eventReactive(input$saveModalFD,{
+  #### masukkan nilai sel baru ke dalam kolom fdNew
+  observeEvent(input$saveModalFD,{
+    selectedRow <- as.numeric(strsplit(input$select_button,"_")[[1]][2])
+    fileName<- as.character(ListTableReact()[selectedRow,5]) #nama file
+    dataDefine <-  readRDS(fileName)
+    
     finalDemand$table1 <- as.data.frame(hot_to_r(input$editFD))
-    inputSektor<-input$sektorEcon #"tanaman pangan"
+    inputSektor<-input$sektorEcon 
     inputTahun<-paste0("y",input$pilihtahunFD)
     indexSektor <- as.numeric(which(sapply(Sector,function(x) any(x==c(inputSektor)))))
     
-    # fdBauReact$isi <- fdBau
-    # fdBauReact$isi[c(indexSektor), c(inputTahun)] <- fdBauReact$isi[c(indexSektor), c(inputTahun)] + finalDemand$table1[,-1]
-     
-    #fdSelisih <- fdZero
-    if (is.null(loadFileRDS()$fdSelisih)) {
+    if (is.null(dataDefine$fdSelisih)) {
       fdSelisih = fdZero
+      fdSelisih[c(indexSektor), c(inputTahun)] <- finalDemand$table1[,-1]
     }else{
-      fdSelisih =  loadFileRDS()$fdSelisih
+      fdSelisih = dataDefine$fdSelisih
+      fdSelisih[c(indexSektor), c(inputTahun)] <- finalDemand$table1[,-1]
     }
-    fdSelisih[c(indexSektor), c(inputTahun)] <- fdSelisih[c(indexSektor), c(inputTahun)] + finalDemand$table1[,-1]
     
-    
-    fdNew_list<-list(fdBauReal = fdBau,
-                     #fdNew = fdBauReact$isi,
-                     fdEditNew = finalDemand$table1,
-                     fdSelisih = fdSelisih
-    )
-    fdNew_list
-
-  })
-  
- 
-  
-  ##### simpan tabel FD baru ke dalam folder ####
-  observeEvent(input$saveModalFD,{
-    dataDefine <-  loadFileRDS()
-    dataDefine$fdSelisih <- FDSave()$fdSelisih
-    #dataDefine$proyPdrb <- proyPdrbTable()
-    selectedRow <- as.numeric(strsplit(input$select_button,"_")[[1]][2])
-    fileName<- as.character(ListTableReact()[selectedRow,5]) #nama file
+    dataDefine$fdSelisih <- fdSelisih
     saveRDS(dataDefine, file = fileName)
-  
+    
     insertUI(selector='#objDownloadFD',
              where='afterEnd',
-             ui= uiOutput(ns('downButtonFD'))
-    )
+             ui= uiOutput(ns('downButtonFD')))
+    
+    
   })
-
+  
   output$downButtonFD<- renderUI({
     tagList(tags$br(),
+            renderText("tabel diatas sudah tersimpan"),
+            tags$br(),
             actionButton(ns('downloadFD'),'download tabel')
     )
   })
-
-
+  
+  
   observeEvent(input$downloadFD,{
-    #browser()
     selectedRow <- as.numeric(strsplit(input$select_button,"_")[[1]][2])
-    fileName <- as.character(ListTableReact()[selectedRow,5]) #nama file
-    fileName <- strsplit(fileName,"/")[[1]][5]
-    namaSheet <- names(FDSave())
+    fileName<- as.character(ListTableReact()[selectedRow,5]) #nama file
+    dataDefine <-  readRDS(fileName)
     
-    dirFile <- paste0(data$alamatFile,"/","Excel_",fileName,".xlsx")
-    write.xlsx(FDSave(),
+    fdNew_list<-list(fdBauReal = fdBau,
+                     fdEditNew = finalDemand$table1,
+                     fdSelisih = dataDefine$fdSelisih
+    )
+    fdNew_list
+    
+    fileNameDownload <- strsplit(fileName,"/")[[1]][5]
+    namaSheet <- names(fdNew_list)
+    
+    
+    
+    dirFile <- paste0(data$alamatFile,"/","Excel_",fileNameDownload,".xlsx")
+    write.xlsx(fdNew_list,
                file = dirFile,
                sheetName = namaSheet)
   })
@@ -437,14 +500,132 @@ buttonModule <- function(input, output, session, data, type) {
   #                   ALUR BUTTON KONSTRUKSI SATELIT AKUN                        #
   #                                                                              #
   ################################################################################
-  observeEvent(input$satHit, {
-    insertUI(selector= paste0("#", ns("satPlaceholder")),
+  satAkun <- reactiveValues(
+    table1 = NULL
+  )
+  
+  
+  # START LAND ----------------------------------------------------------
+  observeEvent(input$satLandHit, {
+    insertUI(selector= paste0("#", ns("satLandPlaceholder")),
              where='afterEnd',
-             ui= uiOutput(ns('satMUIManual'))
+             ui= uiOutput(ns('satLandUIManual'))
     )
   })
   
-  output$satMUIManual<- renderUI({
+  
+  output$satLandUIManual<- renderUI({
+    
+    tagList(
+      tags$b('Sunting secara manual'),
+      tags$br(),
+      tags$h6("Nilai yang diinputkan adalah selisih dari BAU"),
+      tags$br(),
+      rHandsontableOutput(ns('editSatLand')),
+      tags$br(),
+      tags$h6("untuk memilih tipe tutupan lahan disediakan menu dropdown pada kolom 1 dan 2"),
+      tags$br(),
+      actionButton(ns('saveModalSatLand'), 'simpan tabel'), 
+      tags$br(), 
+      tags$br(),
+      tags$div(id='teksLandSatSave')
+    )
+  })
+  
+  valSatLand <- eventReactive(input$satLandHit,{
+    selectedRow <- as.numeric(strsplit(input$select_button,"_")[[1]][2])
+    fileName<- as.character(ListTableReact()[selectedRow,5]) #nama file
+    dataDefine <-  readRDS(fileName)
+    
+    if (is.null(dataDefine$satSelisih)) {
+      satAkun$table1 = data$listConsumZero
+      satAkun$table1
+    }else{
+      selectedRow <- as.numeric(strsplit(input$select_button,"_")[[1]][2])
+      fileName<- as.character(ListTableReact()[selectedRow,5]) #nama file
+      dataDefine <-  readRDS(fileName)
+      satAkun$table1 <- data$listConsumZero
+      tupla <- ordered(factor(sort(colnames(LDMProp_his)[landCover_his!=0])))
+      satAkun$table1[,1] <- tupla[1]
+      satAkun$table1[,2] <- tupla[1]
+      satAkun$table1 = dplyr::bind_rows(dataDefine$satSelisih,satAkun$table1)
+    }
+    
+    indexCol <- c(colnames(satAkun$table1)[1],colnames(satAkun$table1)[2],
+                  paste0("y",input$pilihtahunSatLand))
+    indexRow <- input$banyakTupla
+    satAkun$table1 <- satAkun$table1[1:indexRow,c(indexCol)]
+    satAkun$table1
+  })
+  
+  output$editSatLand <- renderRHandsontable({
+    rhandsontable(valSatLand(),
+                  rowHeaderWidth = 50,
+                  fixedColumnsLeft = 2,
+                  height = 200,
+    ) %>% 
+      hot_table(contextMenu = TRUE) %>% 
+      hot_context_menu(customOpts = list(
+        search = list(name = "Search",
+                      callback = htmlwidgets::JS(
+                        "function (key, options) {
+                         var srch = prompt('Search criteria');
+                         this.search.query(srch);
+                         this.render();
+                       }")))) %>% 
+      hot_col(col = c(colnames(satAkun$table1)[1],colnames(satAkun$table1)[2]),
+              type = "dropdown", source = sort(colnames(LDMProp_his)[landCover_his!=0])) 
+    
+  })
+  
+  
+  ##### simpan tabel Sat baru ke dalam folder ####
+  observeEvent(input$saveModalSatLand,{
+    removeUI(selector='#textInvalid')
+    removeUI(selector='#textTampil')
+    
+    satEditNew<-as.data.frame(hot_to_r(input$editSatLand))
+    satInvalid <- satEditNew[-2,]
+    tupla <- ordered(factor(sort(colnames(LDMProp_his)[landCover_his!=0])))
+    satZero = data$listConsumZero
+    satZero[,1] <- tupla[1]
+    satZero[,2] <- tupla[1]
+    satSelisih <- dplyr::bind_rows(satZero,satEditNew)
+    satSelisih <- satSelisih[-(1:nrow(data$listConsumZero)),]
+    rownames(satSelisih) <- 1:nrow(satSelisih)
+    satSelisih[is.na(satSelisih)] <- 0
+    
+    if (nlevels(satSelisih[,1])==length(colnames(LDMProp_his)[landCover_his!=0]) & nlevels(satSelisih[,2])==length(colnames(LDMProp_his)[landCover_his!=0]) ) {
+      selectedRow <- as.numeric(strsplit(input$select_button,"_")[[1]][2])
+      fileName<- as.character(ListTableReact()[selectedRow,5]) #nama file
+      
+      dataDefine <-  readRDS(fileName)
+      dataDefine[5] <- list(dataDefine$fdSelisih)
+      dataDefine$satSelisih <- satSelisih
+      
+      saveRDS(dataDefine, file = fileName)
+      
+      insertUI(selector='#teksLandSatSave',
+               where = 'afterEnd',
+               ui = tags$div(id="textTampil","tabel di atas sudah tersimpan"))
+    }else{
+      
+      insertUI(selector='#teksLandSatSave',
+               where = 'afterEnd',
+               ui =tags$h4(id='textInvalid', 
+                           "masih ada tutupan lahan yang belum dipilih, tabel tidak dapat disimpan"))
+    }
+  })
+  # ## END Land -------------------------------------------------------------
+  
+  observeEvent(input$satHit, {
+    insertUI(selector= paste0("#", ns("satPlaceholder")),
+             where='afterEnd',
+             ui= uiOutput(ns('satUIManual'))
+    )
+  })
+  
+  output$satUIManual<- renderUI({
     tagList(selectInput(ns("pilihtahunSat"),
                         label="pilih tahun", selected = loadFileRDS()$tahunAwal,
                         choices=c(loadFileRDS()$tahunAwal:loadFileRDS()$tahunAkhir)),
@@ -470,6 +651,7 @@ buttonModule <- function(input, output, session, data, type) {
     tagList(
       tags$b('Sunting secara manual'),
       tags$br(),
+      tags$h6("Nilai yang diinputkan adalah selisih dari BAU"),
       tags$br(),
       rHandsontableOutput(ns('editSat')),
       tags$br(),
@@ -480,78 +662,65 @@ buttonModule <- function(input, output, session, data, type) {
     )
   })
   
-  satAkun <- reactiveValues(
-    table1 = NULL
-  )
   
-  
-  
-  SatData <- reactive({
-    if (is.null(loadFileRDS()$satSelisih)) {
+  valSat<- eventReactive(c(input$showYearSat),{
+    selectedRow <- as.numeric(strsplit(input$select_button,"_")[[1]][2])
+    fileName<- as.character(ListTableReact()[selectedRow,5]) #nama file
+    dataDefine <-  readRDS(fileName)
+    
+    if (is.null(dataDefine$satSelisih)) {
       satAkun$table1 = data$listConsumZero
     }else{
-      satAkun$table1 =  loadFileRDS()$satSelisih
+      satAkun$table1 =  dataDefine$satSelisih
     }
-  })
-  
-  #observeEvent(input$showYearSat,{
-  valSat<- eventReactive(c(input$showYearSat),{
-    #browser()
-    #bentuk list
+    
     indexAwal <- paste0("y",input$pilihtahunSat)
-    satAkun$table1 <- SatData()[indexAwal]
+    satAkun$table1 <- satAkun$table1[indexAwal]
     satAkun$table1 <- data.frame(satAkun$table1)
     satAkun$table1 <- satAkun$table1[,c(-1,-2,-3)]
     satAkun$table1 <- cbind(Sector,satAkun$table1)
     satAkun$table1 <- filter(satAkun$table1, satAkun$table1$Sector %in% c(input$sektorSat))
     satAkun$table1 <- satAkun$table1[,c("Sector",paste0("y",input$pilihtahunSat,".",input$pilihBahanBakar))]
-    rownames(satAkun$table1) <- c(input$sektorSat)
     satAkun$table1
   })
   
   output$editSat <- renderRHandsontable({
     rhandsontable(valSat(),
-                  rowHeaderWidth = 160,
-    )%>%hot_cols(format=3)
+                  rowHeaderWidth = 50,
+                  fixedColumnsLeft = 1
+    )%>%hot_cols(colWidths = 100)
   })
   
   #### masukkan nilai sel baru ke dalam kolom satNew 
-  # browser()
-  satSave<-eventReactive(input$saveModalSat,{
+  #satSave<-eventReactive(input$saveModalSat,{
+  observeEvent(input$saveModalSat,{
+    #browser()
+    selectedRow <- as.numeric(strsplit(input$select_button,"_")[[1]][2])
+    fileName<- as.character(ListTableReact()[selectedRow,5]) #nama file
+    dataDefine <-  readRDS(fileName)
+    
     satAkun$table1<-as.data.frame(hot_to_r(input$editSat))
     inputSektor<-input$sektorSat 
     indexSektor <- as.numeric(which(sapply(Sector,function(x) any(x==c(inputSektor)))))
     inputTahun<-paste0("y",input$pilihtahunSat)
     inputBahanBakar <- input$pilihBahanBakar
     
-    
-    if (is.null(loadFileRDS()$satSelisih)) {
+    if (is.null(dataDefine$satSelisih)) {
       satSelisih = data$listConsumZero
+      satSelisih[[inputTahun]][indexSektor,inputBahanBakar]<-satAkun$table1[-1]
     }else{
-      satSelisih =  loadFileRDS()$satSelisih
+      satSelisih =  dataDefine$satSelisih
+      satSelisih[[inputTahun]][indexSektor,inputBahanBakar]<-satAkun$table1[-1]
     }
     
-    satSelisih[[inputTahun]][indexSektor,inputBahanBakar]<-satSelisih[[inputTahun]][indexSektor,inputBahanBakar] + satAkun$table1[-1]
-      
-    satNew_list<-list(satBauReal = data$listConsumBAU, 
-                      satEditNew=satAkun$table1, # 1 data.frame = tabel yang diedit (partial) yang tampilkan di modal dialog UI
-                      satSelisih = satSelisih  #list selisih (15 tabel)
-    )
-    satNew_list
-  })
-  
-  
-  
-  ##### simpan tabel Sat baru ke dalam folder ####
-  observeEvent(input$saveModalSat,{
-    #browser()
-    dataDefine <-  loadFileRDS()
-    dataDefine$fdSelisih <- FDSave()$fdSelisih
-    dataDefine$satSelisih <- satSave()$satSelisih
-    #dataDefine$proyPdrb <- proyPdrbTable()
-    #dataDefine$proyEmisi <- proyEmisiTabel()
-    selectedRow <- as.numeric(strsplit(input$select_button,"_")[[1]][2])
-    fileName<- as.character(ListTableReact()[selectedRow,5]) #nama file
+    satSelisih <- lapply(satSelisih, function(x){
+      tconsum <- rowSums(x[4:ncol(x)]) 
+      x[3] <- tconsum
+      x
+    })
+    
+    dataDefine[5] <- list(dataDefine$fdSelisih)
+    dataDefine$satSelisih <- satSelisih
     saveRDS(dataDefine, file = fileName)
     
     #tampilan keterangan setiap save tabel konsumsi
@@ -565,13 +734,15 @@ buttonModule <- function(input, output, session, data, type) {
              ui = tags$div (textTampil))
   })
   
+  
+  
   ### tutup modal dialog Econ ###
   observeEvent(input$closeModalFD,{
     removeModal()
   })
   
   
-
+  
   ################################################################################
   #                                                                              #
   #                                  BUTTON RUN                                  #
@@ -632,7 +803,7 @@ buttonModule <- function(input, output, session, data, type) {
   observeEvent(input$run_button_trigger, {
     
     removeUI(selector=paste0('#',ns('scenarioResultVisualization')))
-             
+    
     # reset reactiveValues to NULL
     scenarioSimulation$selectedFile <- NULL
     scenarioSimulation$initialYear <- NULL
@@ -654,7 +825,7 @@ buttonModule <- function(input, output, session, data, type) {
     scenarioSimulation$scenarioSeriesOfImpactLand3 <- NULL
     scenarioSimulation$inputLRCRate=NULL
     scenarioSimulation$inputPercentageDiagTPM=NULL
-
+    
     selectedRow <- as.numeric(strsplit(input$run_button,"_")[[1]][2])
     fileName<- as.character(ListTableReact()[selectedRow,5]) #nama file dari ListTableReact ada di col=5
     selectedFile<-readRDS(fileName)
@@ -723,7 +894,7 @@ buttonModule <- function(input, output, session, data, type) {
     scenarioSeriesOfImpactWaste <- list()
     scenarioSeriesOfImpactAgriculture <- list()
     scenarioSeriesOfImpactLand1<-list()
-
+    
     # Historical consumption and emission data
     eval(parse(text=paste0("scenarioSeriesOfGDP$y",ioPeriod,"<- analysisGDP")))
     eval(parse(text=paste0("scenarioSeriesOfIntermediateDemand$y",ioPeriod," <- matrixIoIntermediateDemand")))
@@ -828,6 +999,7 @@ buttonModule <- function(input, output, session, data, type) {
     
     # masukkan semua variabel ke reactiveValues
     scenarioSimulation$selectedFile <- selectedFile
+    scenarioSimulation$fileName <- fileName
     scenarioSimulation$initialYear <-initialYear
     scenarioSimulation$finalYear <- finalYear
     scenarioSimulation$iteration <- iteration
@@ -884,11 +1056,11 @@ buttonModule <- function(input, output, session, data, type) {
     #   runLUTM()
     # }
     ######
-
+    
   })
   
   checkLandCover<-reactive({
-
+    
     
     # masukkan reactive values
     selectedFile=scenarioSimulation$selectedFile
@@ -904,40 +1076,40 @@ buttonModule <- function(input, output, session, data, type) {
     
     # jika land Cover bernilai negatif
     if(any(unlist(sapply(scenarioSeriesOfImpactLand1,'[[', "landCover"))<0)==TRUE){
-        if (is.null(inputLRCRate)){
-          print("land cover gagal dihitung dan tidak ada input LRC")
-          showModal(modalEditLRCRate()) 
-        } else {
-          projectionYear <- initialYear
-          listYear <- paste0("y", ioPeriod)
-          for(step in 1:(iteration+1)){
-            # notes on the year
-            timeStep <- paste0("y", projectionYear)
-            eval(parse(text= paste0("scenarioSeriesOfImpactLand1$", timeStep, " <- functionSatelliteLand1(type= 'projection',
+      if (is.null(inputLRCRate)){
+        print("land cover gagal dihitung dan tidak ada input LRC")
+        showModal(modalEditLRCRate()) 
+      } else {
+        projectionYear <- initialYear
+        listYear <- paste0("y", ioPeriod)
+        for(step in 1:(iteration+1)){
+          # notes on the year
+          timeStep <- paste0("y", projectionYear)
+          eval(parse(text= paste0("scenarioSeriesOfImpactLand1$", timeStep, " <- functionSatelliteLand1(type= 'projection',
                                                                                             matrix_output= as.matrix(scenarioSeriesOfOutput[,'",timeStep,"']),
                                                                                             advanceMode = TRUE,
                                                                                             currYear=projectionYear,
                                                                                             runNum = NULL,
                                                                                             LRCRate= inputLRCRate)")))
-            listYear <- c(listYear, timeStep)
-            projectionYear <- initialYear+step
-          }
-          if(any(unlist(sapply(scenarioSeriesOfImpactLand1,'[[', "landCover"))<0)==TRUE){
-            showModal(modalEditLRCRate()) 
-            print("ada input rate LRC namun land cover tetap tidak berhasil dihitung")
-          } else {
-            # jika landCover bernilai positif jalankan perhitungan LUTM
-            print("ada input rate LRC dan land cover berhasil dihitung")
-            scenarioSimulation$scenarioSeriesOfImpactLand1<-scenarioSeriesOfImpactLand1
-            runLUTM()
-          }
+          listYear <- c(listYear, timeStep)
+          projectionYear <- initialYear+step
         }
-      # jika landCover bernilai positif jalankan perhitungan LUTM
-        } else{
-        scenarioSimulation$scenarioSeriesOfImpactLand1<-scenarioSeriesOfImpactLand1
-        runLUTM()
+        if(any(unlist(sapply(scenarioSeriesOfImpactLand1,'[[', "landCover"))<0)==TRUE){
+          showModal(modalEditLRCRate()) 
+          print("ada input rate LRC namun land cover tetap tidak berhasil dihitung")
+        } else {
+          # jika landCover bernilai positif jalankan perhitungan LUTM
+          print("ada input rate LRC dan land cover berhasil dihitung")
+          scenarioSimulation$scenarioSeriesOfImpactLand1<-scenarioSeriesOfImpactLand1
+          runLUTM()
+        }
       }
-
+      # jika landCover bernilai positif jalankan perhitungan LUTM
+    } else{
+      scenarioSimulation$scenarioSeriesOfImpactLand1<-scenarioSeriesOfImpactLand1
+      runLUTM()
+    }
+    
   })
   
   runLUTM<-reactive({
@@ -1006,7 +1178,7 @@ buttonModule <- function(input, output, session, data, type) {
     scenarioSimulation$scenarioSeriesOfImpactLand3<-scenarioSeriesOfImpactLand3
     
     checkLUTM()
-
+    
   })
   
   checkLUTM<-reactive({
@@ -1072,7 +1244,7 @@ buttonModule <- function(input, output, session, data, type) {
           runScenarioVisualization()
         }
       }
-        
+      
     } else{
       print("hitung LUTM berhasil")
       scenarioSimulation$scenarioSeriesOfImpactLand2<-scenarioSeriesOfImpactLand2
@@ -1377,7 +1549,7 @@ buttonModule <- function(input, output, session, data, type) {
     insertUI(selector=paste0("#",ns("scenarioResultPlaceholder")),
              where='afterEnd',
              ui= uiOutput(ns('scenarioResultVisualization'))
-             )
+    )
   })
   
   output$scenarioResultVisualization <- renderUI({
@@ -1399,7 +1571,11 @@ buttonModule <- function(input, output, session, data, type) {
                                   "Buangan Limbah",
                                   "Penggunaan Pupuk",
                                   "Kebutuhan Lahan",
-                                  "Emisi")),
+                                  "Emisi Sektor Energi", 
+                                  "Emisi Sektor Limbah", 
+                                  "Emisi Sektor Pertanian", 
+                                  "Emisi Sektor Lahan", 
+                                  "Emisi Total")),
             selectInput(ns('selectScenarioResultTableYear'),
                         label="Pilih tahun tabel",
                         choices=c(initialYear:finalYear)),
@@ -1409,136 +1585,166 @@ buttonModule <- function(input, output, session, data, type) {
   modalEditLRCRate<-reactive({
     # print("show modal executed")
     # showModal(
-      modalDialog(title="Sunting LRC", 
-                          "Perhitungan emisi tidak berhasil dilakukan karena luas lahan yang tersedia tidak dapat memenuhi perubahan permintaan akhir. 
+    modalDialog(title="Sunting LRC", 
+                "Perhitungan emisi tidak berhasil dilakukan karena luas lahan yang tersedia tidak dapat memenuhi perubahan permintaan akhir. 
                             Silakan menyunting kembali permintaan akhir, atau sunting laju land requirement coefficient (LRC) di bawah ini:", 
-                  tags$br(),
-                  tags$br(),
-                  rHandsontableOutput(ns('editLRCRate')),
-                  tags$br(),
-                  actionButton(ns('saveEditLRCRate'), "simpan tabel"),
-                  footer= tagList(
+                tags$br(),
+                tags$br(),
+                rHandsontableOutput(ns('editLRCRate')),
+                tags$br(),
+                actionButton(ns('saveEditLRCRate'), "simpan tabel"),
+                footer= tagList(
                   actionButton(ns("buttonRunCheckLandCover"), "Jalankan Aksi"),
                   actionButton(ns("buttonClose"), "Batal"),
                   size="l"
-                  )
+                )
     )
     # )
   })
   
   modalEditPercentageDiagTPM <- reactive  ({
     # showModal(
-      modalDialog(title="Sunting Constraint LUTM", 
-                          "LUTM tidak berhasil dihitung. Silakan sunting persentase proporsi yang akan digunakan untuk menghitung luas tutupan
+    modalDialog(title="Sunting Constraint LUTM", 
+                "LUTM tidak berhasil dihitung. Silakan sunting persentase proporsi yang akan digunakan untuk menghitung luas tutupan
                           lahan yang tidak berubah:", 
-                          sliderInput(ns("sliderPercentageDiagTPM"), "tentukan persentase", min=0, max=1, step = 0.01, round = FALSE),
-                          actionButton(ns('saveEditPercentageDiagTPM'), "simpan tabel"),
-                          footer= tagList(
-                            actionButton(ns("buttonRunCheckLUTM"), "Jalankan Aksi"),
-                            actionButton(ns("buttonClose"), "Batal")
-                          )
-    # )
+                sliderInput(ns("sliderPercentageDiagTPM"), "tentukan persentase", min=0, max=1, step = 0.01, round = FALSE),
+                actionButton(ns('saveEditPercentageDiagTPM'), "simpan tabel"),
+                footer= tagList(
+                  actionButton(ns("buttonRunCheckLUTM"), "Jalankan Aksi"),
+                  actionButton(ns("buttonClose"), "Batal")
+                )
+                # )
     )
   })
-
-output$editLRCRate <- renderRHandsontable({
-  rhandsontable(
-    if(is.null(scenarioSimulation$inputLRCRate)){
-      showTable<-as.matrix(LRCRate_his)
-      colnames(showTable)<- "laju LRC"
-      rownames(showTable)<- c(Sector, "Sektor yang tidak menghasilkan output")
-      showTable
-    } else {
-      showTable<-scenarioSimulation$inputLRCRate
-      colnames(showTable)<- "laju LRC"
-      rownames(showTable)<- c(Sector, "Sektor yang tidak menghasilkan output")
-      showTable
-    },height=500, width=500,rowHeaderWidth = 400
-  )%>%hot_cols(format=5,colWidths = 100)
-})
-
-observeEvent(input$saveEditLRCRate,{
-  scenarioSimulation$inputLRCRate<-as.matrix(hot_to_r(input$editLRCRate))
-  # coding u/save input$editLRCRate ke RDS
-})
-
-observeEvent(input$saveEditPercentageDiagTPM,{
-  scenarioSimulation$sliderPercentageDiagTPM<-input$sliderPercentageDiagTPM
-  # coding u/ save input$sliderPercentageDiagTPM ke RDDS
-})
-
-observeEvent(input$buttonRunCheckLandCover,{
-  removeModal()
-  checkLandCover()
-})
-
-observeEvent(input$buttonRunCheckLUTM,{
-  removeModal()
-  checkLUTM()
-})
-
-observeEvent(input$buttonClose,{
-  removeModal()
-})
-
-output$scenarioResultPlot <- renderPlotly({
-  if(input$selectScenarioResultPlot=="Proyeksi PDRB Kumulatif"){
-    scenarioSimulation$plotComparisonCummulativeGDP
-  } else if (input$selectScenarioResultPlot=="Proyeksi Emisi Kumulatif"){
-    scenarioSimulation$plotComparisonCummulativeEmission
-  } else if (input$selectScenarioResultPlot=="Proyeksi Intensitas Emisi Kumulatif"){
-    scenarioSimulation$plotComparisonCummulativeEmissionIntensity
-  } else if (input$selectScenarioResultPlot=="Proyeksi PDRB"){
-    scenarioSimulation$plotComparisonResultTotalGDP
-  } else if (input$selectScenarioResultPlot=="Proyeksi Emisi"){
-    scenarioSimulation$plotComparisonTotalEmission
-  } else if (input$selectScenarioResultPlot=="Proyeksi Intensitas Emisi"){
-    scenarioSimulation$plotComparisonEmissionIntensity
-  }
-})
-
-output$scenarioResultTable <- renderDataTable({
   
-  scenarioResultGDP <- scenarioSimulation$scenarioResultGDP
-  scenarioResultIncome <- scenarioSimulation$scenarioResultIncome
-  scenarioResultLabour <- scenarioSimulation$scenarioResultLabour
-  scenarioResultEnergyConsumption <- scenarioSimulation$scenarioResultEnergyConsumption
-  scenarioResultWasteDisposal <- scenarioSimulation$scenarioResultWasteDisposal
-  scenarioResultFertilizerUsed <- scenarioSimulation$scenarioResultFertilizerUsed
-  scenarioResultLandReq <- scenarioSimulation$scenarioResultLandReq
-  scenarioResultTotalEmission  <- scenarioSimulation$scenarioResultTotalEmission 
+  output$editLRCRate <- renderRHandsontable({
+    rhandsontable(
+      if(is.null(scenarioSimulation$inputLRCRate)){
+        showTable<-as.matrix(LRCRate_his)
+        colnames(showTable)<- "laju LRC"
+        rownames(showTable)<- c(Sector, "Sektor yang tidak menghasilkan output")
+        showTable
+      } else {
+        showTable<-scenarioSimulation$inputLRCRate
+        colnames(showTable)<- "laju LRC"
+        rownames(showTable)<- c(Sector, "Sektor yang tidak menghasilkan output")
+        showTable
+      },height=500, width=500,rowHeaderWidth = 400
+    )%>%hot_cols(format=5,colWidths = 100)
+  })
   
-  if(input$selectScenarioResultTable=="PDRB"){
-    scenarioResultGDP[scenarioResultGDP$year==input$selectScenarioResultTableYear,]
+  observeEvent(input$saveEditLRCRate,{
+    fileName<-  scenarioSimulation$fileName 
     
-  } else if (input$selectScenarioResultTable=="Pendapatan"){
-    scenarioResultIncome[scenarioResultIncome$year==input$selectScenarioResultTableYear,]
+    scenarioSimulation$inputLRCRate<-as.matrix(hot_to_r(input$editLRCRate))
     
-  } else if (input$selectScenarioResultTable=="Tenaga Kerja"){
-    scenarioResultLabour[scenarioResultLabour$year==input$selectScenarioResultTableYear,] 
+    # coding u/save input$editLRCRate ke RDS
     
-  } else if (input$selectScenarioResultTable=="Konsumsi Energi"){
-    scenarioResultEnergyConsumption[scenarioResultEnergyConsumption$year==input$selectScenarioResultTableYear,] 
+    dataDefine <-  readRDS(fileName)
+    dataDefine$inputLRCRate <- as.matrix(hot_to_r(input$editLRCRate))
+    saveRDS(dataDefine, file = fileName)
     
-  } else if (input$selectScenarioResultTable=="Buangan Limbah"){
-    scenarioResultWasteDisposal[scenarioResultWasteDisposal$year==input$selectScenarioResultTableYear,] 
+  })
+  
+  observeEvent(input$saveEditPercentageDiagTPM,{
+    fileName<-  scenarioSimulation$fileName 
     
-  } else if (input$selectScenarioResultTable=="Penggunaan Pupuk"){
-    scenarioResultFertilizerUsed[scenarioResultFertilizerUsed$year==input$selectScenarioResultTableYear,]
+    scenarioSimulation$sliderPercentageDiagTPM<-input$sliderPercentageDiagTPM
     
-  } else if (input$selectScenarioResultTable=="Kebutuhan Lahan"){
-    scenarioResultLandReq[scenarioResultLandReq$year==input$selectScenarioResultTableYear,] 
+    # coding u/ save input$sliderPercentageDiagTPM ke RDDS
+    dataDefine <-  readRDS(fileName)
+    dataDefine$inputPercentageDiagTPM <- input$sliderPercentageDiagTPM
+    saveRDS(dataDefine, file = fileName)
+  })
+  
+  observeEvent(input$buttonRunCheckLandCover,{
+    removeModal()
+    checkLandCover()
+  })
+  
+  observeEvent(input$buttonRunCheckLUTM,{
+    removeModal()
+    checkLUTM()
+  })
+  
+  observeEvent(input$buttonClose,{
+    removeModal()
+  })
+  
+  output$scenarioResultPlot <- renderPlotly({
+    if(input$selectScenarioResultPlot=="Proyeksi PDRB Kumulatif"){
+      scenarioSimulation$plotComparisonCummulativeGDP
+    } else if (input$selectScenarioResultPlot=="Proyeksi Emisi Kumulatif"){
+      scenarioSimulation$plotComparisonCummulativeEmission
+    } else if (input$selectScenarioResultPlot=="Proyeksi Intensitas Emisi Kumulatif"){
+      scenarioSimulation$plotComparisonCummulativeEmissionIntensity
+    } else if (input$selectScenarioResultPlot=="Proyeksi PDRB"){
+      scenarioSimulation$plotComparisonResultTotalGDP
+    } else if (input$selectScenarioResultPlot=="Proyeksi Emisi"){
+      scenarioSimulation$plotComparisonTotalEmission
+    } else if (input$selectScenarioResultPlot=="Proyeksi Intensitas Emisi"){
+      scenarioSimulation$plotComparisonEmissionIntensity
+    }
+  })
+  
+  output$scenarioResultTable <- renderDataTable({
     
-  } else if (input$selectScenarioResultTable=="Emisi"){
-    scenarioResultTotalEmission[scenarioResultTotalEmission$Year==input$selectScenarioResultTableYear,] 
-  } 
-})
+    scenarioResultGDP <- scenarioSimulation$scenarioResultGDP
+    scenarioResultIncome <- scenarioSimulation$scenarioResultIncome
+    scenarioResultLabour <- scenarioSimulation$scenarioResultLabour
+    scenarioResultEnergyConsumption <- scenarioSimulation$scenarioResultEnergyConsumption
+    scenarioResultEnergyEmission <- scenarioSimulation$scenarioResultEnergyEmission
+    scenarioResultWasteDisposal <- scenarioSimulation$scenarioResultWasteDisposal
+    scenarioResultWasteEmission <- scenarioSimulation$scenarioResultWasteEmission
+    scenarioResultFertilizerUsed <- scenarioSimulation$scenarioResultFertilizerUsed
+    scenarioResultFertilizerEmission <- scenarioSimulation$scenarioResultFertilizerEmission
+    scenarioResultLandReq <- scenarioSimulation$scenarioResultLandReq
+    scenarioResultLandEmission <-scenarioSimulation$scenarioResultLandEmission
+    scenarioResultTotalEmission  <- scenarioSimulation$scenarioResultTotalEmission 
 
-
+    
+    if(input$selectScenarioResultTable=="PDRB"){
+      scenarioResultGDP[scenarioResultGDP$year==input$selectScenarioResultTableYear,]
+      
+    } else if (input$selectScenarioResultTable=="Pendapatan"){
+      scenarioResultIncome[scenarioResultIncome$year==input$selectScenarioResultTableYear,]
+      
+    } else if (input$selectScenarioResultTable=="Tenaga Kerja"){
+      scenarioResultLabour[scenarioResultLabour$year==input$selectScenarioResultTableYear,] 
+      
+    } else if (input$selectScenarioResultTable=="Konsumsi Energi"){
+      scenarioResultEnergyConsumption[scenarioResultEnergyConsumption$year==input$selectScenarioResultTableYear,] 
+      
+    } else if (input$selectScenarioResultTable=="Buangan Limbah"){
+      scenarioResultWasteDisposal[scenarioResultWasteDisposal$year==input$selectScenarioResultTableYear,] 
+      
+    } else if (input$selectScenarioResultTable=="Penggunaan Pupuk"){
+      scenarioResultFertilizerUsed[scenarioResultFertilizerUsed$year==input$selectScenarioResultTableYear,]
+      
+    } else if (input$selectScenarioResultTable=="Kebutuhan Lahan"){
+      scenarioResultLandReq[scenarioResultLandReq$year==input$selectScenarioResultTableYear,] 
+      
+    } else if (input$selectScenarioResultTable=="Emisi Sektor Energi"){
+      scenarioResultEnergyEmission[scenarioResultEnergyEmission$year==input$selectScenarioResultTableYear,] 
+      
+    } else if (input$selectScenarioResultTable=="Emisi Sektor Limbah"){
+      scenarioResultWasteEmission[scenarioResultWasteEmission$year==input$selectScenarioResultTableYear,] 
+      
+    } else if (input$selectScenarioResultTable=="Emisi Sektor Pertanian"){
+      scenarioResultFertilizerEmission[scenarioResultFertilizerEmission$year==input$selectScenarioResultTableYear,] 
+      
+    } else if (input$selectScenarioResultTable=="Emisi Sektor Lahan"){
+      scenarioResultLandEmission[scenarioResultLandEmission$year==input$selectScenarioResultTableYear,] 
+      
+    } else if (input$selectScenarioResultTable=="Emisi Total"){
+      scenarioResultTotalEmission[scenarioResultTotalEmission$Year==input$selectScenarioResultTableYear,] 
+    } 
+  })
+  
   ### hapus file ###
   observeEvent(input$delete_button_trigger, {
     selectedRow <- as.numeric(strsplit(input$delete_button,"_")[[1]][2])
-    fileName<- as.character(ListTableReact()[selectedRow,5]) #nama file dari ListTableReact ada di col=5
+    fileName<- as.character(ListTableReact()[selectedRow,5]) #nama file
     file.remove(fileName)
     shinyjs::js$refresh()
   })
