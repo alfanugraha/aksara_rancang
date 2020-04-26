@@ -1255,6 +1255,7 @@ buttonModule <- function(input, output, session, data, type) {
   
   runScenarioVisualization<-reactive({
     selectedFile = scenarioSimulation$selectedFile
+    fileName = scenarioSimulation$fileName
     initialYear = scenarioSimulation$initialYear
     finalYear = scenarioSimulation$finalYear
     iteration = scenarioSimulation$iteration
@@ -1517,6 +1518,28 @@ buttonModule <- function(input, output, session, data, type) {
       theme(plot.title = element_text(hjust = 0.5))'
       )))
     }
+    
+    # save tables to RDS
+    # coding u/save input$editLRCRate ke RDS
+    
+    dataDefine <-  readRDS(fileName)
+    dataDefine$scenarioResultGDP <- scenarioResultGDP
+    dataDefine$scenarioResultIncome <- scenarioResultIncome
+    dataDefine$scenarioResultLabour <- scenarioResultLabour
+    dataDefine$scenarioResultEnergyConsumption <- scenarioResultEnergyConsumption
+    dataDefine$scenarioResultEnergyEmission <- scenarioResultEnergyEmission
+    dataDefine$scenarioResultWasteDisposal <- scenarioResultWasteDisposal
+    dataDefine$scenarioResultWasteEmission <- scenarioResultWasteEmission
+    dataDefine$scenarioResultFertilizerUsed <- scenarioResultFertilizerUsed
+    dataDefine$scenarioResultFertilizerEmission <- scenarioResultFertilizerEmission
+    dataDefine$scenarioResultLandReq <- scenarioResultLandReq
+    dataDefine$scenarioResultLandCover <- scenarioResultLandCover
+    dataDefine$scenarioResultLUTM <- scenarioResultLUTM
+    dataDefine$scenarioResultLandEmission <- scenarioResultLandEmission
+    dataDefine$scenarioResultTotalEmission <- scenarioResultTotalEmission
+    dataDefine$scenarioAllResult <- scenarioAllResult
+    saveRDS(dataDefine, file = fileName)
+    
     
     scenarioSimulation$scenarioResultGDP <- scenarioResultGDP
     scenarioSimulation$scenarioResultIncome <- scenarioResultIncome
