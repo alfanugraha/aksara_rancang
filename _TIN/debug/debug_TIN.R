@@ -138,10 +138,10 @@ functionSatelliteImpact <- function(type = "energy",
 
 # Function for calculating Land Requirement Coefficient, Land Requirement, & land Cover
 
-functionSatelliteLand1<-function(type=NULL, # historis / projected
+functionSatelliteLand1<-function(type=NULL, 
                                  matrix_output=NULL, 
                                  advanceMode = FALSE,
-                                 currYear= NULL, # tahun looping
+                                 currYear= NULL,
                                  runNum = NULL, # input for advanceMode = FALSE, runNUm 1 to 2
                                  LRCRate= NULL){ # input for advanceMode = TRUE, LRCRate sebagai reactive value yang by default diisi LRC historis 
                                    
@@ -191,9 +191,9 @@ functionSatelliteLand1<-function(type=NULL, # historis / projected
 # Function for calculating LUTM
 # Land cover yang dihasilkan pada fungsi ini adalah land cover proyeksi + input land cover skenario
 
-functionSatelliteLand2<- function(type=NULL, # historis / projection
+functionSatelliteLand2<- function(type=NULL,
                                   landCoverProjection = NULL,  #proyeksi land cover BAU atau skenario
-                                  landCoverProjectionMin=NULL, #proyeksi land cover BAU atau skenario tahun -1
+                                  landCoverProjectionMin=NULL,
                                   inputLandCover=NULL,  #perubahan land cover skenario aksi
                                   LUTMTemplate=NULL,
                                   advanceMode=FALSE, 
@@ -225,12 +225,11 @@ functionSatelliteLand2<- function(type=NULL, # historis / projection
       multiplier <- matrix(percentage, nrow=ncol(TPM), ncol=1)
     } else {
       if(runNum==1){ multiplier = 0.8
-      } else if (runNum ==2) {multiplier <- 0.7
-      } else if (runNum == 3) {multiplier <- 0.6
-      } else if (runNum == 4) {multiplier <- 0.5
+      } else if (runNum ==2) {multiplier <- 0.5
+      } else if (runNum == 3) {multiplier <- 0.3
+      } else if (runNum == 4) {multiplier <- 0.1
       } else if (runNum==5) {multiplier <- 0
       } else if (runNum==6) {
-        # buka semua nilai 0 pada LUTM template
         multiplier <- 0.1
         LUTMTemplate <- matrix(NA, nrow=nrow(LUTMTemplate_his),ncol=ncol(LUTMTemplate_his))
         rownames(LUTMTemplate)<-rownames(LUTMTemplate_his)
@@ -739,7 +738,7 @@ projectionYear <- initialYear
 listYear <- paste0("y", ioPeriod)
 
 for(step in 1:(iteration+1)){
-  for (i in 1:6){   # 6 tipe yg akan dirun otomatis
+  for (i in 1:6){   # 5 tipe yg akan dirun otomatis
     timeStep <- paste0("y", projectionYear)
     eval(parse(text=paste0(
       "bauSeriesOfImpactLand2$",timeStep,"<-tryCatch({

@@ -1,6 +1,7 @@
 library(gtools)
 library(plyr)
 library(stringr)
+library(scales)
 
 source("_DB/debug_TIN.R")
 
@@ -203,15 +204,18 @@ tradeOffSummary<-tradeOffSummary[-is.na(tradeOffSummary),]
 
 ############################################
 
+remove_breaks <- function(original_func, remove_list = list()) {
+  function(x) {
+    original_result <- original_func(x)
+    original_result[!(original_result %in% remove_list)]
+  }
+}
 
 ggplot(tradeOffSummary, aes(x = peningkatan.PDRB, y = penurunan.emisi, color = ID)) +
-  geom_point(shape = 19, size = 5) +
+  geom_point(shape = 19, size = 4, position=position_jitter(h=0.05,w=0.05), alpha = 0.5) +
   geom_hline(aes(yintercept = 0), colour = "#BB0000", linetype = "dashed") + 
-  geom_vline(aes(xintercept = 0), colour = "#BB0000", linetype ="dashed")
-
-
-
-
+  geom_vline(aes(xintercept = 0), colour = "#BB0000", linetype ="dashed") +
+  theme(legend.position = "none")
 
 
 
