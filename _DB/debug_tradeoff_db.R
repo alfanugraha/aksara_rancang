@@ -273,3 +273,7 @@ id <- data.frame(
   ID=c("Q1","Q2","Q3","Q4")
 )
 tradeOffTablePlot <-  dplyr::bind_rows(id,tradeOffTablePlot)
+
+
+
+
