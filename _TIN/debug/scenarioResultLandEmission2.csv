@@ -1,0 +1,781 @@
+"","year","id.sector","sector","emission"
+"1",2016,"1","Tanaman Pangan",129220.115935751
+"2",2016,"2","Tanaman Hortikultura",49490.6925076921
+"3",2016,"3","Perkebunan",20974.9558643635
+"4",2016,"4","Peternakan",34926.1187975113
+"5",2016,"5","Jasa Pertanian dan Perburuan ",4143.04687004288
+"6",2016,"6","Kehutanan dan Penebangan Kayu",2564.93112853377
+"7",2016,"7","Perikanan",29953.3162542902
+"8",2016,"8","Pertambangan Minyak Gas dan Panas Bumi",35873.7332620013
+"9",2016,"9","Pertambangan Bijih Logam",1849.93999974489
+"10",2016,"10","Pertambangan dan Penggalian Lainnya",16053.1224441285
+"11",2016,"11","Industri Batubara dan Pengilangan Migas",51441.9197227969
+"12",2016,"12","Industri Makanan dan Minuman",136485.625633204
+"13",2016,"13","Pengolahan Tembakau",6214.07875088832
+"14",2016,"14","Industri Tekstil dan Pakaian Jadi",187497.066931505
+"15",2016,"15","Industri Kulit Barang dari Kulit dan Alas Kaki",18048.8707987686
+"16",2016,"16","Industri Kayu Barang dari Kayu dan Gabus dan Barang Anyaman dari Bambu Rotan dan Sejenisnya",13043.6240708588
+"17",2016,"17","Industri Kertas dan Barang dari Kertas Percetakan dan Reproduksi Media Rekaman",32692.1516907414
+"18",2016,"18","Industri Kimia Farmasi dan Obat Tradisional",76055.3526869112
+"19",2016,"19","Industri Karet Barang dari Karet dan Plastik",40000.6540451022
+"20",2016,"20","Industri Barang Galian bukan Logam",23860.6657193729
+"21",2016,"21","Industri Logam Dasar",36960.2088479509
+"22",2016,"22","Industri Barang dari Logam Komputer Barang Elektronik Optik dan Peralatan Listrik",302480.926681369
+"23",2016,"23","Industri Mesin dan Perlengkapan YTDL",125200.697974598
+"24",2016,"24","Industri Alat Angkutan",265815.221094476
+"25",2016,"25","Industri Furnitur",7220.73221850952
+"26",2016,"26","Industri pengolahan lainnya jasa reparasi dan pemasangan mesin dan peralatan",14843.3686550239
+"27",2016,"27","Ketenagalistrikan",4632.26295653537
+"28",2016,"28","Pengadaan Gas dan Produksi Es",20807.6479013592
+"29",2016,"29","Pengadaan Air Pengelolaan Sampah Limbah dan Daur Ulang",2424.9303583115
+"30",2016,"30","Konstruksi",281765.219830135
+"31",2016,"31","Perdagangan Mobil Sepeda Motor dan Reparasinya",67260.3015669973
+"32",2016,"32","Perdagangan Besar dan Eceran Bukan Mobil dan Sepeda Motor",408600.793161218
+"33",2016,"33","Angkutan Rel",2028.14535064387
+"34",2016,"34","Angkutan Darat",150711.540096782
+"35",2016,"35","Angkutan Laut",438.522695756785
+"36",2016,"36","Angkutan Sungai Danau dan Penyeberangan",2.58138566597259
+"37",2016,"37","Angkutan Udara",17545.1298135151
+"38",2016,"38","Pergudangan dan Jasa Penunjang Angkutan Pos dan Kurir",6697.97737515606
+"39",2016,"39","Penyediaan Akomodasi",13036.0195450065
+"40",2016,"40","Penyediaan Makan Minum",65953.3523306556
+"41",2016,"41","Informasi dan Komunikasi",82309.3418824089
+"42",2016,"42","Jasa Perantara Keuangan",62467.1505073858
+"43",2016,"43","Asuransi dan Dana Pensiun",6589.72497479106
+"44",2016,"44","Jasa Keuangan Lainnya",9798.06209708031
+"45",2016,"45","Jasa Penunjang Keuangan",1084.33208000393
+"46",2016,"46","Real Estate",29380.0502278766
+"47",2016,"47","Jasa Perusahaan",12999.571992632
+"48",2016,"48","Administrasi Pemerintahan Pertahanan dan Jaminan Sosial Wajib",75310.9857140135
+"49",2016,"49","Jasa Pendidikan",79432.3321402363
+"50",2016,"50","Jasa Kesehatan dan Kegiatan Sosial",21780.9815302114
+"51",2016,"51","Jasa lainnya",56507.2723006971
+"52",2016,"52","Lainnya",32.4056167994547
+"53",2017,"1","Tanaman Pangan",139112.714145039
+"54",2017,"2","Tanaman Hortikultura",53279.510777453
+"55",2017,"3","Perkebunan",22580.7183210917
+"56",2017,"4","Peternakan",37599.9289684093
+"57",2017,"5","Jasa Pertanian dan Perburuan ",4460.22270408995
+"58",2017,"6","Kehutanan dan Penebangan Kayu",2761.29245281625
+"59",2017,"7","Perikanan",32246.4276680483
+"60",2017,"8","Pertambangan Minyak Gas dan Panas Bumi",38620.08917461
+"61",2017,"9","Pertambangan Bijih Logam",1991.56433583406
+"62",2017,"10","Pertambangan dan Penggalian Lainnya",17282.0881449736
+"63",2017,"11","Industri Batubara dan Pengilangan Migas",55380.116490745
+"64",2017,"12","Industri Makanan dan Minuman",146934.443496855
+"65",2017,"13","Pengolahan Tembakau",6689.80487044988
+"66",2017,"14","Industri Tekstil dan Pakaian Jadi",201851.125780171
+"67",2017,"15","Industri Kulit Barang dari Kulit dan Alas Kaki",19430.6233660882
+"68",2017,"16","Industri Kayu Barang dari Kayu dan Gabus dan Barang Anyaman dari Bambu Rotan dan Sejenisnya",14042.1940782573
+"69",2017,"17","Industri Kertas dan Barang dari Kertas Percetakan dan Reproduksi Media Rekaman",35194.9378779508
+"70",2017,"18","Industri Kimia Farmasi dan Obat Tradisional",81877.8598124377
+"71",2017,"19","Industri Karet Barang dari Karet dan Plastik",43062.951240174
+"72",2017,"20","Industri Barang Galian bukan Logam",25687.3470936973
+"73",2017,"21","Industri Logam Dasar",39789.7411790157
+"74",2017,"22","Industri Barang dari Logam Komputer Barang Elektronik Optik dan Peralatan Listrik",325637.710375323
+"75",2017,"23","Industri Mesin dan Perlengkapan YTDL",134785.584906606
+"76",2017,"24","Industri Alat Angkutan",286165.018501468
+"77",2017,"25","Industri Furnitur",7773.52388022022
+"78",2017,"26","Industri pengolahan lainnya jasa reparasi dan pemasangan mesin dan peralatan",15979.7202293368
+"79",2017,"27","Ketenagalistrikan",4986.89130442786
+"80",2017,"28","Pengadaan Gas dan Produksi Es",22400.6018998745
+"81",2017,"29","Pengadaan Air Pengelolaan Sampah Limbah dan Daur Ulang",2610.57375869513
+"82",2017,"30","Konstruksi",303336.088180981
+"83",2017,"31","Perdagangan Mobil Sepeda Motor dan Reparasinya",72409.4931926158
+"84",2017,"32","Perdagangan Besar dan Eceran Bukan Mobil dan Sepeda Motor",439881.708253029
+"85",2017,"33","Angkutan Rel",2183.41240731429
+"86",2017,"34","Angkutan Darat",162249.439601699
+"87",2017,"35","Angkutan Laut",472.094317352701
+"88",2017,"36","Angkutan Sungai Danau dan Penyeberangan",2.77900668675373
+"89",2017,"37","Angkutan Udara",18888.3178962529
+"90",2017,"38","Pergudangan dan Jasa Penunjang Angkutan Pos dan Kurir",7210.74892397794
+"91",2017,"39","Penyediaan Akomodasi",14034.0073789695
+"92",2017,"40","Penyediaan Makan Minum",71002.488917773
+"93",2017,"41","Informasi dan Komunikasi",88610.6305186025
+"94",2017,"42","Jasa Perantara Keuangan",67249.3968068391
+"95",2017,"43","Asuransi dan Dana Pensiun",7094.20913357117
+"96",2017,"44","Jasa Keuangan Lainnya",10548.1642839895
+"97",2017,"45","Jasa Penunjang Keuangan",1167.34439983696
+"98",2017,"46","Real Estate",31629.2745856196
+"99",2017,"47","Jasa Perusahaan",13994.7695412842
+"100",2017,"48","Administrasi Pemerintahan Pertahanan dan Jaminan Sosial Wajib",81076.5069489933
+"101",2017,"49","Jasa Pendidikan",85513.3679062214
+"102",2017,"50","Jasa Kesehatan dan Kegiatan Sosial",23448.4502313649
+"103",2017,"51","Jasa lainnya",60833.2531027229
+"104",2017,"52","Lainnya",34.8864669704957
+"105",2018,"1","Tanaman Pangan",147962.505674806
+"106",2018,"2","Tanaman Hortikultura",56668.9390269574
+"107",2018,"3","Perkebunan",24017.2128281696
+"108",2018,"4","Peternakan",39991.8852676555
+"109",2018,"5","Jasa Pertanian dan Perburuan ",4743.96413886905
+"110",2018,"6","Kehutanan dan Penebangan Kayu",2936.9547760649
+"111",2018,"7","Perikanan",34297.8157399136
+"112",2018,"8","Pertambangan Minyak Gas dan Panas Bumi",41076.9439643164
+"113",2018,"9","Pertambangan Bijih Logam",2118.25965120167
+"114",2018,"10","Pertambangan dan Penggalian Lainnya",18381.5051049692
+"115",2018,"11","Industri Batubara dan Pengilangan Migas",58903.1768296175
+"116",2018,"12","Industri Makanan dan Minuman",156281.821998389
+"117",2018,"13","Pengolahan Tembakau",7115.383357953
+"118",2018,"14","Industri Tekstil dan Pakaian Jadi",214692.082799677
+"119",2018,"15","Industri Kulit Barang dari Kulit dan Alas Kaki",20666.7214980247
+"120",2018,"16","Industri Kayu Barang dari Kayu dan Gabus dan Barang Anyaman dari Bambu Rotan dan Sejenisnya",14935.5020046883
+"121",2018,"17","Industri Kertas dan Barang dari Kertas Percetakan dan Reproduksi Media Rekaman",37433.8983140057
+"122",2018,"18","Industri Kimia Farmasi dan Obat Tradisional",87086.6000393596
+"123",2018,"19","Industri Karet Barang dari Karet dan Plastik",45802.4430506402
+"124",2018,"20","Industri Barang Galian bukan Logam",27321.4728321612
+"125",2018,"21","Industri Logam Dasar",42321.0045263078
+"126",2018,"22","Industri Barang dari Logam Komputer Barang Elektronik Optik dan Peralatan Listrik",346353.472185904
+"127",2018,"23","Industri Mesin dan Perlengkapan YTDL",143360.101872736
+"128",2018,"24","Industri Alat Angkutan",304369.686366761
+"129",2018,"25","Industri Furnitur",8268.04421370956
+"130",2018,"26","Industri pengolahan lainnya jasa reparasi dan pemasangan mesin dan peralatan",16996.285779098
+"131",2018,"27","Ketenagalistrikan",5304.13727793234
+"132",2018,"28","Pengadaan Gas dan Produksi Es",23825.6381244464
+"133",2018,"29","Pengadaan Air Pengelolaan Sampah Limbah dan Daur Ulang",2776.64796463324
+"134",2018,"30","Konstruksi",322633.110457879
+"135",2018,"31","Perdagangan Mobil Sepeda Motor dan Reparasinya",77015.8940055753
+"136",2018,"32","Perdagangan Besar dan Eceran Bukan Mobil dan Sepeda Motor",467865.213856538
+"137",2018,"33","Angkutan Rel",2322.3123256071
+"138",2018,"34","Angkutan Darat",172571.096576916
+"139",2018,"35","Angkutan Laut",502.127059626733
+"140",2018,"36","Angkutan Sungai Danau dan Penyeberangan",2.95579591834012
+"141",2018,"37","Angkutan Udara",20089.9167346992
+"142",2018,"38","Pergudangan dan Jasa Penunjang Angkutan Pos dan Kurir",7669.46777755564
+"143",2018,"39","Penyediaan Akomodasi",14926.7945005089
+"144",2018,"40","Penyediaan Makan Minum",75519.3817760472
+"145",2018,"41","Informasi dan Komunikasi",94247.6825467387
+"146",2018,"42","Jasa Perantara Keuangan",71527.5330354414
+"147",2018,"43","Asuransi dan Dana Pensiun",7545.51419426616
+"148",2018,"44","Jasa Keuangan Lainnya",11219.1960836977
+"149",2018,"45","Jasa Penunjang Keuangan",1241.60615689841
+"150",2018,"46","Real Estate",33641.4018598287
+"151",2018,"47","Jasa Perusahaan",14885.0605093575
+"152",2018,"48","Administrasi Pemerintahan Pertahanan dan Jaminan Sosial Wajib",86234.268328821
+"153",2018,"49","Jasa Pendidikan",90953.3845404256
+"154",2018,"50","Jasa Kesehatan dan Kegiatan Sosial",24940.1463535996
+"155",2018,"51","Jasa lainnya",64703.2200668879
+"156",2018,"52","Lainnya",37.1058037277176
+"157",2019,"1","Tanaman Pangan",156106.223774861
+"158",2019,"2","Tanaman Hortikultura",59787.9444963502
+"159",2019,"3","Perkebunan",25339.0977876709
+"160",2019,"4","Peternakan",42193.0012762297
+"161",2019,"5","Jasa Pertanian dan Perburuan ",5005.06749371918
+"162",2019,"6","Kehutanan dan Penebangan Kayu",3098.60202351995
+"163",2019,"7","Perikanan",36185.5354805307
+"164",2019,"8","Pertambangan Minyak Gas dan Panas Bumi",43337.7805899977
+"165",2019,"9","Pertambangan Bijih Logam",2234.84668373018
+"166",2019,"10","Pertambangan dan Penggalian Lainnya",19393.2059757195
+"167",2019,"11","Industri Batubara dan Pengilangan Migas",62145.1526606595
+"168",2019,"12","Industri Makanan dan Minuman",164883.427497793
+"169",2019,"13","Pengolahan Tembakau",7507.00741147066
+"170",2019,"14","Industri Tekstil dan Pakaian Jadi",226508.534492358
+"171",2019,"15","Industri Kulit Barang dari Kulit dan Alas Kaki",21804.1985444203
+"172",2019,"16","Industri Kayu Barang dari Kayu dan Gabus dan Barang Anyaman dari Bambu Rotan dan Sejenisnya",15757.5380837226
+"173",2019,"17","Industri Kertas dan Barang dari Kertas Percetakan dan Reproduksi Media Rekaman",39494.2251100753
+"174",2019,"18","Industri Kimia Farmasi dan Obat Tradisional",91879.7651576332
+"175",2019,"19","Industri Karet Barang dari Karet dan Plastik",48323.3667319278
+"176",2019,"20","Industri Barang Galian bukan Logam",28825.2211757616
+"177",2019,"21","Industri Logam Dasar",44650.3130832398
+"178",2019,"22","Industri Barang dari Logam Komputer Barang Elektronik Optik dan Peralatan Listrik",365416.443765046
+"179",2019,"23","Industri Mesin dan Perlengkapan YTDL",151250.507966647
+"180",2019,"24","Industri Alat Angkutan",321121.909591616
+"181",2019,"25","Industri Furnitur",8723.10964402359
+"182",2019,"26","Industri pengolahan lainnya jasa reparasi dan pemasangan mesin dan peralatan",17931.7454720906
+"183",2019,"27","Ketenagalistrikan",5596.07203909686
+"184",2019,"28","Pengadaan Gas dan Produksi Es",25136.9789912053
+"185",2019,"29","Pengadaan Air Pengelolaan Sampah Limbah dan Daur Ulang",2929.47207493023
+"186",2019,"30","Konstruksi",340390.535484782
+"187",2019,"31","Perdagangan Mobil Sepeda Motor dan Reparasinya",81254.7768708306
+"188",2019,"32","Perdagangan Besar dan Eceran Bukan Mobil dan Sepeda Motor",493616.078192696
+"189",2019,"33","Angkutan Rel",2450.13022672858
+"190",2019,"34","Angkutan Darat",182069.248533254
+"191",2019,"35","Angkutan Laut",529.763663949974
+"192",2019,"36","Angkutan Sungai Danau dan Penyeberangan",3.11848016466642
+"193",2019,"37","Angkutan Udara",21195.6469857167
+"194",2019,"38","Pergudangan dan Jasa Penunjang Angkutan Pos dan Kurir",8091.58811995606
+"195",2019,"39","Penyediaan Akomodasi",15748.3513266469
+"196",2019,"40","Penyediaan Makan Minum",79675.8980060865
+"197",2019,"41","Informasi dan Komunikasi",99434.9869570266
+"198",2019,"42","Jasa Perantara Keuangan",75464.3416395974
+"199",2019,"43","Asuransi dan Dana Pensiun",7960.8122472278
+"200",2019,"44","Jasa Keuangan Lainnya",11836.6901562548
+"201",2019,"45","Jasa Penunjang Keuangan",1309.94299998552
+"202",2019,"46","Real Estate",35492.9931936445
+"203",2019,"47","Jasa Perusahaan",15704.3203356063
+"204",2019,"48","Administrasi Pemerintahan Pertahanan dan Jaminan Sosial Wajib",90980.5219059125
+"205",2019,"49","Jasa Pendidikan",95959.3738656612
+"206",2019,"50","Jasa Kesehatan dan Kegiatan Sosial",26312.8287122252
+"207",2019,"51","Jasa lainnya",68264.4248598689
+"208",2019,"52","Lainnya",39.1480725042322
+"209",2020,"1","Tanaman Pangan",163795.42317156
+"210",2020,"2","Tanaman Hortikultura",62732.8714546387
+"211",2020,"3","Perkebunan",26587.2054589118
+"212",2020,"4","Peternakan",44271.2681903407
+"213",2020,"5","Jasa Pertanian dan Perburuan ",5251.59809975477
+"214",2020,"6","Kehutanan dan Penebangan Kayu",3251.22738485225
+"215",2020,"7","Perikanan",37967.8974572538
+"216",2020,"8","Pertambangan Minyak Gas dan Panas Bumi",45472.4349830697
+"217",2020,"9","Pertambangan Bijih Logam",2344.92673919957
+"218",2020,"10","Pertambangan dan Penggalian Lainnya",20348.4416100375
+"219",2020,"11","Industri Batubara dan Pengilangan Migas",65206.1867359906
+"220",2020,"12","Industri Makanan dan Minuman",173004.958597477
+"221",2020,"13","Pengolahan Tembakau",7876.77407075866
+"222",2020,"14","Industri Tekstil dan Pakaian Jadi",237665.484193977
+"223",2020,"15","Industri Kulit Barang dari Kulit dan Alas Kaki",22878.1905111664
+"224",2020,"16","Industri Kayu Barang dari Kayu dan Gabus dan Barang Anyaman dari Bambu Rotan dan Sejenisnya",16533.6945328182
+"225",2020,"17","Industri Kertas dan Barang dari Kertas Percetakan dan Reproduksi Media Rekaman",41439.5605652937
+"226",2020,"18","Industri Kimia Farmasi dan Obat Tradisional",96405.4132563138
+"227",2020,"19","Industri Karet Barang dari Karet dan Plastik",50703.5921536732
+"228",2020,"20","Industri Barang Galian bukan Logam",30245.0420382151
+"229",2020,"21","Industri Logam Dasar",46849.61783945
+"230",2020,"22","Industri Barang dari Logam Komputer Barang Elektronik Optik dan Peralatan Listrik",383415.469242688
+"231",2020,"23","Industri Mesin dan Perlengkapan YTDL",158700.533253819
+"232",2020,"24","Industri Alat Angkutan",336939.154630223
+"233",2020,"25","Industri Furnitur",9152.77687823265
+"234",2020,"26","Industri pengolahan lainnya jasa reparasi dan pemasangan mesin dan peralatan",18814.9951153887
+"235",2020,"27","Ketenagalistrikan",5871.71328328559
+"236",2020,"28","Pengadaan Gas dan Produksi Es",26375.1310585615
+"237",2020,"29","Pengadaan Air Pengelolaan Sampah Limbah dan Daur Ulang",3073.76673767018
+"238",2020,"30","Konstruksi",357156.879816232
+"239",2020,"31","Perdagangan Mobil Sepeda Motor dan Reparasinya",85257.0784202882
+"240",2020,"32","Perdagangan Besar dan Eceran Bukan Mobil dan Sepeda Motor",517929.730517757
+"241",2020,"33","Angkutan Rel",2570.81433147232
+"242",2020,"34","Angkutan Darat",191037.287872918
+"243",2020,"35","Angkutan Laut",555.857808992596
+"244",2020,"36","Angkutan Sungai Danau dan Penyeberangan",3.27208464769686
+"245",2020,"37","Angkutan Udara",22239.6640151099
+"246",2020,"38","Pergudangan dan Jasa Penunjang Angkutan Pos dan Kurir",8490.14900360177
+"247",2020,"39","Penyediaan Akomodasi",16524.0552709976
+"248",2020,"40","Penyediaan Makan Minum",83600.4299822325
+"249",2020,"41","Informasi dan Komunikasi",104332.776572535
+"250",2020,"42","Jasa Perantara Keuangan",79181.4283525804
+"251",2020,"43","Asuransi dan Dana Pensiun",8352.93160831682
+"252",2020,"44","Jasa Keuangan Lainnya",12419.7205352334
+"253",2020,"45","Jasa Penunjang Keuangan",1374.46581452573
+"254",2020,"46","Real Estate",37241.2431688999
+"255",2020,"47","Jasa Perusahaan",16477.8554806513
+"256",2020,"48","Administrasi Pemerintahan Pertahanan dan Jaminan Sosial Wajib",95461.8766990387
+"257",2020,"49","Jasa Pendidikan",100685.967987236
+"258",2020,"50","Jasa Kesehatan dan Kegiatan Sosial",27608.8986687394
+"259",2020,"51","Jasa lainnya",71626.8710311729
+"260",2020,"52","Lainnya",41.0763577974285
+"261",2021,"1","Tanaman Pangan",171225.70882297
+"262",2021,"2","Tanaman Hortikultura",65578.6356745151
+"263",2021,"3","Perkebunan",27793.2863579216
+"264",2021,"4","Peternakan",46279.5548837965
+"265",2021,"5","Jasa Pertanian dan Perburuan ",5489.82743029417
+"266",2021,"6","Kehutanan dan Penebangan Kayu",3398.71348500925
+"267",2021,"7","Perikanan",39690.2430407158
+"268",2021,"8","Pertambangan Minyak Gas dan Panas Bumi",47535.2104541247
+"269",2021,"9","Pertambangan Bijih Logam",2451.30013576042
+"270",2021,"10","Pertambangan dan Penggalian Lainnya",21271.5121745016
+"271",2021,"11","Industri Batubara dan Pengilangan Migas",68164.148468414
+"272",2021,"12","Industri Makanan dan Minuman",180853.018308786
+"273",2021,"13","Pengolahan Tembakau",8234.08980171198
+"274",2021,"14","Industri Tekstil dan Pakaian Jadi",248446.752698606
+"275",2021,"15","Industri Kulit Barang dari Kulit dan Alas Kaki",23916.018598141
+"276",2021,"16","Industri Kayu Barang dari Kayu dan Gabus dan Barang Anyaman dari Bambu Rotan dan Sejenisnya",17283.7159367943
+"277",2021,"17","Industri Kertas dan Barang dari Kertas Percetakan dan Reproduksi Media Rekaman",43319.391920206
+"278",2021,"18","Industri Kimia Farmasi dan Obat Tradisional",100778.671952843
+"279",2021,"19","Industri Karet Barang dari Karet dan Plastik",53003.6696891717
+"280",2021,"20","Industri Barang Galian bukan Logam",31617.0541343495
+"281",2021,"21","Industri Logam Dasar",48974.8667411968
+"282",2021,"22","Industri Barang dari Logam Komputer Barang Elektronik Optik dan Peralatan Listrik",400808.424457673
+"283",2021,"23","Industri Mesin dan Perlengkapan YTDL",165899.698360354
+"284",2021,"24","Industri Alat Angkutan",352223.79517494
+"285",2021,"25","Industri Furnitur",9567.97618839687
+"286",2021,"26","Industri pengolahan lainnya jasa reparasi dan pemasangan mesin dan peralatan",19668.5036294257
+"287",2021,"27","Ketenagalistrikan",6138.07302712467
+"288",2021,"28","Pengadaan Gas dan Produksi Es",27571.5915826948
+"289",2021,"29","Pengadaan Air Pengelolaan Sampah Limbah dan Daur Ulang",3213.20265379324
+"290",2021,"30","Konstruksi",373358.66120924
+"291",2021,"31","Perdagangan Mobil Sepeda Motor dan Reparasinya",89124.6128983663
+"292",2021,"32","Perdagangan Besar dan Eceran Bukan Mobil dan Sepeda Motor",541424.683982201
+"293",2021,"33","Angkutan Rel",2687.43471359112
+"294",2021,"34","Angkutan Darat",199703.351865925
+"295",2021,"35","Angkutan Laut",581.073301723768
+"296",2021,"36","Angkutan Sungai Danau dan Penyeberangan",3.4205169001812
+"297",2021,"37","Angkutan Udara",23248.5264926076
+"298",2021,"38","Pergudangan dan Jasa Penunjang Angkutan Pos dan Kurir",8875.28938846905
+"299",2021,"39","Penyediaan Akomodasi",17273.6394071465
+"300",2021,"40","Penyediaan Makan Minum",87392.8135746487
+"301",2021,"41","Informasi dan Komunikasi",109065.64589042
+"302",2021,"42","Jasa Perantara Keuangan",82773.3518602969
+"303",2021,"43","Asuransi dan Dana Pensiun",8731.84737210759
+"304",2021,"44","Jasa Keuangan Lainnya",12983.118886058
+"305",2021,"45","Jasa Penunjang Keuangan",1436.81599148597
+"306",2021,"46","Real Estate",38930.6253836197
+"307",2021,"47","Jasa Perusahaan",17225.3438461574
+"308",2021,"48","Administrasi Pemerintahan Pertahanan dan Jaminan Sosial Wajib",99792.3335516126
+"309",2021,"49","Jasa Pendidikan",105253.406373168
+"310",2021,"50","Jasa Kesehatan dan Kegiatan Sosial",28861.3268480952
+"311",2021,"51","Jasa lainnya",74876.0955929659
+"312",2021,"52","Lainnya",42.9397131100781
+"313",2022,"1","Tanaman Pangan",178556.402797538
+"314",2022,"2","Tanaman Hortikultura",68386.2567537571
+"315",2022,"3","Perkebunan",28983.2015770672
+"316",2022,"4","Peternakan",48260.9235489604
+"317",2022,"5","Jasa Pertanian dan Perburuan ",5724.86365903177
+"318",2022,"6","Kehutanan dan Penebangan Kayu",3544.22275833688
+"319",2022,"7","Perikanan",41389.5032015163
+"320",2022,"8","Pertambangan Minyak Gas dan Panas Bumi",49570.3375577078
+"321",2022,"9","Pertambangan Bijih Logam",2556.24775874649
+"322",2022,"10","Pertambangan dan Penggalian Lainnya",22182.2103821451
+"323",2022,"11","Industri Batubara dan Pengilangan Migas",71082.4632232127
+"324",2022,"12","Industri Makanan dan Minuman",188595.886717462
+"325",2022,"13","Pengolahan Tembakau",8586.61625881
+"326",2022,"14","Industri Tekstil dan Pakaian Jadi",259083.514698474
+"327",2022,"15","Industri Kulit Barang dari Kulit dan Alas Kaki",24939.9361782651
+"328",2022,"16","Industri Kayu Barang dari Kayu dan Gabus dan Barang Anyaman dari Bambu Rotan dan Sejenisnya",18023.6844447185
+"329",2022,"17","Industri Kertas dan Barang dari Kertas Percetakan dan Reproduksi Media Rekaman",45174.0269952443
+"330",2022,"18","Industri Kimia Farmasi dan Obat Tradisional",105093.313768771
+"331",2022,"19","Industri Karet Barang dari Karet dan Plastik",55272.918183988
+"332",2022,"20","Industri Barang Galian bukan Logam",32970.6764953227
+"333",2022,"21","Industri Logam Dasar",51071.6299141624
+"334",2022,"22","Industri Barang dari Logam Komputer Barang Elektronik Optik dan Peralatan Listrik",417968.253564677
+"335",2022,"23","Industri Mesin dan Perlengkapan YTDL",173002.369609391
+"336",2022,"24","Industri Alat Angkutan",367303.568362843
+"337",2022,"25","Industri Furnitur",9977.61038337401
+"338",2022,"26","Industri pengolahan lainnya jasa reparasi dan pemasangan mesin dan peralatan",20510.5721601161
+"339",2022,"27","Ketenagalistrikan",6400.86262376123
+"340",2022,"28","Pengadaan Gas dan Produksi Es",28752.0153734556
+"341",2022,"29","Pengadaan Air Pengelolaan Sampah Limbah dan Daur Ulang",3350.76964355867
+"342",2022,"30","Konstruksi",389343.282367438
+"343",2022,"31","Perdagangan Mobil Sepeda Motor dan Reparasinya",92940.3089597283
+"344",2022,"32","Perdagangan Besar dan Eceran Bukan Mobil dan Sepeda Motor",564604.723333967
+"345",2022,"33","Angkutan Rel",2802.49197688057
+"346",2022,"34","Angkutan Darat",208253.260453181
+"347",2022,"35","Angkutan Laut",605.95081913053
+"348",2022,"36","Angkutan Sungai Danau dan Penyeberangan",3.56695964410343
+"349",2022,"37","Angkutan Udara",24243.8667031898
+"350",2022,"38","Pergudangan dan Jasa Penunjang Angkutan Pos dan Kurir",9255.2675523198
+"351",2022,"39","Penyediaan Akomodasi",18013.1765081536
+"352",2022,"40","Penyediaan Makan Minum",91134.366033658
+"353",2022,"41","Informasi dan Komunikasi",113735.078294335
+"354",2022,"42","Jasa Perantara Keuangan",86317.1310971194
+"355",2022,"43","Asuransi dan Dana Pensiun",9105.684346459
+"356",2022,"44","Jasa Keuangan Lainnya",13538.9657389831
+"357",2022,"45","Jasa Penunjang Keuangan",1498.33045916581
+"358",2022,"46","Real Estate",40597.3639994949
+"359",2022,"47","Jasa Perusahaan",17962.8132671393
+"360",2022,"48","Administrasi Pemerintahan Pertahanan dan Jaminan Sosial Wajib",104064.747217198
+"361",2022,"49","Jasa Pendidikan",109759.625195134
+"362",2022,"50","Jasa Kesehatan dan Kegiatan Sosial",30096.9681327933
+"363",2022,"51","Jasa lainnya",78081.7692419505
+"364",2022,"52","Lainnya",44.7780929791383
+"365",2023,"1","Tanaman Pangan",185924.286295932
+"366",2023,"2","Tanaman Hortikultura",71208.1212445214
+"367",2023,"3","Perkebunan",30179.153384365
+"368",2023,"4","Peternakan",50252.3439442113
+"369",2023,"5","Jasa Pertanian dan Perburuan ",5961.09225583972
+"370",2023,"6","Kehutanan dan Penebangan Kayu",3690.47021833636
+"371",2023,"7","Perikanan",43097.3839208147
+"372",2023,"8","Pertambangan Minyak Gas dan Panas Bumi",51615.7891146335
+"373",2023,"9","Pertambangan Bijih Logam",2661.72779409886
+"374",2023,"10","Pertambangan dan Penggalian Lainnya",23097.5286752551
+"375",2023,"11","Industri Batubara dan Pengilangan Migas",74015.5829523404
+"376",2023,"12","Industri Makanan dan Minuman",196378.03566222
+"377",2023,"13","Pengolahan Tembakau",8940.93112654435
+"378",2023,"14","Industri Tekstil dan Pakaian Jadi",269774.238317146
+"379",2023,"15","Industri Kulit Barang dari Kulit dan Alas Kaki",25969.0482198377
+"380",2023,"16","Industri Kayu Barang dari Kayu dan Gabus dan Barang Anyaman dari Bambu Rotan dan Sejenisnya",18767.4069050723
+"381",2023,"17","Industri Kertas dan Barang dari Kertas Percetakan dan Reproduksi Media Rekaman",47038.0708650779
+"382",2023,"18","Industri Kimia Farmasi dan Obat Tradisional",109429.844300171
+"383",2023,"19","Industri Karet Barang dari Karet dan Plastik",57553.6788591326
+"384",2023,"20","Industri Barang Galian bukan Logam",34331.165951174
+"385",2023,"21","Industri Logam Dasar",53179.0302279295
+"386",2023,"22","Industri Barang dari Logam Komputer Barang Elektronik Optik dan Peralatan Listrik",435215.136622596
+"387",2023,"23","Industri Mesin dan Perlengkapan YTDL",180141.07359456
+"388",2023,"24","Industri Alat Angkutan",382459.84311884
+"389",2023,"25","Industri Furnitur",10389.3227036565
+"390",2023,"26","Industri pengolahan lainnya jasa reparasi dan pemasangan mesin dan peralatan",21356.9126093718
+"391",2023,"27","Ketenagalistrikan",6664.98538476115
+"392",2023,"28","Pengadaan Gas dan Produksi Es",29938.4276011698
+"393",2023,"29","Pengadaan Air Pengelolaan Sampah Limbah dan Daur Ulang",3489.03452780194
+"394",2023,"30","Konstruksi",405408.995500215
+"395",2023,"31","Perdagangan Mobil Sepeda Motor dan Reparasinya",96775.3625225876
+"396",2023,"32","Perdagangan Besar dan Eceran Bukan Mobil dan Sepeda Motor",587902.357913247
+"397",2023,"33","Angkutan Rel",2918.13294000108
+"398",2023,"34","Angkutan Darat",216846.54379189
+"399",2023,"35","Angkutan Laut",630.954543282459
+"400",2023,"36","Angkutan Sungai Danau dan Penyeberangan",3.71414531031014
+"401",2023,"37","Angkutan Udara",25244.2563986646
+"402",2023,"38","Pergudangan dan Jasa Penunjang Angkutan Pos dan Kurir",9637.17339273529
+"403",2023,"39","Penyediaan Akomodasi",18756.4653730092
+"404",2023,"40","Penyediaan Makan Minum",94894.8998544326
+"405",2023,"41","Informasi dan Komunikasi",118428.199310575
+"406",2023,"42","Jasa Perantara Keuangan",89878.8883675115
+"407",2023,"43","Asuransi dan Dana Pensiun",9481.41784235572
+"408",2023,"44","Jasa Keuangan Lainnya",14097.6324722432
+"409",2023,"45","Jasa Penunjang Keuangan",1560.15699740397
+"410",2023,"46","Real Estate",42272.5581880189
+"411",2023,"47","Jasa Perusahaan",18704.0239623713
+"412",2023,"48","Administrasi Pemerintahan Pertahanan dan Jaminan Sosial Wajib",108358.835369588
+"413",2023,"49","Jasa Pendidikan",114288.704626591
+"414",2023,"50","Jasa Kesehatan dan Kegiatan Sosial",31338.8779796709
+"415",2023,"51","Jasa lainnya",81303.7056727349
+"416",2023,"52","Lainnya",46.6257991783085
+"417",2024,"1","Tanaman Pangan",193453.712977582
+"418",2024,"2","Tanaman Hortikultura",74091.8560095172
+"419",2024,"3","Perkebunan",31401.3268144684
+"420",2024,"4","Peternakan",52287.4268634311
+"421",2024,"5","Jasa Pertanian dan Perburuan ",6202.50023957915
+"422",2024,"6","Kehutanan dan Penebangan Kayu",3839.92420029516
+"423",2024,"7","Perikanan",44842.7104667301
+"424",2024,"8","Pertambangan Minyak Gas dan Panas Bumi",53706.0878458897
+"425",2024,"9","Pertambangan Bijih Logam",2769.52051269118
+"426",2024,"10","Pertambangan dan Penggalian Lainnya",24032.9156123378
+"427",2024,"11","Industri Batubara dan Pengilangan Migas",77013.012262098
+"428",2024,"12","Industri Makanan dan Minuman",204330.810691576
+"429",2024,"13","Pengolahan Tembakau",9303.01446016457
+"430",2024,"14","Industri Tekstil dan Pakaian Jadi",280699.359442924
+"431",2024,"15","Industri Kulit Barang dari Kulit dan Alas Kaki",27020.7238694205
+"432",2024,"16","Industri Kayu Barang dari Kayu dan Gabus dan Barang Anyaman dari Bambu Rotan dan Sejenisnya",19527.4357163245
+"433",2024,"17","Industri Kertas dan Barang dari Kertas Percetakan dan Reproduksi Media Rekaman",48942.9844881487
+"434",2024,"18","Industri Kimia Farmasi dan Obat Tradisional",113861.454639291
+"435",2024,"19","Industri Karet Barang dari Karet dan Plastik",59884.4459356795
+"436",2024,"20","Industri Barang Galian bukan Logam",35721.484569977
+"437",2024,"21","Industri Logam Dasar",55332.635962175
+"438",2024,"22","Industri Barang dari Logam Komputer Barang Elektronik Optik dan Peralatan Listrik",452840.163063349
+"439",2024,"23","Industri Mesin dan Perlengkapan YTDL",187436.295929446
+"440",2024,"24","Industri Alat Angkutan",397948.424007379
+"441",2024,"25","Industri Furnitur",10810.061947182
+"442",2024,"26","Industri pengolahan lainnya jasa reparasi dan pemasangan mesin dan peralatan",22221.8093414895
+"443",2024,"27","Ketenagalistrikan",6934.89912109223
+"444",2024,"28","Pengadaan Gas dan Produksi Es",31150.8522933807
+"445",2024,"29","Pengadaan Air Pengelolaan Sampah Limbah dan Daur Ulang",3630.3309134985
+"446",2024,"30","Konstruksi",421826.954490475
+"447",2024,"31","Perdagangan Mobil Sepeda Motor dan Reparasinya",100694.500851531
+"448",2024,"32","Perdagangan Besar dan Eceran Bukan Mobil dan Sepeda Motor",611710.800522143
+"449",2024,"33","Angkutan Rel",3036.30936792654
+"450",2024,"34","Angkutan Darat",225628.237594126
+"451",2024,"35","Angkutan Laut",656.506482019162
+"452",2024,"36","Angkutan Sungai Danau dan Penyeberangan",3.86455806894491
+"453",2024,"37","Angkutan Udara",26266.5799555987
+"454",2024,"38","Pergudangan dan Jasa Penunjang Angkutan Pos dan Kurir",10027.4526398663
+"455",2024,"39","Penyediaan Akomodasi",19516.0510820445
+"456",2024,"40","Penyediaan Makan Minum",98737.884572304
+"457",2024,"41","Informasi dan Komunikasi",123224.218494048
+"458",2024,"42","Jasa Perantara Keuangan",93518.7382960689
+"459",2024,"43","Asuransi dan Dana Pensiun",9865.38941435611
+"460",2024,"44","Jasa Keuangan Lainnya",14668.5481508741
+"461",2024,"45","Jasa Penunjang Keuangan",1623.33910210823
+"462",2024,"46","Real Estate",43984.4815406025
+"463",2024,"47","Jasa Perusahaan",19461.4859372546
+"464",2024,"48","Administrasi Pemerintahan Pertahanan dan Jaminan Sosial Wajib",112747.072767071
+"465",2024,"49","Jasa Pendidikan",118917.085561489
+"466",2024,"50","Jasa Kesehatan dan Kegiatan Sosial",32608.0170939527
+"467",2024,"51","Jasa lainnya",84596.2840819637
+"468",2024,"52","Lainnya",48.5140169221035
+"469",2025,"1","Tanaman Pangan",201264.582117041
+"470",2025,"2","Tanaman Hortikultura",77083.3819031405
+"471",2025,"3","Perkebunan",32669.1838681173
+"472",2025,"4","Peternakan",54398.57915192
+"473",2025,"5","Jasa Pertanian dan Perburuan ",6452.93181291593
+"474",2025,"6","Kehutanan dan Penebangan Kayu",3994.96462300043
+"475",2025,"7","Perikanan",46653.2755777491
+"476",2025,"8","Pertambangan Minyak Gas dan Panas Bumi",55874.5198583844
+"477",2025,"9","Pertambangan Bijih Logam",2881.34241556769
+"478",2025,"10","Pertambangan dan Penggalian Lainnya",25003.2663799625
+"479",2025,"11","Industri Batubara dan Pengilangan Migas",80122.4824891416
+"480",2025,"12","Industri Makanan dan Minuman",212580.852517635
+"481",2025,"13","Pengolahan Tembakau",9678.63210757186
+"482",2025,"14","Industri Tekstil dan Pakaian Jadi",292032.8506972
+"483",2025,"15","Industri Kulit Barang dari Kulit dan Alas Kaki",28111.7101056059
+"484",2025,"16","Industri Kayu Barang dari Kayu dan Gabus dan Barang Anyaman dari Bambu Rotan dan Sejenisnya",20315.873646317
+"485",2025,"17","Industri Kertas dan Barang dari Kertas Percetakan dan Reproduksi Media Rekaman",50919.1018820589
+"486",2025,"18","Industri Kimia Farmasi dan Obat Tradisional",118458.714151798
+"487",2025,"19","Industri Karet Barang dari Karet dan Plastik",62302.3347603144
+"488",2025,"20","Industri Barang Galian bukan Logam",37163.7719117332
+"489",2025,"21","Industri Logam Dasar",57566.741330274
+"490",2025,"22","Industri Barang dari Logam Komputer Barang Elektronik Optik dan Peralatan Listrik",471123.995409276
+"491",2025,"23","Industri Mesin dan Perlengkapan YTDL",195004.206397308
+"492",2025,"24","Industri Alat Angkutan",414015.952597724
+"493",2025,"25","Industri Furnitur",11246.5280038903
+"494",2025,"26","Industri pengolahan lainnya jasa reparasi dan pemasangan mesin dan peralatan",23119.0350506104
+"495",2025,"27","Ketenagalistrikan",7214.90196361446
+"496",2025,"28","Pengadaan Gas dan Produksi Es",32408.5962110403
+"497",2025,"29","Pengadaan Air Pengelolaan Sampah Limbah dan Daur Ulang",3776.90881713148
+"498",2025,"30","Konstruksi",438858.600408812
+"499",2025,"31","Perdagangan Mobil Sepeda Motor dan Reparasinya",104760.132661377
+"500",2025,"32","Perdagangan Besar dan Eceran Bukan Mobil dan Sepeda Motor",636409.178963843
+"501",2025,"33","Angkutan Rel",3158.903112832
+"502",2025,"34","Angkutan Darat",234738.182349845
+"503",2025,"35","Angkutan Laut",683.01352673457
+"504",2025,"36","Angkutan Sungai Danau dan Penyeberangan",4.0205931064418
+"505",2025,"37","Angkutan Udara",27327.1169471948
+"506",2025,"38","Pergudangan dan Jasa Penunjang Angkutan Pos dan Kurir",10432.3201359024
+"507",2025,"39","Penyediaan Akomodasi",20304.0293471012
+"508",2025,"40","Penyediaan Makan Minum",102724.516225069
+"509",2025,"41","Informasi dan Komunikasi",128199.508089966
+"510",2025,"42","Jasa Perantara Keuangan",97294.6421837476
+"511",2025,"43","Asuransi dan Dana Pensiun",10263.7134606579
+"512",2025,"44","Jasa Keuangan Lainnya",15260.8040880119
+"513",2025,"45","Jasa Penunjang Keuangan",1688.88289085425
+"514",2025,"46","Real Estate",45760.3948802468
+"515",2025,"47","Jasa Perusahaan",20247.2610850955
+"516",2025,"48","Administrasi Pemerintahan Pertahanan dan Jaminan Sosial Wajib",117299.338100654
+"517",2025,"49","Jasa Pendidikan",123718.470758341
+"518",2025,"50","Jasa Kesehatan dan Kegiatan Sosial",33924.5953622004
+"519",2025,"51","Jasa lainnya",88011.9357873684
+"520",2025,"52","Lainnya",50.4728143614267
+"521",2026,"1","Tanaman Pangan",209479.17460783
+"522",2026,"2","Tanaman Hortikultura",80229.531928573
+"523",2026,"3","Perkebunan",34002.5731294589
+"524",2026,"4","Peternakan",56618.8513682761
+"525",2026,"5","Jasa Pertanian dan Perburuan ",6716.30753782678
+"526",2026,"6","Kehutanan dan Penebangan Kayu",4158.01867875071
+"527",2026,"7","Perikanan",48557.4240533554
+"528",2026,"8","Pertambangan Minyak Gas dan Panas Bumi",58155.0324375337
+"529",2026,"9","Pertambangan Bijih Logam",2998.94409948717
+"530",2026,"10","Pertambangan dan Penggalian Lainnya",26023.7720352029
+"531",2026,"11","Industri Batubara dan Pengilangan Migas",83392.6730814235
+"532",2026,"12","Industri Makanan dan Minuman",221257.317379999
+"533",2026,"13","Pengolahan Tembakau",10073.6644465739
+"534",2026,"14","Industri Tekstil dan Pakaian Jadi",303952.140406136
+"535",2026,"15","Industri Kulit Barang dari Kulit dan Alas Kaki",29259.0865605575
+"536",2026,"16","Industri Kayu Barang dari Kayu dan Gabus dan Barang Anyaman dari Bambu Rotan dan Sejenisnya",21145.0638661929
+"537",2026,"17","Industri Kertas dan Barang dari Kertas Percetakan dan Reproduksi Media Rekaman",52997.3596040999
+"538",2026,"18","Industri Kimia Farmasi dan Obat Tradisional",123293.593957794
+"539",2026,"19","Industri Karet Barang dari Karet dan Plastik",64845.1979203268
+"540",2026,"20","Industri Barang Galian bukan Logam",38680.6073055434
+"541",2026,"21","Industri Logam Dasar",59916.3217486303
+"542",2026,"22","Industri Barang dari Logam Komputer Barang Elektronik Optik dan Peralatan Listrik",490352.871122089
+"543",2026,"23","Industri Mesin dan Perlengkapan YTDL",202963.282319629
+"544",2026,"24","Industri Alat Angkutan",430913.969623385
+"545",2026,"25","Industri Furnitur",11705.5538469692
+"546",2026,"26","Industri pengolahan lainnya jasa reparasi dan pemasangan mesin dan peralatan",24062.6360047544
+"547",2026,"27","Ketenagalistrikan",7509.37741910033
+"548",2026,"28","Pengadaan Gas dan Produksi Es",33731.3496149025
+"549",2026,"29","Pengadaan Air Pengelolaan Sampah Limbah dan Daur Ulang",3931.06294838127
+"550",2026,"30","Konstruksi",456770.567459925
+"551",2026,"31","Perdagangan Mobil Sepeda Motor dan Reparasinya",109035.906322308
+"552",2026,"32","Perdagangan Besar dan Eceran Bukan Mobil dan Sepeda Motor",662384.151845786
+"553",2026,"33","Angkutan Rel",3287.83340705888
+"554",2026,"34","Angkutan Darat",244318.996270256
+"555",2026,"35","Angkutan Laut",710.890651108885
+"556",2026,"36","Angkutan Sungai Danau dan Penyeberangan",4.18469318601511
+"557",2026,"37","Angkutan Udara",28442.4703159202
+"558",2026,"38","Pergudangan dan Jasa Penunjang Angkutan Pos dan Kurir",10858.1141715368
+"559",2026,"39","Penyediaan Akomodasi",21132.7361431656
+"560",2026,"40","Penyediaan Makan Minum",106917.20641788
+"561",2026,"41","Informasi dan Komunikasi",133431.957363462
+"562",2026,"42","Jasa Perantara Keuangan",101265.712645673
+"563",2026,"43","Asuransi dan Dana Pensiun",10682.6258327936
+"564",2026,"44","Jasa Keuangan Lainnya",15883.6721820707
+"565",2026,"45","Jasa Penunjang Keuangan",1757.81446623181
+"566",2026,"46","Real Estate",47628.1005252481
+"567",2026,"47","Jasa Perusahaan",21073.6508905902
+"568",2026,"48","Administrasi Pemerintahan Pertahanan dan Jaminan Sosial Wajib",122086.898096559
+"569",2026,"49","Jasa Pendidikan",128768.026970235
+"570",2026,"50","Jasa Kesehatan dan Kegiatan Sosial",35309.2241100113
+"571",2026,"51","Jasa lainnya",91604.13357604
+"572",2026,"52","Lainnya",52.5328569058286
+"573",2027,"1","Tanaman Pangan",218228.568703659
+"574",2027,"2","Tanaman Hortikultura",83580.5084362908
+"575",2027,"3","Perkebunan",35422.7711665135
+"576",2027,"4","Peternakan",58983.6718560482
+"577",2027,"5","Jasa Pertanian dan Perburuan ",6996.83003667299
+"578",2027,"6","Kehutanan dan Penebangan Kayu",4331.68818144144
+"579",2027,"7","Perikanan",50585.539927482
+"580",2027,"8","Pertambangan Minyak Gas dan Panas Bumi",60584.015167699
+"581",2027,"9","Pertambangan Bijih Logam",3124.20210590664
+"582",2027,"10","Pertambangan dan Penggalian Lainnya",27110.7165385038
+"583",2027,"11","Industri Batubara dan Pengilangan Migas",86875.7656745652
+"584",2027,"12","Industri Makanan dan Minuman",230498.653517435
+"585",2027,"13","Pengolahan Tembakau",10494.4149120902
+"586",2027,"14","Industri Tekstil dan Pakaian Jadi",316647.421775574
+"587",2027,"15","Industri Kulit Barang dari Kulit dan Alas Kaki",30481.1616412023
+"588",2027,"16","Industri Kayu Barang dari Kayu dan Gabus dan Barang Anyaman dari Bambu Rotan dan Sejenisnya",22028.2375625432
+"589",2027,"17","Industri Kertas dan Barang dari Kertas Percetakan dan Reproduksi Media Rekaman",55210.9199070881
+"590",2027,"18","Industri Kimia Farmasi dan Obat Tradisional",128443.243057984
+"591",2027,"19","Industri Karet Barang dari Karet dan Plastik",67553.6112644652
+"592",2027,"20","Industri Barang Galian bukan Logam",40296.1945247301
+"593",2027,"21","Industri Logam Dasar",62418.868900311
+"594",2027,"22","Industri Barang dari Logam Komputer Barang Elektronik Optik dan Peralatan Listrik",510833.620693019
+"595",2027,"23","Industri Mesin dan Perlengkapan YTDL",211440.524734403
+"596",2027,"24","Industri Alat Angkutan",448912.112630637
+"597",2027,"25","Industri Furnitur",12194.4640401128
+"598",2027,"26","Industri pengolahan lainnya jasa reparasi dan pemasangan mesin dan peralatan",25067.6690147623
+"599",2027,"27","Ketenagalistrikan",7823.02436074514
+"600",2027,"28","Pengadaan Gas dan Produksi Es",35140.219359198
+"601",2027,"29","Pengadaan Air Pengelolaan Sampah Limbah dan Daur Ulang",4095.25310721347
+"602",2027,"30","Konstruksi",475848.672543946
+"603",2027,"31","Perdagangan Mobil Sepeda Motor dan Reparasinya",113590.049314306
+"604",2027,"32","Perdagangan Besar dan Eceran Bukan Mobil dan Sepeda Motor",690050.195490362
+"605",2027,"33","Angkutan Rel",3425.15755994255
+"606",2027,"34","Angkutan Darat",254523.558072008
+"607",2027,"35","Angkutan Laut",740.582683633055
+"608",2027,"36","Angkutan Sungai Danau dan Penyeberangan",4.35947681270793
+"609",2027,"37","Angkutan Udara",29630.4374841066
+"610",2027,"38","Pergudangan dan Jasa Penunjang Angkutan Pos dan Kurir",11311.6290385976
+"611",2027,"39","Penyediaan Akomodasi",22015.3949429526
+"612",2027,"40","Penyediaan Makan Minum",111382.856888035
+"613",2027,"41","Informasi dan Komunikasi",139005.059234501
+"614",2027,"42","Jasa Perantara Keuangan",105495.315087016
+"615",2027,"43","Asuransi dan Dana Pensiun",11128.8110135609
+"616",2027,"44","Jasa Keuangan Lainnya",16547.0913876794
+"617",2027,"45","Jasa Penunjang Keuangan",1831.23375261769
+"618",2027,"46","Real Estate",49617.4010001583
+"619",2027,"47","Jasa Perusahaan",21953.8418547988
+"620",2027,"48","Administrasi Pemerintahan Pertahanan dan Jaminan Sosial Wajib",127186.146684796
+"621",2027,"49","Jasa Pendidikan",134146.328737053
+"622",2027,"50","Jasa Kesehatan dan Kegiatan Sosial",36783.9975214245
+"623",2027,"51","Jasa lainnya",95430.1972740862
+"624",2027,"52","Lainnya",54.7270161529679
+"625",2028,"1","Tanaman Pangan",227659.1925802
+"626",2028,"2","Tanaman Hortikultura",87192.3927241956
+"627",2028,"3","Perkebunan",36953.5461402971
+"628",2028,"4","Peternakan",61532.6177957847
+"629",2028,"5","Jasa Pertanian dan Perburuan ",7299.1940800057
+"630",2028,"6","Kehutanan dan Penebangan Kayu",4518.8796304451
+"631",2028,"7","Perikanan",52771.5653570656
+"632",2028,"8","Pertambangan Minyak Gas dan Panas Bumi",63202.1190363683
+"633",2028,"9","Pertambangan Bijih Logam",3259.21272871429
+"634",2028,"10","Pertambangan dan Penggalian Lainnya",28282.2907838783
+"635",2028,"11","Industri Batubara dan Pengilangan Migas",90630.052635847
+"636",2028,"12","Industri Makanan dan Minuman",240459.522152943
+"637",2028,"13","Pengolahan Tembakau",10947.9251029337
+"638",2028,"14","Industri Tekstil dan Pakaian Jadi",330331.160591169
+"639",2028,"15","Industri Kulit Barang dari Kulit dan Alas Kaki",31798.3877608887
+"640",2028,"16","Industri Kayu Barang dari Kayu dan Gabus dan Barang Anyaman dari Bambu Rotan dan Sejenisnya",22980.1753603735
+"641",2028,"17","Industri Kertas dan Barang dari Kertas Percetakan dan Reproduksi Media Rekaman",57596.8285102308
+"642",2028,"18","Industri Kimia Farmasi dan Obat Tradisional",133993.844988604
+"643",2028,"19","Industri Karet Barang dari Karet dan Plastik",70472.9022771939
+"644",2028,"20","Industri Barang Galian bukan Logam",42037.5717260565
+"645",2028,"21","Industri Logam Dasar",65116.2649328044
+"646",2028,"22","Industri Barang dari Logam Komputer Barang Elektronik Optik dan Peralatan Listrik",532909.006005147
+"647",2028,"23","Industri Mesin dan Perlengkapan YTDL",220577.807139148
+"648",2028,"24","Industri Alat Angkutan",468311.595076915
+"649",2028,"25","Industri Furnitur",12721.4408902175
+"650",2028,"26","Industri pengolahan lainnya jasa reparasi dan pemasangan mesin dan peralatan",26150.9541196601
+"651",2028,"27","Ketenagalistrikan",8161.09192339954
+"652",2028,"28","Pengadaan Gas dan Produksi Es",36658.7840168151
+"653",2028,"29","Pengadaan Air Pengelolaan Sampah Limbah dan Daur Ulang",4272.22714852614
+"654",2028,"30","Konstruksi",496412.203155775
+"655",2028,"31","Perdagangan Mobil Sepeda Motor dan Reparasinya",118498.778897991
+"656",2028,"32","Perdagangan Besar dan Eceran Bukan Mobil dan Sepeda Motor",719870.323479379
+"657",2028,"33","Angkutan Rel",3573.17380207614
+"658",2028,"34","Angkutan Darat",265522.64933744
+"659",2028,"35","Angkutan Laut",772.586544448852
+"660",2028,"36","Angkutan Sungai Danau dan Penyeberangan",4.54786913165761
+"661",2028,"37","Angkutan Udara",30910.9000416438
+"662",2028,"38","Pergudangan dan Jasa Penunjang Angkutan Pos dan Kurir",11800.4546746161
+"663",2028,"39","Penyediaan Akomodasi",22966.7777542582
+"664",2028,"40","Penyediaan Makan Minum",116196.203902339
+"665",2028,"41","Informasi dan Komunikasi",145012.084063395
+"666",2028,"42","Jasa Perantara Keuangan",110054.235320204
+"667",2028,"43","Asuransi dan Dana Pensiun",11609.7362722722
+"668",2028,"44","Jasa Keuangan Lainnya",17262.1645609808
+"669",2028,"45","Jasa Penunjang Keuangan",1910.36948105852
+"670",2028,"46","Real Estate",51761.5888548631
+"671",2028,"47","Jasa Perusahaan",22902.564684296
+"672",2028,"48","Administrasi Pemerintahan Pertahanan dan Jaminan Sosial Wajib",132682.423908333
+"673",2028,"49","Jasa Pendidikan",139943.386282053
+"674",2028,"50","Jasa Kesehatan dan Kegiatan Sosial",38373.5971204176
+"675",2028,"51","Jasa lainnya",99554.1591471905
+"676",2028,"52","Lainnya",57.0920131297151
+"677",2029,"1","Tanaman Pangan",237939.99415555
+"678",2029,"2","Tanaman Hortikultura",91129.8910449001
+"679",2029,"3","Perkebunan",38622.3216071173
+"680",2029,"4","Peternakan",64311.3530921751
+"681",2029,"5","Jasa Pertanian dan Perburuan ",7628.81646487854
+"682",2029,"6","Kehutanan dan Penebangan Kayu",4722.94652665502
+"683",2029,"7","Perikanan",55154.6625916106
+"684",2029,"8","Pertambangan Minyak Gas dan Panas Bumi",66056.2468999979
+"685",2029,"9","Pertambangan Bijih Logam",3406.39465875634
+"686",2029,"10","Pertambangan dan Penggalian Lainnya",29559.4833116651
+"687",2029,"11","Industri Batubara dan Pengilangan Migas",94722.7913359742
+"688",2029,"12","Industri Makanan dan Minuman",251318.370443407
+"689",2029,"13","Pengolahan Tembakau",11442.3195720057
+"690",2029,"14","Industri Tekstil dan Pakaian Jadi",345248.498554566
+"691",2029,"15","Industri Kulit Barang dari Kulit dan Alas Kaki",33234.3627868942
+"692",2029,"16","Industri Kayu Barang dari Kayu dan Gabus dan Barang Anyaman dari Bambu Rotan dan Sejenisnya",24017.931052859
+"693",2029,"17","Industri Kertas dan Barang dari Kertas Percetakan dan Reproduksi Media Rekaman",60197.8285338716
+"694",2029,"18","Industri Kimia Farmasi dan Obat Tradisional",140044.837777577
+"695",2029,"19","Industri Karet Barang dari Karet dan Plastik",73655.3695280854
+"696",2029,"20","Industri Barang Galian bukan Logam",43935.9353665798
+"697",2029,"21","Industri Logam Dasar",68056.8332073152
+"698",2029,"22","Industri Barang dari Logam Komputer Barang Elektronik Optik dan Peralatan Listrik",556974.503586696
+"699",2029,"23","Industri Mesin dan Perlengkapan YTDL",230538.822292641
+"700",2029,"24","Industri Alat Angkutan",489459.955175423
+"701",2029,"25","Industri Furnitur",13295.9250920746
+"702",2029,"26","Industri pengolahan lainnya jasa reparasi dan pemasangan mesin dan peralatan",27331.8981758313
+"703",2029,"27","Ketenagalistrikan",8529.63652619702
+"704",2029,"28","Pengadaan Gas dan Produksi Es",38314.2483984598
+"705",2029,"29","Pengadaan Air Pengelolaan Sampah Limbah dan Daur Ulang",4465.15553020503
+"706",2029,"30","Konstruksi",518829.551220598
+"707",2029,"31","Perdagangan Mobil Sepeda Motor dan Reparasinya",123850.034074486
+"708",2029,"32","Perdagangan Besar dan Eceran Bukan Mobil dan Sepeda Motor",752378.758002917
+"709",2029,"33","Angkutan Rel",3734.53381761975
+"710",2029,"34","Angkutan Darat",277513.316793743
+"711",2029,"35","Angkutan Laut",807.475576924297
+"712",2029,"36","Angkutan Sungai Danau dan Penyeberangan",4.75324515712498
+"713",2029,"37","Angkutan Udara",32306.7972432544
+"714",2029,"38","Pergudangan dan Jasa Penunjang Angkutan Pos dan Kurir",12333.3483022956
+"715",2029,"39","Penyediaan Akomodasi",24003.9284277744
+"716",2029,"40","Penyediaan Makan Minum",121443.477700467
+"717",2029,"41","Informasi dan Komunikasi",151560.646611594
+"718",2029,"42","Jasa Perantara Keuangan",115024.145575225
+"719",2029,"43","Asuransi dan Dana Pensiun",12134.0172978026
+"720",2029,"44","Jasa Keuangan Lainnya",18041.702108317
+"721",2029,"45","Jasa Penunjang Keuangan",1996.63935379142
+"722",2029,"46","Real Estate",54099.0768262932
+"723",2029,"47","Jasa Perusahaan",23936.8155766817
+"724",2029,"48","Administrasi Pemerintahan Pertahanan dan Jaminan Sosial Wajib",138674.194577806
+"725",2029,"49","Jasa Pendidikan",146263.052840834
+"726",2029,"50","Jasa Kesehatan dan Kegiatan Sosial",40106.500295801
+"727",2029,"51","Jasa lainnya",104049.899225125
+"728",2029,"52","Lainnya",59.6702163284158
+"729",2030,"1","Tanaman Pangan",249270.690184763
+"730",2030,"2","Tanaman Hortikultura",95469.4939698714
+"731",2030,"3","Perkebunan",40461.5155081925
+"732",2030,"4","Peternakan",67373.8579716131
+"733",2030,"5","Jasa Pertanian dan Perburuan ",7992.10049677477
+"734",2030,"6","Kehutanan dan Penebangan Kayu",4947.85311138315
+"735",2030,"7","Perikanan",57781.1261192629
+"736",2030,"8","Pertambangan Minyak Gas dan Panas Bumi",69201.843574953
+"737",2030,"9","Pertambangan Bijih Logam",3568.60707945881
+"738",2030,"10","Pertambangan dan Penggalian Lainnya",30967.1051004012
+"739",2030,"11","Industri Batubara dan Pengilangan Migas",99233.4880747699
+"740",2030,"12","Industri Makanan dan Minuman",263286.144386403
+"741",2030,"13","Pengolahan Tembakau",11987.2025178074
+"742",2030,"14","Industri Tekstil dan Pakaian Jadi",361689.222635221
+"743",2030,"15","Industri Kulit Barang dari Kulit dan Alas Kaki",34816.9822359672
+"744",2030,"16","Industri Kayu Barang dari Kayu dan Gabus dan Barang Anyaman dari Bambu Rotan dan Sejenisnya",25161.6642742385
+"745",2030,"17","Industri Kertas dan Barang dari Kertas Percetakan dan Reproduksi Media Rekaman",63064.4474860857
+"746",2030,"18","Industri Kimia Farmasi dan Obat Tradisional",146713.769131256
+"747",2030,"19","Industri Karet Barang dari Karet dan Plastik",77162.8362152389
+"748",2030,"20","Industri Barang Galian bukan Logam",46028.1634098924
+"749",2030,"21","Industri Logam Dasar",71297.6977476364
+"750",2030,"22","Industri Barang dari Logam Komputer Barang Elektronik Optik dan Peralatan Listrik",583497.614249786
+"751",2030,"23","Industri Mesin dan Perlengkapan YTDL",241517.074719692
+"752",2030,"24","Industri Alat Angkutan",512768.024885383
+"753",2030,"25","Industri Furnitur",13929.0766821642
+"754",2030,"26","Industri pengolahan lainnya jasa reparasi dan pemasangan mesin dan peralatan",28633.4424211812
+"755",2030,"27","Ketenagalistrikan",8935.81758483331
+"756",2030,"28","Pengadaan Gas dan Produksi Es",40138.7718617448
+"757",2030,"29","Pengadaan Air Pengelolaan Sampah Limbah dan Daur Ulang",4677.78611471635
+"758",2030,"30","Konstruksi",543536.200292845
+"759",2030,"31","Perdagangan Mobil Sepeda Motor dan Reparasinya",129747.769317719
+"760",2030,"32","Perdagangan Besar dan Eceran Bukan Mobil dan Sepeda Motor",788207.013929471
+"761",2030,"33","Angkutan Rel",3912.37221611363
+"762",2030,"34","Angkutan Darat",290728.493367182
+"763",2030,"35","Angkutan Laut",845.927541864506
+"764",2030,"36","Angkutan Sungai Danau dan Penyeberangan",4.97959456180936
+"765",2030,"37","Angkutan Udara",33845.246046449
+"766",2030,"38","Pergudangan dan Jasa Penunjang Angkutan Pos dan Kurir",12920.6620119209
+"767",2030,"39","Penyediaan Akomodasi",25146.9948445294
+"768",2030,"40","Penyediaan Makan Minum",127226.612794834
+"769",2030,"41","Informasi dan Komunikasi",158777.960467726
+"770",2030,"42","Jasa Perantara Keuangan",120501.592248947
+"771",2030,"43","Asuransi dan Dana Pensiun",12711.838870433
+"772",2030,"44","Jasa Keuangan Lainnya",18900.8474704258
+"773",2030,"45","Jasa Penunjang Keuangan",2091.7192653383
+"774",2030,"46","Real Estate",56675.273388604
+"775",2030,"47","Jasa Perusahaan",25076.6860812989
+"776",2030,"48","Administrasi Pemerintahan Pertahanan dan Jaminan Sosial Wajib",145277.855939712
+"777",2030,"49","Jasa Pendidikan",153228.095426155
+"778",2030,"50","Jasa Kesehatan dan Kegiatan Sosial",42016.3707455337
+"779",2030,"51","Jasa lainnya",109004.752587101
+"780",2030,"52","Lainnya",62.5117104018026
