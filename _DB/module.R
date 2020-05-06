@@ -1195,6 +1195,7 @@ buttonModule <- function(input, output, session, data, type) {
     scenarioSeriesOfImpactLand2<-scenarioSimulation$scenarioSeriesOfImpactLand2
     scenarioSeriesOfImpactLand3<-scenarioSimulation$scenarioSeriesOfImpactLand3
     inputPercentageDiagTPM = scenarioSimulation$inputPercentageDiagTPM
+    print(inputPercentageDiagTPM) #delete after use
     
     if(any(is.na(scenarioSeriesOfImpactLand2[[timeStep]]))==TRUE){
       if (is.null(inputPercentageDiagTPM)){
@@ -1630,8 +1631,8 @@ buttonModule <- function(input, output, session, data, type) {
     modalDialog(title="Sunting Constraint LUTM", 
                 "LUTM tidak berhasil dihitung. Silakan sunting persentase proporsi yang akan digunakan untuk menghitung luas tutupan
                           lahan yang tidak berubah:", 
-                sliderInput(ns("sliderPercentageDiagTPM"), "tentukan persentase", min=0, max=1, step = 0.01, round = FALSE),
-                actionButton(ns('saveEditPercentageDiagTPM'), "simpan tabel"),
+                sliderInput(ns("sliderPercentageDiagTPM"), "tentukan persentase", min=0, max=1, value = NULL, step = 0.01, round = FALSE),
+                actionButton(ns('saveEditPercentageDiagTPM'), "simpan nilai"),
                 footer= tagList(
                   actionButton(ns("buttonRunCheckLUTM"), "Jalankan Aksi"),
                   actionButton(ns("buttonClose"), "Batal")
@@ -1672,7 +1673,7 @@ buttonModule <- function(input, output, session, data, type) {
   observeEvent(input$saveEditPercentageDiagTPM,{
     fileName<-  scenarioSimulation$fileName 
     
-    scenarioSimulation$sliderPercentageDiagTPM<-input$sliderPercentageDiagTPM
+    scenarioSimulation$inputPercentageDiagTPM<-input$sliderPercentageDiagTPM
     
     # coding u/ save input$sliderPercentageDiagTPM ke RDDS
     dataDefine <-  readRDS(fileName)

@@ -11,9 +11,7 @@ library(openxlsx)
 library(plotly)
 
 source("_DB/debug_TIN.R")
-# source("_DB/lcd-scenario.R")
 source("_DB/global.R")
-# source("_DB/module_TIN.R")
 source("_DB/module_TIN.R")
 
 
@@ -26,34 +24,31 @@ ui <- fluidPage(
       tags$br(),
       buttonUI("forEnergy"),
     ),
-    tabPanel(h3("limbah"),
+    tabPanel(h5("limbah"),
              tags$br(),
              tags$br(),
              buttonUI("forWaste")
     ),
-    tabPanel(h3("pertanian"),
+    tabPanel(h5("pertanian"),
              tags$br(),
              tags$br(),
              buttonUI("forAgri")
+    ),
+    tabPanel(h5("lahan"),
+             tags$br(),
+             tags$br(),
+             buttonUI("forLand")
     )
-    # ,
-    # tabPanel(h3("lahan"),
-    #          tags$br(),
-    #          tags$br(),
-    #          buttonUI("forLand")
-    # )
   )
 )
 
 
 
-server <- function(input,output,session,data, type){
+server <- function(input,output,session,data){
   callModule(buttonModule, "forEnergy", energyData, type="energy")
   callModule(buttonModule, "forWaste", wasteData, type="waste")
   callModule(buttonModule, "forAgri", agriData, type="agriculture")
-  #callModule(buttonModule, "forLand", landData, type="land")
-  
-  #callModule(editSatelliteServer, "forEnergy", energyData)
+  callModule(buttonModule, "forLand", landData, type="land")
 }
 
 app <- shinyApp(ui,server)
