@@ -1,3 +1,7 @@
+library(gtools)
+library(plyr)
+library(stringr)
+library(scales)
 
 selectedProv <- "Jabar"
 username <- "dw"
@@ -40,7 +44,7 @@ for (i in 1:nrow(scenarioPath)){
   }
 }
 
-
+#ketika typenya tidak ada salah satu dari sektor itu maka akan  muncul modal dialog
 scenarioPath$ID<-paste0("scen",1:nrow(scenarioPath), ".", scenarioPath$type)
 
 #### harus sudah di run (Jalankan Analisis di tab Skenario Aksi)
@@ -243,37 +247,56 @@ remove_breaks <- function(original_func, remove_list = list()) {
 
 
 
-
 # Categorize each combination based on its performance
+#tradeOffSummary$quadrant <- "not yet define"
+tradeOffSummary[tradeOffSummary$penurunan.emisi<=0 & tradeOffSummary$peningkatan.PDRB>0,"quadrant"]<- "Q1" 
+tradeOffSummary[tradeOffSummary$penurunan.emisi<=0 & tradeOffSummary$peningkatan.PDRB<=0,"quadrant"]<- "Q2" 
+tradeOffSummary[tradeOffSummary$penurunan.emisi>0 & tradeOffSummary$peningkatan.PDRB>0,"quadrant"]<- "Q3" 
+tradeOffSummary[tradeOffSummary$penurunan.emisi>0 & tradeOffSummary$peningkatan.PDRB<=0,"quadrant"]<- "Q4" 
 
-# kuadran 1 : emisi naik, pdrb naik
-tradeOffSummaryQ1<-filter(tradeOffSummary,tradeOffSummary$penurunan.emisi<=0 & tradeOffSummary$peningkatan.PDRB>0 )
-# kuadran 2 : emisi naik, pdrb turun
-tradeOffSummaryQ2<-filter(tradeOffSummary,tradeOffSummary$penurunan.emisi<=0 & tradeOffSummary$peningkatan.PDRB<=0 )
-# kuadran 3 : emisi turun, pdrb naik** 
-tradeOffSummaryQ3<-filter(tradeOffSummary,tradeOffSummary$penurunan.emisi>0 & tradeOffSummary$peningkatan.PDRB>0 )
-# kuadran 4 : emisi turun, pdrb turun
-tradeOffSummaryQ4<-filter(tradeOffSummary,tradeOffSummary$penurunan.emisi>0 & tradeOffSummary$peningkatan.PDRB<=0 )
+
+# # kuadran 1 : emisi naik, pdrb naik
+# tradeOffSummaryQ1<-filter(tradeOffSummary,tradeOffSummary$penurunan.emisi<=0 & tradeOffSummary$peningkatan.PDRB>0 )
+# # kuadran 2 : emisi naik, pdrb turun
+# tradeOffSummaryQ2<-filter(tradeOffSummary,tradeOffSummary$penurunan.emisi<=0 & tradeOffSummary$peningkatan.PDRB<=0 )
+# # kuadran 3 : emisi turun, pdrb naik** 
+# tradeOffSummaryQ3<-filter(tradeOffSummary,tradeOffSummary$penurunan.emisi>0 & tradeOffSummary$peningkatan.PDRB>0 )
+# # kuadran 4 : emisi turun, pdrb turun
+# tradeOffSummaryQ4<-filter(tradeOffSummary,tradeOffSummary$penurunan.emisi>0 & tradeOffSummary$peningkatan.PDRB<=0 )
 
 # best intervention scenario (from Q3)
-tradeOffSummaryQ3$ID[tradeOffSummaryQ3$penurunan.intensitasEmisi == min(tradeOffSummaryQ3$penurunan.intensitasEmisi)]
+# tradeOffSummaryQ3$ID[tradeOffSummaryQ3$penurunan.intensitasEmisi == min(tradeOffSummaryQ3$penurunan.intensitasEmisi)]
 
 
 #### _DB
 ### belum buat logic ketika quadrantnya null
-tradeOffSummaryQ1$quadrant <- "Q1"
-#tradeOffSummaryQ2$quadrant <- "Q2"
-tradeOffSummaryQ3$quadrant <- "Q3"
-#tradeOffSummaryQ4$quadrant <- "Q4"
-
-tradeOffTablePlot <- rbind(tradeOffSummaryQ1,tradeOffSummaryQ2,
-                       tradeOffSummaryQ3,tradeOffSummaryQ4)
+# tradeOffSummaryQ1$quadrant <- "Q1"
+# tradeOffSummaryQ2$quadrant <- "Q2"
+# tradeOffSummaryQ3$quadrant <- "Q3"
+# tradeOffSummaryQ4$quadrant <- "Q4"
+# 
+# tradeOffTablePlot <- rbind(tradeOffSummaryQ1,tradeOffSummaryQ2,
+#                        tradeOffSummaryQ3,tradeOffSummaryQ4)
 
 id <- data.frame(
   ID=c("Q1","Q2","Q3","Q4")
 )
-tradeOffTablePlot <-  dplyr::bind_rows(id,tradeOffTablePlot)
+tradeOffTablePlot <-  dplyr::bind_rows(id,tradeOffSummary)
 
-
+# Categorize tradeOffResultCombined by quadrant 
+tradeOffResultCombined <- cbind(bauAllResult, ID = "BAU", Category = "BAU")
+for ( i in 1:length (tradeOffResult)){
+  if (any(str_detect(tradeOffSummaryQ1$ID, names(tradeOffResult)[[i]]))){
+    quadrant <- "Q1"
+  } else if (any(str_detect(tradeOffSummaryQ2$ID, names(tradeOffResult)[[i]]))){
+    quadrant <- "Q2"
+  } else if (any(str_detect(tradeOffSummaryQ3$ID, names(tradeOffResult)[[i]]))){
+    quadrant <- "Q3"
+  } else if (any(str_detect(tradeOffSummaryQ4$ID, names(tradeOffResult)[[i]]))){
+    quadrant <- "Q4"
+  }
+  tradeOffResultCombined<-rbind(tradeOffResultCombined, cbind(tradeOffResult[[i]][["scenarioAllResult"]],
+                                                              Category = quadrant))
+}
 
 

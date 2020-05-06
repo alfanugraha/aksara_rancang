@@ -7,8 +7,11 @@ library(plyr)
 library(stringr)
 library(scales)
 library(tidyr)
+library(shinyWidgets)
 
 #source("_DB/debug_tradeoff_db.R")
+source("_DB/debug_TIN.R")
+username <- "dw"
 
 ui <- fluidPage( 
   titlePanel("ANALISIS TRADE-OFF"),
@@ -29,6 +32,8 @@ server <- function(input,output,session){
     )
   })
   
+  
+  
   output$tradeOffResultVisualization <- renderUI({
     tagList(  
       #dataTableOutput("ListTable"),
@@ -41,13 +46,87 @@ server <- function(input,output,session){
                hr(),
                verbatimTextOutput("textBestScenario"),
                hr()
-               ),
+        ),
         column(4,
                plotlyOutput("sunPlotTradeOff")
         )
-      )
+      ), 
+      selectInput('selectTradeOffCombination', 
+                  label = "pilih kombinasi skenario yang akan ditampilkan",
+                  choices= c("seluruh kombinasi skenario", 
+                             "kombinasi skenario terbaik", 
+                             "kombinasi skenario emisi naik & PDRB naik",
+                             "kombinasi skenario emisi naik & PDRB turun", 
+                             "kombinasi skenario emisi turun & PDRB turun", 
+                             "kombinasi skenario emisi turun & PDRB naik"
+                  )), 
+      plotlyOutput('tradeOffPlotEmission'), 
+      plotlyOutput('tradeOffPlotGDP'),
+      plotlyOutput('tradeOffPlotEmissionIntensity'),
     )
   })
+  
+  
+  tradeOffPlot <-reactive({
+    
+    calculateTradeOff <- calculateTradeOff()
+    tradeOffResultCombined <- calculateTradeOff$tradeOffResultCombined
+    tradeOffSummary<- calculateTradeOff$tradeOffSummary
+    
+    #what to plot
+    if(input$selectTradeOffCombination=="seluruh kombinasi skenario"){
+      table<-tradeOffResultCombined
+    } else if (input$selectTradeOffCombination== "kombinasi skenario terbaik"){
+      tradeOffSummaryQ3<-filter(tradeOffSummary,tradeOffSummary$penurunan.emisi>0 & tradeOffSummary$peningkatan.PDRB>0 )
+      bestScenID<-tradeOffSummaryQ3$ID[tradeOffSummaryQ3$penurunan.intensitasEmisi == min(tradeOffSummaryQ3$penurunan.intensitasEmisi)]
+      table<-filter(tradeOffResultCombined, Category=="Q3" & ID==bestScenID)
+      table<-rbind(table, filter(tradeOffResultCombined, ID=="BAU"))
+    } else if (input$selectTradeOffCombination== "kombinasi skenario emisi naik & PDRB naik"){
+      table<-filter(tradeOffResultCombined, Category=="Q1")
+      table<-rbind(table, filter(tradeOffResultCombined, ID=="BAU"))
+    } else if (input$selectTradeOffCombination== "kombinasi skenario emisi naik & PDRB turun"){
+      table<-filter(tradeOffResultCombined, Category=="Q2")
+      table<-rbind(table, filter(tradeOffResultCombined, ID=="BAU"))
+    } else if (input$selectTradeOffCombination== "kombinasi skenario emisi turun & PDRB turun"){
+      table<-filter(tradeOffResultCombined, Category=="Q4")
+      table<-rbind(table, filter(tradeOffResultCombined, ID=="BAU"))
+    } else if (input$selectTradeOffCombination== "kombinasi skenario emisi turun & PDRB naik"){
+      table<-filter(tradeOffResultCombined, Category=="Q3")
+      table<-rbind(table, filter(tradeOffResultCombined, ID=="BAU"))
+    }
+    
+    table
+    
+  })
+  
+  output$tradeOffPlotEmission<-renderPlotly({
+    ggplot(tradeOffPlot(), aes(x=Year, y=CummulativeEmission, group=ID))+
+      geom_line(aes(color=ID))+
+      geom_point(aes(color=ID))+
+      labs(x="Tahun", y="Emisi")+
+      ggtitle("Grafik Proyeksi Emisi")+
+      theme(plot.title = element_text(hjust = 0.5))
+  })
+  
+  output$tradeOffPlotGDP<-renderPlotly({
+    ggplot(tradeOffPlot(), aes(x=Year, y=ResultTotalGDP, group=ID))+
+      geom_line(aes(color=ID))+
+      geom_point(aes(color=ID))+
+      labs(x="Tahun", y="Emisi")+
+      ggtitle("Grafik Proyeksi PDRB")+
+      theme(plot.title = element_text(hjust = 0.5))
+  })
+  
+  output$tradeOffPlotEmissionIntensity<-renderPlotly({
+    ggplot(tradeOffPlot(), aes(x=Year, y=EmissionIntensity, group=ID))+
+      geom_line(aes(color=ID))+
+      geom_point(aes(color=ID))+
+      labs(x="Tahun", y="Emisi")+
+      ggtitle("Grafik Proyeksi Intensitas Emisi")+
+      theme(plot.title = element_text(hjust = 0.5))
+  })
+  
+  
   
   loadRDSAll <- reactive({
     alamatFileEnergy <- paste0("_DB/skenarioData/", selectedProv, "/", "energi")
@@ -56,19 +135,19 @@ server <- function(input,output,session){
     alamatFileAgri <- paste0("_DB/skenarioData/", selectedProv, "/", "pertanian")
     
     nameFilesEnergy <- list.files(path = alamatFileEnergy,
-                            pattern = paste0("^", username))
+                                  pattern = paste0("^", username))
     dirFileEnergy <- paste0(alamatFileEnergy, "/",nameFilesEnergy)
     
     nameFilesLand <- list.files(path = alamatFileLand,
-                            pattern = paste0("^", username))
+                                pattern = paste0("^", username))
     dirFileLand <- paste0(alamatFileLand, "/",nameFilesLand)
     
     nameFilesWaste <- list.files(path = alamatFileWaste,
-                            pattern = paste0("^", username))
+                                 pattern = paste0("^", username))
     dirFileWaste <- paste0(alamatFileWaste, "/",nameFilesWaste)
     
     nameFilesAgri <- list.files(path = alamatFileAgri,
-                            pattern = paste0("^", username))
+                                pattern = paste0("^", username))
     dirFileAgri <- paste0(alamatFileAgri, "/",nameFilesAgri)
     
     dirFileAll <- c(dirFileEnergy,dirFileLand,dirFileWaste,dirFileAgri)
@@ -88,13 +167,13 @@ server <- function(input,output,session){
   ### buat tabel daftar nama file reaktif ###
   ListTableReact <- reactive({
     #browser()
-      data.frame(
-        Nama.Skenario =  unlist(lapply(loadRDSAll(), function(x)x[[2]])),
-        Tahun.Awal = unlist(lapply(loadRDSAll(), function(x)x[[3]])), 
-        Tahun.Akhir = unlist(lapply(loadRDSAll(), function(x)x[[4]])),
-        Deskripsi.Skenario = unlist(lapply(loadRDSAll(), function(x)x[[5]])),
-        Nama.File = unlist(lapply(loadRDSAll(), function(x)x[[1]])) 
-        )
+    data.frame(
+      Nama.Skenario =  unlist(lapply(loadRDSAll(), function(x)x[[2]])),
+      Tahun.Awal = unlist(lapply(loadRDSAll(), function(x)x[[3]])), 
+      Tahun.Akhir = unlist(lapply(loadRDSAll(), function(x)x[[4]])),
+      Deskripsi.Skenario = unlist(lapply(loadRDSAll(), function(x)x[[5]])),
+      Nama.File = unlist(lapply(loadRDSAll(), function(x)x[[1]])) 
+    )
   })
   
   ###tampilkan tabel list ###
@@ -126,7 +205,6 @@ server <- function(input,output,session){
     
     #### harus sudah di run (Jalankan Analisis di tab Skenario Aksi)
     for (i in 1:ncol(scenarioPath)){
-      # scenarioFile[i,]<-readRDS(scenarioPath[i,])
       eval(parse(text = paste0(scenarioPath$ID,"<-readRDS('",scenarioPath$path,"')")))
     }
     
@@ -231,46 +309,6 @@ server <- function(input,output,session){
     }
     any(is.null(tradeOffResult))
     
-    # bauAllResult$type<-"BAU"
-    
-    # # create trade off summary 
-    # tradeOffSummary<-data.frame(ID=NA, peningkatan.PDRB=NA,penurunan.emisi=NA, penurunan.intensitasEmisi=NA, stringsAsFactors = FALSE)
-    # for (i in 1:length(tradeOffResult)){
-    #   scenarioAllResult<- tradeOffResult[[i]][["scenarioAllResult"]]
-    #   scenarioAllResult.finalYear<-scenarioAllResult[scenarioAllResult$Year==finalYear,]
-    #   bauAllResult.finalYear<-bauAllResult[bauAllResult$Year==finalYear,]
-    #   
-    #   # peningkatan PDRB <- mean ( GDP intervensi-GDP bau / GDP bau )
-    #   peningkatan.PDRB <- mean((scenarioAllResult$ResultTotalGDP - bauAllResult$ResultTotalGDP) / bauAllResult$ResultTotalGDP) *100
-    #   # penurunan emisi <- - mean ( emisi intervensi-emisi bau / emisi bau )
-    #   penurunan.emisi <- -mean((scenarioAllResult$TotalEmission - bauAllResult$TotalEmission) / bauAllResult$TotalEmission)*100
-    #   # penurunan intensitas emisi <- - mean ( intensitas emisi intervensi-intensitas emisi bau / intensitas emisi bau )
-    #   penurunan.intensitasEmisi <- -mean((scenarioAllResult$EmissionIntensity - bauAllResult$EmissionIntensity) / bauAllResult$EmissionIntensity)*100
-    #   
-    #   
-    #   # penurunan emisi2 <- (emisi kumulatif intervensi tahun akhir - emisi kumulatif bau tahun akhir)/emisi kumulatif bau tahun akhir
-    #   # penurunan.emisi2 <- -(scenarioAllResult.finalYear$CummulativeEmission - bauAllResult.finalYear$CummulativeEmission) / bauAllResult.finalYear$CummulativeEmission*100
-    #   
-    #   
-    #   tradeOffSummary.addRow<-data.frame(ID=names(tradeOffResult)[[i]],
-    #                                     peningkatan.PDRB=peningkatan.PDRB,
-    #                                     penurunan.emisi=penurunan.emisi,
-    #                                     # penurunan.emisi2=penurunan.emisi2,
-    #                                     penurunan.intensitasEmisi=penurunan.intensitasEmisi, 
-    #                                     stringsAsFactors = FALSE)
-    #   tradeOffSummary<-rbind(tradeOffSummary,tradeOffSummary.addRow)
-    #   
-    #   # tradeOffResult[[i]][["scenarioAllResult"]]$type <- "SCENARIO"
-    #   # tradeOffResult[[i]][["scenarioAllResult"]]<-rbind(tradeOffResult[[i]][["scenarioAllResult"]],bauAllResult)
-    # }
-    # tradeOffSummary<-tradeOffSummary[-is.na(tradeOffSummary),]
-    # 
-    
-    
-    
-    
-    #########################################
-    
     
     # create trade off summary 
     tradeOffSummary<-data.frame(ID=NA, peningkatan.PDRB=NA,penurunan.emisi=NA, penurunan.intensitasEmisi=NA, stringsAsFactors = FALSE)
@@ -299,73 +337,53 @@ server <- function(input,output,session){
                                          stringsAsFactors = FALSE)
       tradeOffSummary<-rbind(tradeOffSummary,tradeOffSummary.addRow)
       
-      # tradeOffResult[[i]][["scenarioAllResult"]]$type <- "SCENARIO"
-      # tradeOffResult[[i]][["scenarioAllResult"]]<-rbind(tradeOffResult[[i]][["scenarioAllResult"]],bauAllResult)
+      
     }
     tradeOffSummary<-tradeOffSummary[-is.na(tradeOffSummary),]
     
-    ############################################
-    
-    remove_breaks <- function(original_func, remove_list = list()) {
-      function(x) {
-        original_result <- original_func(x)
-        original_result[!(original_result %in% remove_list)]
-      }
-    }
-    
-    # ggplot(tradeOffSummary, aes(x = peningkatan.PDRB, y = penurunan.emisi, color = ID)) +
-    #   geom_point(shape = 19, size = 4, position=position_jitter(h=0.05,w=0.05), alpha = 0.5) +
-    #   geom_hline(aes(yintercept = 0), colour = "#BB0000", linetype = "dashed") + 
-    #   geom_vline(aes(xintercept = 0), colour = "#BB0000", linetype ="dashed") +
-    #   theme(legend.position = "none")
-    
-    
-    
-    
-    
-    
-    
-    # Categorize each combination based on its performance
-    
-    # kuadran 1 : emisi naik, pdrb naik
-    tradeOffSummaryQ1<-filter(tradeOffSummary,tradeOffSummary$penurunan.emisi<=0 & tradeOffSummary$peningkatan.PDRB>0 )
-    # kuadran 2 : emisi naik, pdrb turun
-    tradeOffSummaryQ2<-filter(tradeOffSummary,tradeOffSummary$penurunan.emisi<=0 & tradeOffSummary$peningkatan.PDRB<=0 )
-    # kuadran 3 : emisi turun, pdrb naik** 
-    tradeOffSummaryQ3<-filter(tradeOffSummary,tradeOffSummary$penurunan.emisi>0 & tradeOffSummary$peningkatan.PDRB>0 )
-    # kuadran 4 : emisi turun, pdrb turun
-    tradeOffSummaryQ4<-filter(tradeOffSummary,tradeOffSummary$penurunan.emisi>0 & tradeOffSummary$peningkatan.PDRB<=0 )
-    
-    # best intervention scenario (from Q3)
-    tradeOffSummaryQ3$ID[tradeOffSummaryQ3$penurunan.intensitasEmisi == min(tradeOffSummaryQ3$penurunan.intensitasEmisi)]
-    
-    
+   
     #### _DB
     ### belum buat logic ketika quadrantnya null
-    tradeOffSummaryQ1$quadrant <- "Q1"
-    #tradeOffSummaryQ2$quadrant <- "Q2"
-    tradeOffSummaryQ3$quadrant <- "Q3"
-    #tradeOffSummaryQ4$quadrant <- "Q4"
-    
-    tradeOffTablePlot <- rbind(tradeOffSummaryQ1,tradeOffSummaryQ2,
-                               tradeOffSummaryQ3,tradeOffSummaryQ4)
+    tradeOffSummary[tradeOffSummary$penurunan.emisi<=0 & tradeOffSummary$peningkatan.PDRB>0,"quadrant"]<- "Q1" 
+    tradeOffSummary[tradeOffSummary$penurunan.emisi<=0 & tradeOffSummary$peningkatan.PDRB<=0,"quadrant"]<- "Q2" 
+    tradeOffSummary[tradeOffSummary$penurunan.emisi>0 & tradeOffSummary$peningkatan.PDRB>0,"quadrant"]<- "Q3" 
+    tradeOffSummary[tradeOffSummary$penurunan.emisi>0 & tradeOffSummary$peningkatan.PDRB<=0,"quadrant"]<- "Q4" 
     
     id <- data.frame(
       ID=c("Q1","Q2","Q3","Q4")
     )
-    tradeOffTablePlot <-  dplyr::bind_rows(id,tradeOffTablePlot)
-    tradeOffTablePlot
+    tradeOffTablePlot <-  dplyr::bind_rows(id,tradeOffSummary)
+    
+    # Categorize tradeOffResultCombined by quadrant 
+    tradeOffResultCombined <- cbind(bauAllResult, ID = "BAU", Category = "BAU")
+    for ( i in 1:length (tradeOffResult)){
+      if (any(str_detect(tradeOffSummaryQ1$ID, names(tradeOffResult)[[i]]))){
+        quadrant <- "Q1"
+      } else if (any(str_detect(tradeOffSummaryQ2$ID, names(tradeOffResult)[[i]]))){
+        quadrant <- "Q2"
+      } else if (any(str_detect(tradeOffSummaryQ3$ID, names(tradeOffResult)[[i]]))){
+        quadrant <- "Q3"
+      } else if (any(str_detect(tradeOffSummaryQ4$ID, names(tradeOffResult)[[i]]))){
+        quadrant <- "Q4"
+      }
+      tradeOffResultCombined<-rbind(tradeOffResultCombined, cbind(tradeOffResult[[i]][["scenarioAllResult"]],
+                                                                  Category = quadrant))
+    }
+    
+    list(tradeOffTablePlot = tradeOffTablePlot,
+         tradeOffResultCombined = tradeOffResultCombined,
+         tradeOffSummary = tradeOffSummary)
   })
   
   
   output$sunPlotTradeOff <- renderPlotly({
-    fig2 <- plot_ly(calculateTradeOff(), ids = ~ID, labels = ~ID, parents = ~quadrant, 
-                    width = 800, height = 800, type = 'sunburst')
+    fig2 <- plot_ly(calculateTradeOff()$tradeOffTablePlot, ids = ~ID, labels = ~ID, parents = ~quadrant, 
+                    width = 700, height = 700, type = 'sunburst')
     fig2
   })
   
   bestScenario <- eventReactive(input$tradeOffRunButton,{
-    cleanNA <- drop_na(calculateTradeOff())
+    cleanNA <- drop_na(calculateTradeOff()$tradeOffTablePlot)
     best <- cleanNA %>% 
       filter(quadrant == "Q3") %>% 
       filter(penurunan.intensitasEmisi == min(penurunan.intensitasEmisi))
