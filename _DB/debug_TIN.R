@@ -596,9 +596,9 @@ analysisCPI <- t(t(ioAddedValue) / ioTotalOutput)
 ###BEGIN: BAU projection####
 
 # Series of GPD & Output projection
-bauSeriesOfGDP <- data.frame(Sektor = ioSector[,1], stringsAsFactors = FALSE)
+bauSeriesOfGDP <- data.frame(Sektor = ioSector[,1], stringsAsFactors = FALSE) #ini
 bauSeriesOfGDP$y2015 <- analysisGDP
-bauSeriesOfFinalDemand <- rowSumsMatrixIoFinalDemand
+bauSeriesOfFinalDemand <- rowSumsMatrixIoFinalDemand #ini
 bauSeriesOfOutput <- ioTotalOutput
 
 # Series of Intervention Point
