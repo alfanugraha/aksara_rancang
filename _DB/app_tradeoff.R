@@ -8,8 +8,8 @@ library(stringr)
 library(scales)
 library(tidyr)
 library(shinyWidgets)
+library(DT)
 
-#source("_DB/debug_tradeoff_db.R")
 source("_DB/debug_TIN.R")
 username <- "dw"
 
@@ -36,8 +36,6 @@ server <- function(input,output,session){
   
   output$tradeOffResultVisualization <- renderUI({
     tagList(  
-      #dataTableOutput("ListTable"),
-      #plotlyOutput("sunPlotTradeOff")
       fluidRow(
         column(8,
                br(),
@@ -355,6 +353,19 @@ server <- function(input,output,session){
     tradeOffTablePlot <-  dplyr::bind_rows(id,tradeOffSummary)
     
     # Categorize tradeOffResultCombined by quadrant 
+    # kuadran 1 : emisi naik, pdrb naik
+    tradeOffSummaryQ1<-filter(tradeOffSummary,tradeOffSummary$penurunan.emisi<=0 & tradeOffSummary$peningkatan.PDRB>0 )
+    # kuadran 2 : emisi naik, pdrb turun
+    tradeOffSummaryQ2<-filter(tradeOffSummary,tradeOffSummary$penurunan.emisi<=0 & tradeOffSummary$peningkatan.PDRB<=0 )
+    # kuadran 3 : emisi turun, pdrb naik** 
+    tradeOffSummaryQ3<-filter(tradeOffSummary,tradeOffSummary$penurunan.emisi>0 & tradeOffSummary$peningkatan.PDRB>0 )
+    # kuadran 4 : emisi turun, pdrb turun
+    tradeOffSummaryQ4<-filter(tradeOffSummary,tradeOffSummary$penurunan.emisi>0 & tradeOffSummary$peningkatan.PDRB<=0 )
+    
+    # best intervention scenario (from Q3)
+    tradeOffSummaryQ3$ID[tradeOffSummaryQ3$penurunan.intensitasEmisi == min(tradeOffSummaryQ3$penurunan.intensitasEmisi)]
+    
+    
     tradeOffResultCombined <- cbind(bauAllResult, ID = "BAU", Category = "BAU")
     for ( i in 1:length (tradeOffResult)){
       if (any(str_detect(tradeOffSummaryQ1$ID, names(tradeOffResult)[[i]]))){
