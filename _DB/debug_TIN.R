@@ -96,7 +96,7 @@ functionSatelliteImpact <- function(type = "energy",
   }
   
   # calculate the coefficient & the new total satellite consumption 
-  coefficientConsumption <- as.matrix(impact$consumption[,3]) / ioTotalOutput
+  coefficientConsumption <- as.matrix(impact$consumption[,3]) / matrix_output
   impact$consumption[,3] <- coefficientConsumption * matrix_output
   
   # calculate emission

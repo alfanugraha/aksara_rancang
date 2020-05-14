@@ -1196,8 +1196,8 @@ buttonModule <- function(input, output, session, data, type) {
     scenarioSeriesOfImpactLand3<-scenarioSimulation$scenarioSeriesOfImpactLand3
     inputPercentageDiagTPM = scenarioSimulation$inputPercentageDiagTPM
     print(inputPercentageDiagTPM) #delete after use
-    
-    if(any(is.na(scenarioSeriesOfImpactLand2[[timeStep]]))==TRUE){
+    if(any(is.na(unlist(scenarioSeriesOfImpactLand2)))==TRUE){
+      # any(unlist(sapply(scenarioSeriesOfImpactLand2,'[[',"landCover"))<0)==FALSE
       if (is.null(inputPercentageDiagTPM)){
         showModal(modalEditPercentageDiagTPM())
       } else{
