@@ -234,7 +234,7 @@ buttonModule <- function(input, output, session, data, type) {
                                 choices=c("Final Demand","AV","Input-Output")),
                     pickerInput(ns("sektorEcon"),
                                 label="pilih sektor", selected = Sector[1],
-                                choices=Sector,options = list(`actions-box` = TRUE),multiple = T)),
+                                choices=sort(Sector),options = list(`actions-box` = TRUE),multiple = T)),
                   tags$br(),
                   actionButton(ns("econHit"),"tentukan tahun intervensi"),
                   width=5
@@ -300,7 +300,7 @@ buttonModule <- function(input, output, session, data, type) {
                                 choices=c("Final Demand","AV","Input-Output")),
                     pickerInput(ns("sektorEcon"),
                                 label="pilih sektor", selected = Sector[1],
-                                choices=Sector,options = list(`actions-box` = TRUE),multiple = T)),
+                                choices=sort(Sector),options = list(`actions-box` = TRUE),multiple = T)),
                   tags$br(),
                   actionButton(ns("econHit"),"tentukan tahun intervensi"),
                   width=5
@@ -327,7 +327,7 @@ buttonModule <- function(input, output, session, data, type) {
                               choices=c("konsumsi energi","faktor emisi")),
                   pickerInput(ns("sektorSat"),
                               label="pilih sektor",selected = Sector[1],
-                              choices=Sector,options = list(`actions-box` = TRUE),multiple = T)
+                              choices=sort(Sector),options = list(`actions-box` = TRUE),multiple = T)
                 ),
                 tags$br(),
                 actionButton(ns("satHit"),"tentukan tahun intervensi"),
@@ -554,6 +554,7 @@ buttonModule <- function(input, output, session, data, type) {
     indexCol <- c(colnames(satAkun$table1)[1],colnames(satAkun$table1)[2],
                   paste0("y",input$pilihtahunSatLand))
     indexRow <- input$banyakTupla
+    indexRow <- as.numeric(indexRow)
     satAkun$table1 <- satAkun$table1[1:indexRow,c(indexCol)]
     satAkun$table1
   })
