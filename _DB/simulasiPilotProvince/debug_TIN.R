@@ -3,11 +3,10 @@ library(limSolve)
 library(plotly)
 library(rlist)
 
-
 ###BEGIN: initiate all variables & function####
 # username <- "alfanugraha"
 # password <- "1234"
-selectedProv = "Sulawesi_Selatan"
+selectedProv = "SumSel"
 datapath <- paste0("_DB/data/", selectedProv, "/")
 datapathCSV <- ("_DB/input csv")
 
@@ -89,8 +88,15 @@ rowImport <- 1
 rowIncome <- 2
 rowProfit <- 3
 
-initialYear <- 2010
-finalYear <- 2030
+if(selectedProv=="SumSel"){
+  initialYear <- 2007
+  finalYear <- 2030
+} else if (selectedProv == "Sulawesi_Selatan"){
+  initialYear <- 2010
+  finalYear <- 2030
+}
+
+
 iteration <- finalYear - initialYear
 
 functionSatelliteImpact <- function(type = "energy", 
@@ -111,7 +117,7 @@ functionSatelliteImpact <- function(type = "energy",
   }
   
   # calculate the coefficient & the new total satellite consumption 
-  coefficientConsumption <- as.matrix(impact$consumption[,3]) / matrix_output
+  coefficientConsumption <- as.matrix(impact$consumption[,3]) / ioTotalOutput
   impact$consumption[,3] <- coefficientConsumption * matrix_output
   
   # calculate emission
@@ -495,7 +501,6 @@ analysisME[is.na(analysisME)] <- 0
 # Coefficient Waste Product (CW) & Multiplier Waste (MW)
 analysisCW <- as.matrix(satelliteWaste[,3]) / ioTotalOutput
 analysisMW <- ioLeontiefInverse %*% analysisCW
-analysisMW[is.na(analysisMW)] <- 0
 
 # Coefficient Agriculture-Fertilizer (CA) & Multiplier Agriculture-Fertilizer (MA)
 analysisCA <- as.matrix(satelliteAgriculture[,3]) / ioTotalOutput
@@ -725,11 +730,16 @@ for (i in 1:2){
 ## cek landCover
 
 landCoverTable<-data.frame(landCover_his)
+landReqTable<-data.frame(landReq_his)
 for (i in names(bauSeriesOfImpactLand1)){
   eval(parse(text = paste("landCoverTable$", i, "<-bauSeriesOfImpactLand1$",i,"[['landCover']][['luas.land.use']]")))
+  eval(parse(text = paste("landReqTable$", i, "<-bauSeriesOfImpactLand1$",i,"[['landReq']][['land.requirement']]")))
+  
 }
 landCoverTable<-landCoverTable[,-1]
 rownames(landCoverTable)<-colnames(LDMProp_his)
+landReqTable<-landReqTable[,-1]
+rownames(landReqTable)<-rbind(as.matrix(ioSector[,1]), "sektor lainnya")
 
 # jika masih ada value landCover yang negatif, force to enter advanceMode pada UI
 if(any(unlist(sapply(bauSeriesOfImpactLand1,'[[', "landCover"))<0)==TRUE){
@@ -797,6 +807,12 @@ for(step in 1:(iteration+1)){
 #####END : BAU projection ####
 
 #####BEGIN : BAU projection visualization ####
+if (selectedProv == "SumSel"){
+  #redefine year
+  initialYear <- 2010
+  finalYear<-2030
+  iteration<- finalYear-initialYear
+}
 # 1. GDP (ind. 1)
 resultGDP <- data.frame(year = 0, sector = "", category="", GDP = 0, stringsAsFactors = FALSE)
 # resultGDP <- data.frame(year = 0, id.sector = 0, sector = "", GDP = 0, stringsAsFactors = FALSE)
@@ -814,7 +830,7 @@ resultIncomePerCapita <- data.frame(year = 0, Income.per.capita = 0)
 for(t in 0:iteration){
   t_curr <- initialYear + t
   pop_curr <- populationProjection[which(populationProjection[, 1] == t_curr), 2]
-  inc_curr <- sum(bauSeriesOfAddedValue[[t+2]][rowIncome,])
+  inc_curr <- sum(bauSeriesOfAddedValue[[paste0("y", initialYear+t)]][rowIncome,])
   inc_capita <- inc_curr/pop_curr
   add.row <- data.frame(cbind(t_curr, inc_capita))
   names(add.row) <- names(resultIncomePerCapita)
@@ -827,7 +843,7 @@ resultIncome <- data.frame(year = 0, sector= "", income = 0, stringsAsFactors = 
 sc.name <- ioSector[,1]
 for(t in 0:iteration){
   t_curr <- initialYear + t
-  inc_curr <- data.frame(bauSeriesOfAddedValue[[t+2]][rowIncome,])
+  inc_curr <- data.frame(bauSeriesOfAddedValue[[paste0("y", initialYear+t)]][rowIncome,])
   add.row <- data.frame(cbind(t_curr, sc.name, inc_curr), stringsAsFactors = FALSE)
   names(add.row) <- names(resultIncome)
   resultIncome <- data.frame(rbind(resultIncome, add.row), stringsAsFactors = FALSE)
@@ -838,7 +854,7 @@ resultIncome <- resultIncome[resultIncome$year != 0, ]
 resultLabour <- data.frame(year = 0, id.sector = 0, sector= "", labour = 0, stringsAsFactors = FALSE)
 for(t in 0:iteration){
   t_curr <- initialYear + t
-  add.row <- data.frame(bauSeriesOfImpactLabour[[t+2]][[1]])
+  add.row <- data.frame(bauSeriesOfImpactLabour[[paste0("y", initialYear+t)]][[1]])
   names(add.row) <- names(resultLabour)[2:4]
   add.row$year <- t_curr
   add.row <- add.row[, names(resultLabour)]
@@ -847,12 +863,12 @@ for(t in 0:iteration){
 resultLabour <- resultLabour[resultLabour$year != 0, ]
 
 # 5. Energy cons (indicator number 2)
-resultEnergyConsumption <- bauSeriesOfImpactEnergy[[2]][[1]]
+resultEnergyConsumption <- bauSeriesOfImpactEnergy[[paste0("y",initialYear)]][[1]]
 resultEnergyConsumption$year <- initialYear
 resultEnergyConsumption <- resultEnergyConsumption[, c("year", names(bauSeriesOfImpactEnergy[[2]][[1]]))]
 for(t in 1:iteration){
   t_curr <- initialYear + t
-  add.row <- data.frame(bauSeriesOfImpactEnergy[[t+2]][[1]]) # [[2]] for emission
+  add.row <- data.frame(bauSeriesOfImpactEnergy[[paste0("y", initialYear+t)]][[1]]) # [[2]] for emission
   add.row$year <- t_curr
   add.row <- add.row[, names(resultEnergyConsumption)]
   resultEnergyConsumption <- data.frame(rbind(resultEnergyConsumption, add.row), stringsAsFactors = FALSE)
@@ -860,12 +876,12 @@ for(t in 1:iteration){
 names(resultEnergyConsumption)[2:3] <- c("id.sector", "sector")
 
 # 6. Energy emission (indicator number 3)
-resultEnergyEmission <- bauSeriesOfImpactEnergy[[2]][[2]]
+resultEnergyEmission <- bauSeriesOfImpactEnergy[[paste0("y",initialYear)]][[2]]
 resultEnergyEmission$year <- initialYear
 resultEnergyEmission <- resultEnergyEmission[, c("year", names(bauSeriesOfImpactEnergy[[2]][[2]]))]
 for(t in 1:iteration){
   t_curr <- initialYear + t
-  add.row <- data.frame(bauSeriesOfImpactEnergy[[t+2]][[2]]) # [[2]] for emission
+  add.row <- data.frame(bauSeriesOfImpactEnergy[[paste0("y", initialYear+t)]][[2]]) # [[2]] for emission
   add.row$year <- t_curr
   add.row <- add.row[, names(resultEnergyEmission)]
   resultEnergyEmission <- data.frame(rbind(resultEnergyEmission, add.row), stringsAsFactors = FALSE)
@@ -873,12 +889,12 @@ for(t in 1:iteration){
 names(resultEnergyEmission)[2:3] <- c("id.sector", "sector")
 
 # 7. Waste cons (indicator number 2)
-resultWasteDisposal <- bauSeriesOfImpactWaste[[2]][[1]]
+resultWasteDisposal <- bauSeriesOfImpactWaste[[paste0("y",initialYear)]][[1]]
 resultWasteDisposal$year <- initialYear
 resultWasteDisposal <- resultWasteDisposal[, c("year", names(bauSeriesOfImpactWaste[[2]][[1]]))]
 for(t in 1:iteration){
   t_curr <- initialYear + t
-  add.row <- data.frame(bauSeriesOfImpactWaste[[t+2]][[1]]) # [[2]] for emission
+  add.row <- data.frame(bauSeriesOfImpactWaste[[paste0("y", initialYear+t)]][[1]]) # [[2]] for emission
   add.row$year <- t_curr
   add.row <- add.row[, names(resultWasteDisposal)]
   resultWasteDisposal <- data.frame(rbind(resultWasteDisposal, add.row), stringsAsFactors = FALSE)
@@ -887,12 +903,12 @@ for(t in 1:iteration){
 names(resultWasteDisposal)[2:3] <- c("id.sector", "sector")
 
 # 8. Waste emission (indicator number 3)
-resultWasteEmission <- bauSeriesOfImpactWaste[[2]][[2]]
+resultWasteEmission <- bauSeriesOfImpactWaste[[paste0("y",initialYear)]][[2]]
 resultWasteEmission$year <- initialYear
 resultWasteEmission <- resultWasteEmission[, c("year", names(bauSeriesOfImpactWaste[[2]][[2]]))]
 for(t in 1:iteration){
   t_curr <- initialYear + t
-  add.row <- data.frame(bauSeriesOfImpactWaste[[t+2]][[2]]) # [[2]] for emission
+  add.row <- data.frame(bauSeriesOfImpactWaste[[paste0("y", initialYear+t)]][[2]]) # [[2]] for emission
   add.row$year <- t_curr
   add.row <- add.row[, names(resultWasteEmission)]
   resultWasteEmission <- data.frame(rbind(resultWasteEmission, add.row), stringsAsFactors = FALSE)
@@ -900,12 +916,12 @@ for(t in 1:iteration){
 names(resultWasteEmission)[2:3] <- c("id.sector", "sector")
 
 # 9. Fertilizer cons (indicator number 2)
-resultFertilizerUsed <- bauSeriesOfImpactAgriculture[[2]][[1]]
+resultFertilizerUsed <- bauSeriesOfImpactAgriculture[[paste0("y",initialYear)]][[1]]
 resultFertilizerUsed$year <- initialYear
 resultFertilizerUsed <- resultFertilizerUsed[, c("year", names(bauSeriesOfImpactAgriculture[[2]][[1]]))]
 for(t in 1:iteration){
   t_curr <- initialYear + t
-  add.row <- data.frame(bauSeriesOfImpactAgriculture[[t+2]][[1]]) # [[2]] for emission
+  add.row <- data.frame(bauSeriesOfImpactAgriculture[[paste0("y", initialYear+t)]][[1]]) # [[2]] for emission
   add.row$year <- t_curr
   add.row <- add.row[, names(resultFertilizerUsed)]
   resultFertilizerUsed <- data.frame(rbind(resultFertilizerUsed, add.row), stringsAsFactors = FALSE)
@@ -914,12 +930,12 @@ for(t in 1:iteration){
 names(resultFertilizerUsed)[2:3] <- c("id.sector", "sector")
 
 # 10. Fertilizer emission (indicator number 3)
-resultFertilizerEmission <- bauSeriesOfImpactAgriculture[[2]][[2]]
+resultFertilizerEmission <- bauSeriesOfImpactAgriculture[[paste0("y",initialYear)]][[2]]
 resultFertilizerEmission$year <- initialYear
 resultFertilizerEmission <- resultFertilizerEmission[, c("year", names(bauSeriesOfImpactAgriculture[[2]][[2]]))]
 for(t in 1:iteration){
   t_curr <- initialYear + t
-  add.row <- data.frame(bauSeriesOfImpactAgriculture[[t+2]][[2]]) # [[2]] for emission
+  add.row <- data.frame(bauSeriesOfImpactAgriculture[[paste0("y", initialYear+t)]][[2]]) # [[2]] for emission
   add.row$year <- t_curr
   add.row <- add.row[, names(resultFertilizerEmission)]
   resultFertilizerEmission <- data.frame(rbind(resultFertilizerEmission, add.row), stringsAsFactors = FALSE)
@@ -927,36 +943,36 @@ for(t in 1:iteration){
 names(resultFertilizerEmission)[2:3] <- c("id.sector", "sector")
 
 # 11. Land Requirement 
-resultLandReq <- bauSeriesOfImpactLand1[[2]][["landReq"]]
+resultLandReq <- bauSeriesOfImpactLand1[[paste0("y",initialYear)]][["landReq"]]
 resultLandReq$year <- initialYear
 resultLandReq <-resultLandReq[,c("year", names(bauSeriesOfImpactLand1[[2]][["landReq"]]))]
 for(t in 1:iteration){
   t_curr <- initialYear + t
-  add.row <- data.frame(bauSeriesOfImpactLand1[[t+2]][["landReq"]])
+  add.row <- data.frame(bauSeriesOfImpactLand1[[paste0("y", initialYear+t)]][["landReq"]])
   add.row$year <- t_curr
   add.row <- add.row[,names(resultLandReq)]
   resultLandReq <- data.frame(rbind(resultLandReq, add.row), stringsAsFactors = FALSE)
 }
 
 # 12. Land Cover
-resultLandCover <- bauSeriesOfImpactLand2[[2]][["landCover"]]
+resultLandCover <- bauSeriesOfImpactLand2[[paste0("y",initialYear)]][["landCover"]]
 resultLandCover$year <- initialYear
 resultLandCover <-resultLandCover[,c("year", names(bauSeriesOfImpactLand2[[2]][["landCover"]]))]
 for(t in 1:iteration){
   t_curr <- initialYear + t
-  add.row <- data.frame(bauSeriesOfImpactLand2[[t+2]][["landCover"]])
+  add.row <- data.frame(bauSeriesOfImpactLand2[[paste0("y", initialYear+t)]][["landCover"]])
   add.row$year <- t_curr
   add.row <- add.row[,names(resultLandCover)]
   resultLandCover <- data.frame(rbind(resultLandCover, add.row), stringsAsFactors = FALSE)
 }
 
 # 13. LUTM
-resultLUTM <- bauSeriesOfImpactLand2[[2]][["LUTM"]]
+resultLUTM <- bauSeriesOfImpactLand2[[paste0("y",initialYear)]][["LUTM"]]
 resultLUTM$year <- initialYear
 resultLUTM <-resultLUTM[,c("year", names(bauSeriesOfImpactLand2[[2]][["LUTM"]]))]
 for(t in 1:iteration){
   t_curr <- initialYear + t
-  add.row <- data.frame(bauSeriesOfImpactLand2[[t+2]][["LUTM"]])
+  add.row <- data.frame(bauSeriesOfImpactLand2[[paste0("y", initialYear+t)]][["LUTM"]])
   add.row$year <- t_curr
   add.row <- add.row[,names(resultLUTM)]
   resultLUTM <- data.frame(rbind(resultLUTM, add.row), stringsAsFactors = FALSE)
@@ -964,12 +980,12 @@ for(t in 1:iteration){
 
 # 14. Land Emission by sector 
 
-resultLandEmission <- bauSeriesOfImpactLand2[[2]][["emission"]]
+resultLandEmission <- bauSeriesOfImpactLand2[[paste0("y",initialYear)]][["emission"]]
 resultLandEmission$year <- initialYear
 resultLandEmission <-resultLandEmission[,c("year", names(bauSeriesOfImpactLand2[[2]][["emission"]]))]
 for(t in 1:iteration){
   t_curr <- initialYear + t
-  add.row <- data.frame(bauSeriesOfImpactLand2[[t+2]][["emission"]])
+  add.row <- data.frame(bauSeriesOfImpactLand2[[paste0("y", initialYear+t)]][["emission"]])
   add.row$year <- t_curr
   add.row <- add.row[,names(resultLandEmission)]
   resultLandEmission <- data.frame(rbind(resultLandEmission, add.row), stringsAsFactors = FALSE)
@@ -993,6 +1009,7 @@ for(t in 0:iteration){
   emissionFertilizer <- c(emissionFertilizer, add_MF)
   emissionLand<-c(emissionLand, add_MLand)
 }
+
 resultTotalEmission$emissionEnergyCons <- emissionEnergyConsumption
 resultTotalEmission$emissionWasteDisp <- emissionWasteDisposal
 resultTotalEmission$emissionFert <- emissionFertilizer
@@ -1014,9 +1031,11 @@ for(t in 0:iteration){
 # resultTotalGDP <- colSums(bauSeriesOfGDP[,2:(ncol(bauSeriesOfGDP)-1)])
 bauAllResult <- subset(resultTotalEmission, select=c(Year, TotalEmission, CummulativeEmission))
 # insert bau from RADGRK
-# bauAllResult$TotalEmission<-as.matrix(read.csv(paste0(datapath, "bauTotalEmission.csv"), header = FALSE))
+bauAllResult$TotalEmission<-as.matrix(read.csv(paste0(datapath, "bauTotalEmission.csv"), header = FALSE))
+
 # bauAllResult <- cbind(bauAllResult, resultTotalGDP)
-bauAllResult$ResultTotalGDP<-colSums(bauSeriesOfGDP[,2:(ncol(bauSeriesOfGDP)-1)])
+# bauAllResult$ResultTotalGDP<-colSums(bauSeriesOfGDP[,2:(ncol(bauSeriesOfGDP)-1)])
+bauAllResult$ResultTotalGDP<-colSums(bauSeriesOfGDP[,which(colnames(bauSeriesOfGDP)==paste0("y",initialYear)):ncol(bauSeriesOfGDP)])
 bauAllResult$CummulativeGDP <- cumsum(bauAllResult$ResultTotalGDP)
 bauAllResult$EmissionIntensity <- bauAllResult$TotalEmission / bauAllResult$ResultTotalGDP
 bauAllResult$CummulativeEmissionIntensity <-cumsum(bauAllResult$EmissionIntensity)

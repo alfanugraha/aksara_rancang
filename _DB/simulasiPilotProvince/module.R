@@ -830,7 +830,8 @@ buttonModule <- function(input, output, session, data, type) {
     fileName<- as.character(ListTableReact()[selectedRow,5]) #nama file dari ListTableReact ada di col=5
     selectedFile<-readRDS(fileName)
     
-    initialYear<-selectedFile$tahunAwal
+    # initialYear<-selectedFile$tahunAwal
+    initialYear=ioPeriod+1 #edit
     finalYear <- selectedFile$tahunAkhir
     iteration <- finalYear - initialYear
     ioPeriod <- ioPeriod
@@ -1010,7 +1011,7 @@ buttonModule <- function(input, output, session, data, type) {
     # masukkan semua variabel ke reactiveValues
     scenarioSimulation$selectedFile <- selectedFile
     scenarioSimulation$fileName <- fileName
-    scenarioSimulation$initialYear <-initialYear
+    scenarioSimulation$initialYear <-selectedFile$tahunAwal
     scenarioSimulation$finalYear <- finalYear
     scenarioSimulation$iteration <- iteration
     scenarioSimulation$ioPeriod <- ioPeriod
@@ -1074,7 +1075,8 @@ buttonModule <- function(input, output, session, data, type) {
     
     # masukkan reactive values
     selectedFile=scenarioSimulation$selectedFile
-    initialYear=scenarioSimulation$initialYear
+    # initialYear=scenarioSimulation$initialYear
+    initialYear=ioPeriod+1 #edit
     finalYear=scenarioSimulation$finalYear
     iteration=scenarioSimulation$iteration
     ioPeriod=scenarioSimulation$ioPeriod
@@ -1125,7 +1127,8 @@ buttonModule <- function(input, output, session, data, type) {
   runLUTM<-reactive({
     
     selectedFile=scenarioSimulation$selectedFile
-    initialYear=scenarioSimulation$initialYear
+    # initialYear=scenarioSimulation$initialYear
+    initialYear=ioPeriod+1 #edit
     finalYear=scenarioSimulation$finalYear
     iteration=scenarioSimulation$iteration
     ioPeriod=scenarioSimulation$ioPeriod
@@ -1194,7 +1197,8 @@ buttonModule <- function(input, output, session, data, type) {
   checkLUTM<-reactive({
     
     selectedFile=scenarioSimulation$selectedFile
-    initialYear=scenarioSimulation$initialYear
+    # initialYear=scenarioSimulation$initialYear
+    initialYear=ioPeriod+1 #edit
     finalYear=scenarioSimulation$finalYear
     iteration=scenarioSimulation$iteration
     ioPeriod=scenarioSimulation$ioPeriod
@@ -1269,7 +1273,7 @@ buttonModule <- function(input, output, session, data, type) {
     fileName = scenarioSimulation$fileName
     initialYear = scenarioSimulation$initialYear
     finalYear = scenarioSimulation$finalYear
-    iteration = scenarioSimulation$iteration
+    iteration = finalYear-initialYear
     ioPeriod = scenarioSimulation$ioPeriod
     scenarioSeriesOfGDP = scenarioSimulation$scenarioSeriesOfGDP
     scenarioSeriesOfFinalDemand = scenarioSimulation$scenarioSeriesOfFinalDemand
@@ -1302,7 +1306,7 @@ buttonModule <- function(input, output, session, data, type) {
     for(t in 0:iteration){
       t_curr <- initialYear + t
       pop_curr <- populationProjection[which(populationProjection[, 1] == t_curr), 2]
-      inc_curr <- sum(scenarioSeriesOfAddedValue[[t+2]][rowIncome,])
+      inc_curr <- sum(scenarioSeriesOfAddedValue[[paste0("y", initialYear+t)]][rowIncome,])
       inc_capita <- inc_curr/pop_curr
       add.row <- data.frame(cbind(t_curr, inc_capita))
       names(add.row) <- names(scenarioResultIncomePerCapita)
@@ -1315,7 +1319,7 @@ buttonModule <- function(input, output, session, data, type) {
     sc.name <- ioSector[,1]
     for(t in 0:iteration){
       t_curr <- initialYear + t
-      inc_curr <- data.frame(scenarioSeriesOfAddedValue[[t+2]][rowIncome,])
+      inc_curr <- data.frame(scenarioSeriesOfAddedValue[[paste0("y", initialYear+t)]][rowIncome,])
       add.row <- data.frame(cbind(t_curr, sc.name, inc_curr), stringsAsFactors = FALSE)
       names(add.row) <- names(scenarioResultIncome)
       scenarioResultIncome <- data.frame(rbind(scenarioResultIncome, add.row), stringsAsFactors = FALSE)
@@ -1326,7 +1330,7 @@ buttonModule <- function(input, output, session, data, type) {
     scenarioResultLabour <- data.frame(year = 0, id.sector = 0, sector= "", labour = 0, stringsAsFactors = FALSE)
     for(t in 0:iteration){
       t_curr <- initialYear + t
-      add.row <- data.frame(scenarioSeriesOfImpactLabour[[t+2]][[1]])
+      add.row <- data.frame(scenarioSeriesOfImpactLabour[[paste0("y", initialYear+t)]][[1]])
       names(add.row) <- names(scenarioResultLabour)[2:4]
       add.row$year <- t_curr
       add.row <- add.row[, names(scenarioResultLabour)]
@@ -1335,12 +1339,12 @@ buttonModule <- function(input, output, session, data, type) {
     scenarioResultLabour <- scenarioResultLabour[scenarioResultLabour$year != 0, ]
     
     # 5. Energy cons (indicator number 2)
-    scenarioResultEnergyConsumption <- scenarioSeriesOfImpactEnergy[[2]][[1]]
+    scenarioResultEnergyConsumption <- scenarioSeriesOfImpactEnergy[[paste0("y",initialYear)]][[1]]
     scenarioResultEnergyConsumption$year <- initialYear
     scenarioResultEnergyConsumption <- scenarioResultEnergyConsumption[, c("year", names(scenarioSeriesOfImpactEnergy[[2]][[1]]))]
     for(t in 1:iteration){
       t_curr <- initialYear + t
-      add.row <- data.frame(scenarioSeriesOfImpactEnergy[[t+2]][[1]]) # [[2]] for emission
+      add.row <- data.frame(scenarioSeriesOfImpactEnergy[[paste0("y", initialYear+t)]][[1]]) # [[2]] for emission
       add.row$year <- t_curr
       add.row <- add.row[, names(scenarioResultEnergyConsumption)]
       scenarioResultEnergyConsumption <- data.frame(rbind(scenarioResultEnergyConsumption, add.row), stringsAsFactors = FALSE)
@@ -1348,12 +1352,12 @@ buttonModule <- function(input, output, session, data, type) {
     names(scenarioResultEnergyConsumption)[2:3] <- c("id.sector", "sector")
     
     # 6. Energy emission (indicator number 3)
-    scenarioResultEnergyEmission <- scenarioSeriesOfImpactEnergy[[2]][[2]]
+    scenarioResultEnergyEmission <- scenarioSeriesOfImpactEnergy[[paste0("y",initialYear)]][[2]]
     scenarioResultEnergyEmission$year <- initialYear
     scenarioResultEnergyEmission <- scenarioResultEnergyEmission[, c("year", names(scenarioSeriesOfImpactEnergy[[2]][[2]]))]
     for(t in 1:iteration){
       t_curr <- initialYear + t
-      add.row <- data.frame(scenarioSeriesOfImpactEnergy[[t+2]][[2]]) # [[2]] for emission
+      add.row <- data.frame(scenarioSeriesOfImpactEnergy[[paste0("y", initialYear+t)]][[2]]) # [[2]] for emission
       add.row$year <- t_curr
       add.row <- add.row[, names(scenarioResultEnergyEmission)]
       scenarioResultEnergyEmission <- data.frame(rbind(scenarioResultEnergyEmission, add.row), stringsAsFactors = FALSE)
@@ -1361,12 +1365,12 @@ buttonModule <- function(input, output, session, data, type) {
     names(scenarioResultEnergyEmission)[2:3] <- c("id.sector", "sector")
     
     # 7. Waste cons (indicator number 2)
-    scenarioResultWasteDisposal <- scenarioSeriesOfImpactWaste[[2]][[1]]
+    scenarioResultWasteDisposal <- scenarioSeriesOfImpactWaste[[paste0("y",initialYear)]][[1]]
     scenarioResultWasteDisposal$year <- initialYear
     scenarioResultWasteDisposal <- scenarioResultWasteDisposal[, c("year", names(scenarioSeriesOfImpactWaste[[2]][[1]]))]
     for(t in 1:iteration){
       t_curr <- initialYear + t
-      add.row <- data.frame(scenarioSeriesOfImpactWaste[[t+2]][[1]]) # [[2]] for emission
+      add.row <- data.frame(scenarioSeriesOfImpactWaste[[paste0("y", initialYear+t)]][[1]]) # [[2]] for emission
       add.row$year <- t_curr
       add.row <- add.row[, names(scenarioResultWasteDisposal)]
       scenarioResultWasteDisposal <- data.frame(rbind(scenarioResultWasteDisposal, add.row), stringsAsFactors = FALSE)
@@ -1375,12 +1379,12 @@ buttonModule <- function(input, output, session, data, type) {
     names(scenarioResultWasteDisposal)[2:3] <- c("id.sector", "sector")
     
     # 8. Waste emission (indicator number 3)
-    scenarioResultWasteEmission <- scenarioSeriesOfImpactWaste[[2]][[2]]
+    scenarioResultWasteEmission <- scenarioSeriesOfImpactWaste[[paste0("y",initialYear)]][[2]]
     scenarioResultWasteEmission$year <- initialYear
     scenarioResultWasteEmission <- scenarioResultWasteEmission[, c("year", names(scenarioSeriesOfImpactWaste[[2]][[2]]))]
     for(t in 1:iteration){
       t_curr <- initialYear + t
-      add.row <- data.frame(scenarioSeriesOfImpactWaste[[t+2]][[2]]) # [[2]] for emission
+      add.row <- data.frame(scenarioSeriesOfImpactWaste[[paste0("y", initialYear+t)]][[2]]) # [[2]] for emission
       add.row$year <- t_curr
       add.row <- add.row[, names(scenarioResultWasteEmission)]
       scenarioResultWasteEmission <- data.frame(rbind(scenarioResultWasteEmission, add.row), stringsAsFactors = FALSE)
@@ -1388,12 +1392,12 @@ buttonModule <- function(input, output, session, data, type) {
     names(scenarioResultWasteEmission)[2:3] <- c("id.sector", "sector")
     
     # 9. Fertilizer cons (indicator number 2)
-    scenarioResultFertilizerUsed <- scenarioSeriesOfImpactAgriculture[[2]][[1]]
+    scenarioResultFertilizerUsed <- scenarioSeriesOfImpactAgriculture[[paste0("y",initialYear)]][[1]]
     scenarioResultFertilizerUsed$year <- initialYear
     scenarioResultFertilizerUsed <- scenarioResultFertilizerUsed[, c("year", names(scenarioSeriesOfImpactAgriculture[[2]][[1]]))]
     for(t in 1:iteration){
       t_curr <- initialYear + t
-      add.row <- data.frame(scenarioSeriesOfImpactAgriculture[[t+2]][[1]]) # [[2]] for emission
+      add.row <- data.frame(scenarioSeriesOfImpactAgriculture[[paste0("y", initialYear+t)]][[1]]) # [[2]] for emission
       add.row$year <- t_curr
       add.row <- add.row[, names(scenarioResultFertilizerUsed)]
       scenarioResultFertilizerUsed <- data.frame(rbind(scenarioResultFertilizerUsed, add.row), stringsAsFactors = FALSE)
@@ -1402,12 +1406,12 @@ buttonModule <- function(input, output, session, data, type) {
     names(scenarioResultFertilizerUsed)[2:3] <- c("id.sector", "sector")
     
     # 10. Fertilizer emission (indicator number 3)
-    scenarioResultFertilizerEmission <- scenarioSeriesOfImpactAgriculture[[2]][[2]]
+    scenarioResultFertilizerEmission <- scenarioSeriesOfImpactAgriculture[[paste0("y",initialYear)]][[2]]
     scenarioResultFertilizerEmission$year <- initialYear
     scenarioResultFertilizerEmission <- scenarioResultFertilizerEmission[, c("year", names(scenarioSeriesOfImpactAgriculture[[2]][[2]]))]
     for(t in 1:iteration){
       t_curr <- initialYear + t
-      add.row <- data.frame(scenarioSeriesOfImpactAgriculture[[t+2]][[2]]) # [[2]] for emission
+      add.row <- data.frame(scenarioSeriesOfImpactAgriculture[[paste0("y", initialYear+t)]][[2]]) # [[2]] for emission
       add.row$year <- t_curr
       add.row <- add.row[, names(scenarioResultFertilizerEmission)]
       scenarioResultFertilizerEmission <- data.frame(rbind(scenarioResultFertilizerEmission, add.row), stringsAsFactors = FALSE)
@@ -1415,49 +1419,48 @@ buttonModule <- function(input, output, session, data, type) {
     names(scenarioResultFertilizerEmission)[2:3] <- c("id.sector", "sector")
     
     # 11. Land Requirement
-    scenarioResultLandReq <- scenarioSeriesOfImpactLand1[[2]][["landReq"]]
+    scenarioResultLandReq <- scenarioSeriesOfImpactLand1[[paste0("y",initialYear)]][["landReq"]]
     scenarioResultLandReq$year <- initialYear
     scenarioResultLandReq <-scenarioResultLandReq[,c("year", names(scenarioSeriesOfImpactLand1[[2]][["landReq"]]))]
     for(t in 1:iteration){
       t_curr <- initialYear + t
-      add.row <- data.frame(scenarioSeriesOfImpactLand1[[t+2]][["landReq"]])
+      add.row <- data.frame(scenarioSeriesOfImpactLand1[[paste0("y", initialYear+t)]][["landReq"]])
       add.row$year <- t_curr
       add.row <- add.row[,names(scenarioResultLandReq)]
       scenarioResultLandReq <- data.frame(rbind(scenarioResultLandReq, add.row), stringsAsFactors = FALSE)
     }
     
     # 12. Land Cover
-    scenarioResultLandCover <- scenarioSeriesOfImpactLand2[[2]][["landCover"]]
+    scenarioResultLandCover <- scenarioSeriesOfImpactLand2[[paste0("y",initialYear)]][["landCover"]]
     scenarioResultLandCover$year <- initialYear
     scenarioResultLandCover <-scenarioResultLandCover[,c("year", names(scenarioSeriesOfImpactLand2[[2]][["landCover"]]))]
     for(t in 1:iteration){
       t_curr <- initialYear + t
-      add.row <- data.frame(scenarioSeriesOfImpactLand2[[t+2]][["landCover"]])
+      add.row <- data.frame(scenarioSeriesOfImpactLand2[[paste0("y", initialYear+t)]][["landCover"]])
       add.row$year <- t_curr
       add.row <- add.row[,names(scenarioResultLandCover)]
       scenarioResultLandCover <- data.frame(rbind(scenarioResultLandCover, add.row), stringsAsFactors = FALSE)
     }
     
     # 13. LUTM
-    scenarioResultLUTM <- scenarioSeriesOfImpactLand2[[2]][["LUTM"]]
+    scenarioResultLUTM <- scenarioSeriesOfImpactLand2[[paste0("y",initialYear)]][["LUTM"]]
     scenarioResultLUTM$year <- initialYear
     scenarioResultLUTM <-scenarioResultLUTM[,c("year", names(scenarioSeriesOfImpactLand2[[2]][["LUTM"]]))]
     for(t in 1:iteration){
       t_curr <- initialYear + t
-      add.row <- data.frame(scenarioSeriesOfImpactLand2[[t+2]][["LUTM"]])
+      add.row <- data.frame(scenarioSeriesOfImpactLand2[[paste0("y", initialYear+t)]][["LUTM"]])
       add.row$year <- t_curr
       add.row <- add.row[,names(scenarioResultLUTM)]
       scenarioResultLUTM <- data.frame(rbind(scenarioResultLUTM, add.row), stringsAsFactors = FALSE)
     }
     
     # 14. Land Emission by sector
-    
-    scenarioResultLandEmission <- scenarioSeriesOfImpactLand2[[2]][["emission"]]
+    scenarioResultLandEmission <- scenarioSeriesOfImpactLand2[[paste0("y",initialYear)]][["emission"]]
     scenarioResultLandEmission$year <- initialYear
     scenarioResultLandEmission <-scenarioResultLandEmission[,c("year", names(scenarioSeriesOfImpactLand2[[2]][["emission"]]))]
     for(t in 1:iteration){
       t_curr <- initialYear + t
-      add.row <- data.frame(scenarioSeriesOfImpactLand2[[t+2]][["emission"]])
+      add.row <- data.frame(scenarioSeriesOfImpactLand2[[paste0("y", initialYear+t)]][["emission"]])
       add.row$year <- t_curr
       add.row <- add.row[,names(scenarioResultLandEmission)]
       scenarioResultLandEmission <- data.frame(rbind(scenarioResultLandEmission, add.row), stringsAsFactors = FALSE)
@@ -1502,7 +1505,8 @@ buttonModule <- function(input, output, session, data, type) {
     # scenarioResultTotalGDP <- colSums(scenarioSeriesOfGDP[,2:(ncol(scenarioSeriesOfGDP)-1)])
     scenarioAllResult <- subset(scenarioResultTotalEmission, select=c(Year, TotalEmission, CummulativeEmission))
     # scenarioAllResult <- cbind(scenarioAllResult, scenarioResultTotalGDP)
-    scenarioAllResult$ResultTotalGDP<-colSums(scenarioSeriesOfGDP[,2:(ncol(scenarioSeriesOfGDP)-1)])
+    # scenarioAllResult$ResultTotalGDP<-colSums(scenarioSeriesOfGDP[,2:(ncol(scenarioSeriesOfGDP)-1)])
+    scenarioAllResult$ResultTotalGDP<-colSums(scenarioSeriesOfGDP[,which(colnames(scenarioSeriesOfGDP)==paste0("y",initialYear)):ncol(scenarioSeriesOfGDP)])
     scenarioAllResult$CummulativeGDP <- cumsum(scenarioAllResult$ResultTotalGDP)
     scenarioAllResult$EmissionIntensity <- scenarioAllResult$TotalEmission / scenarioAllResult$ResultTotalGDP
     scenarioAllResult$CummulativeEmissionIntensity <-cumsum(scenarioAllResult$EmissionIntensity)
@@ -1514,7 +1518,6 @@ buttonModule <- function(input, output, session, data, type) {
     plotResultTotalGDP<-ggplot(data=scenarioAllResult, aes(x=Year, y=ResultTotalGDP, group=1)) + geom_line() + geom_point()
     plotCummulativeGDP<- ggplot(data=scenarioAllResult, aes(x=Year, y=CummulativeGDP, group=1)) + geom_line() + geom_point()
     plotCummulativeEmissionIntensity<-ggplot(data=scenarioAllResult, aes(x=Year, y=CummulativeEmissionIntensity, group=1)) + geom_line() + geom_point()
-    
     
     #comparison with BAU
     scenarioAllResult$type <- "SCENARIO"

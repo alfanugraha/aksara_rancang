@@ -10,7 +10,7 @@ library(tidyr)
 library(shinyWidgets)
 library(DT)
 
-source("_DB/debug_TIN.R")
+source("_DB/simulasiPilotProvince/debug_TIN.R")
 username <- "dw"
 
 ui <- fluidPage( 
@@ -26,6 +26,7 @@ ui <- fluidPage(
 
 server <- function(input,output,session){
   observeEvent(input$tradeOffRunButton, {
+    print("run")
     insertUI(selector="#tradeOffResultPlaceholder",
              where='afterEnd',
              ui= uiOutput('tradeOffResultVisualization')
@@ -127,6 +128,7 @@ server <- function(input,output,session){
   
   
   loadRDSAll <- reactive({
+    "run"
     alamatFileEnergy <- paste0("_DB/skenarioData/", selectedProv, "/", "energi")
     alamatFileLand <- paste0("_DB/skenarioData/", selectedProv, "/", "lahan")
     alamatFileWaste <- paste0("_DB/skenarioData/", selectedProv, "/", "limbah")
