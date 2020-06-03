@@ -10,7 +10,7 @@ library(dplyr)
 library(openxlsx)
 library(plotly)
 
-# source("_DB/simulasiPilotProvince/debug_TIN.R")
+source("_DB/simulasiPilotProvince/debug_TIN.R")
 source("_DB/simulasiPilotProvince/global.R")
 source("_DB/simulasiPilotProvince/module.R")
 

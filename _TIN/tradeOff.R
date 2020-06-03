@@ -3,12 +3,13 @@ library(plyr)
 library(stringr)
 library(scales)
 
-source("_DB/debug_TIN.R")
+# source("_DB/debug_TIN.R")
+source("_DB/simulasiPilotProvince/debug_TIN.R")
 
 
 # read all intervention scenario  
-scenarioPath<-data.frame(path =list.files("_DB/skenarioData/Jabar", all.files=TRUE, full.names = TRUE, recursive = TRUE))
-scenarioPath<-data.frame(path=scenarioPath[-c(3,7,8,12),]) #delete after use 
+scenarioPath<-data.frame(path =list.files(paste0("_DB/skenarioData/", selectedProv), all.files=TRUE, full.names = TRUE, recursive = TRUE))
+# scenarioPath<-data.frame(path=scenarioPath[-c(3,7,8,12),]) #delete after use 
 for (i in 1:nrow(scenarioPath)){
   if(grepl("/energi/", scenarioPath$path[i])==TRUE){
     scenarioPath$type[i] <- "energi"
