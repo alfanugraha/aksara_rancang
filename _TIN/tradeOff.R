@@ -30,6 +30,15 @@ for (i in 1:ncol(scenarioPath)){
 }
 
 
+#cek apakah ada sat satelit yang null
+cekSatSelisih<-matrix(NA, nrow=nrow(scenarioPath), ncol=1)
+rownames(cekSatSelisih)<-scenarioPath$ID
+for (i in scenarioPath$ID){
+  eval(parse(text = paste0("cekSatSelisih['",i,"',1]<-is.null(",i,"$satSelisih)"))) 
+}
+
+
+
 # calculate delta for each intervention
 for (a in scenarioPath$ID){
   eval(parse(text = paste0(a,"$scenarioResultGDP$GDP<-",a,"$scenarioResultGDP$GDP-resultGDP$GDP")))
@@ -47,9 +56,11 @@ for (a in scenarioPath$ID){
 }
 
 
+
+
 # create all combinations
 scenarioCombination<-list()
-for (i in 4:nrow(scenarioPath)){
+for (i in 22:nrow(scenarioPath)){
   scenarioCombination[[paste0(i)]]<-data.frame(combinations(nrow(scenarioPath),i,scenarioPath$ID), stringsAsFactors = FALSE)
 }
 # set rule for combination : each combination has to have >= 4 scens, with minimum 1 scen from each prk sectors
@@ -103,7 +114,8 @@ for (i in 1:length(scenarioCombination)){
 for (i in 1:length(scenarioCombination)){
   for (combinationName in rownames(scenarioCombination[[i]])){
     print(combinationName)
-    for (x in 1:ncol(scenarioCombination[[i]])){
+    # for (x in 1:ncol(scenarioCombination[[i]])){
+    for (x in 1:1){
       scenName<-scenarioCombination[[i]][paste0(combinationName),x]
       print(scenName)
       eval(parse(text = paste0("tradeOffResult[['",combinationName,"']][['scenarioResultGDP']][['GDP']] <- tradeOffResult[['",combinationName,"']][['scenarioResultGDP']][['GDP']]  + ",scenName,"[['scenarioResultGDP']][['GDP']]")))

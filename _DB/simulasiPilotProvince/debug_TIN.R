@@ -6,7 +6,7 @@ library(rlist)
 ###BEGIN: initiate all variables & function####
 # username <- "alfanugraha"
 # password <- "1234"
-selectedProv = "SumSel"
+selectedProv = "Sulawesi_Selatan"
 datapath <- paste0("_DB/data/", selectedProv, "/")
 datapathCSV <- ("_DB/input csv")
 
@@ -1031,7 +1031,7 @@ for(t in 0:iteration){
 # resultTotalGDP <- colSums(bauSeriesOfGDP[,2:(ncol(bauSeriesOfGDP)-1)])
 bauAllResult <- subset(resultTotalEmission, select=c(Year, TotalEmission, CummulativeEmission))
 # insert bau from RADGRK
-bauAllResult$TotalEmission<-as.matrix(read.csv(paste0(datapath, "bauTotalEmission.csv"), header = FALSE))
+# bauAllResult$TotalEmission<-as.matrix(read.csv(paste0(datapath, "bauTotalEmission.csv"), header = FALSE))
 
 # bauAllResult <- cbind(bauAllResult, resultTotalGDP)
 # bauAllResult$ResultTotalGDP<-colSums(bauSeriesOfGDP[,2:(ncol(bauSeriesOfGDP)-1)])

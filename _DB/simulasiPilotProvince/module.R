@@ -234,7 +234,7 @@ buttonModule <- function(input, output, session, data, type) {
                                 choices=c("Final Demand","AV","Input-Output")),
                     pickerInput(ns("sektorEcon"),
                                 label="pilih sektor", selected = Sector[1],
-                                choices=sort(Sector),options = list(`actions-box` = TRUE),multiple = T)),
+                                choices=Sector,options = list(`actions-box` = TRUE),multiple = T)),
                   tags$br(),
                   actionButton(ns("econHit"),"tentukan tahun intervensi"),
                   width=5
@@ -300,7 +300,7 @@ buttonModule <- function(input, output, session, data, type) {
                                 choices=c("Final Demand","AV","Input-Output")),
                     pickerInput(ns("sektorEcon"),
                                 label="pilih sektor", selected = Sector[1],
-                                choices=sort(Sector),options = list(`actions-box` = TRUE),multiple = T)),
+                                choices=Sector,options = list(`actions-box` = TRUE),multiple = T)),
                   tags$br(),
                   actionButton(ns("econHit"),"tentukan tahun intervensi"),
                   width=5
@@ -327,7 +327,7 @@ buttonModule <- function(input, output, session, data, type) {
                               choices=c("konsumsi energi","faktor emisi")),
                   pickerInput(ns("sektorSat"),
                               label="pilih sektor",selected = Sector[1],
-                              choices=sort(Sector),options = list(`actions-box` = TRUE),multiple = T)
+                              choices=Sector,options = list(`actions-box` = TRUE),multiple = T)
                 ),
                 tags$br(),
                 actionButton(ns("satHit"),"tentukan tahun intervensi"),
@@ -866,18 +866,18 @@ buttonModule <- function(input, output, session, data, type) {
       additionalEmissionFactorAgriculture=NULL
     } else if (type=="agriculture"){
       scenarioInputLandCover= NULL
-      additionalSatelliteEnergy=NULL
-      additionalSatelliteWaste=NULL
+      additionalEmissionFactorEnergy=NULL
+      additionalEmissionFactorWaste=NULL
       additionalSatelliteAgriculture=selectedFile[["satSelisih"]]
       if (is.null(selectedFile[["satSelisihEnergy"]])){
-        additionalEmissionFactorEnergy=NULL
+        additionalSatelliteEnergy=NULL
       } else{
-        additionalEmissionFactorEnergy=selectedFile[["satSelisihEnergy"]]
+        additionalSatelliteEnergy=selectedFile[["satSelisihEnergy"]]
       }
       if (is.null(selectedFile[["satSelisihWaste"]])){
-        additionalEmissionFactorWaste=NULL
+        additionalSatelliteWaste=NULL
       } else{
-        additionalEmissionFactorWaste=selectedFile[["satSelisihWaste"]]
+        additionalSatelliteWaste=selectedFile[["satSelisihWaste"]]
       }
       # additionalEmissionFactorEnergy=NULL
       # additionalEmissionFactorWaste=NULL
