@@ -1,3 +1,4 @@
+### SULAWESI SELATAN ###
 ### Sistem Pertanian Terintegrasi
 rdsSimantriEnergy <- readRDS("_DB/skenarioData/Sulawesi_Selatan/energi/dw_Sulawesi_Selatan_2020-06-03_13-29-40_sistempertanianterintegrasi")
 rdsSimantriWaste <- readRDS("_DB/skenarioData/Sulawesi_Selatan/limbah/dw_Sulawesi_Selatan_2020-06-03_13-26-01_sistempertanianterintegrasi")
@@ -13,3 +14,22 @@ rdsTernakAgri <- readRDS("_DB/skenarioData/Sulawesi_Selatan/pertanian/dw_Sulawes
 
 rdsTernakAgri$satSelisihEnergy <- rdsSimantriEnergy$satSelisih
 rdsTernakAgri$satSelisihWaste <- rdsSimantriWaste$satSelisih
+
+### SUMATERA SELATAN ###
+### Pengelolaan Tanaman Terpadu
+rdsPTTEnergy <- readRDS("_DB/skenarioData/SumSel/energi/dw_SumSel_2020-06-04_16-20-39_PengelolaanTanamanTerpadu(PTT)")
+rdsPTTWaste <- readRDS("_DB/skenarioData/SumSel/limbah/dw_SumSel_2020-06-04_16-20-15_PengelolaanTanamanTerpadu(PTT)")
+rdsPTTAgri <- readRDS("_DB/skenarioData/SumSel/pertanian/dw_SumSel_2020-06-04_13-42-52_PengelolaanTanamanTerpadu(PTT)")
+
+rdsPTTAgri$satSelisihEnergy <- rdsPTTEnergy$satSelisih
+rdsPTTAgri$satSelisihWaste <- rdsPTTWaste$satSelisih
+
+saveRDS(rdsPTTAgri, "_DB/skenarioData/SumSel/pertanian/dw_SumSel_2020-06-04_13-42-52_PengelolaanTanamanTerpadu(PTT)") 
+
+### Alat Pencacah Pupuk Organik
+rdsAPPOWaste <- readRDS("_DB/skenarioData/SumSel/limbah/dw_SumSel_2020-06-04_17-27-13_AlatPencacahPupukOrganik(APPO)")
+rdsAPPOAgri <- readRDS("_DB/skenarioData/SumSel/pertanian/dw_SumSel_2020-06-04_13-42-30_AlatPencacahPupukOrganik(APPO)")
+
+rdsAPPOAgri$satSelisihWaste <- rdsPTTWaste$satSelisih
+
+saveRDS(rdsAPPOAgri, "_DB/skenarioData/SumSel/pertanian/dw_SumSel_2020-06-04_13-42-30_AlatPencacahPupukOrganik(APPO)") 
