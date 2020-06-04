@@ -230,21 +230,21 @@ server <- function(input,output,session){
     
     # create all combinations
     scenarioCombination<-list()
-    for (i in 4:nrow(scenarioPath)){
+    for (i in 22:nrow(scenarioPath)){
       scenarioCombination[[paste0(i)]]<-data.frame(combinations(nrow(scenarioPath),i,scenarioPath$ID), stringsAsFactors = FALSE)
     }
     # set rule for combination : each combination has to have >= 4 scens, with minimum 1 scen from each prk sectors
-    for (i in 1:length(scenarioCombination)){
-      for (a in 1:nrow(scenarioCombination[[i]])){
-        if (any (c(sum(str_detect(scenarioCombination[[i]][a,], "lahan")), 
-                   sum(str_detect(scenarioCombination[[i]][a,], "energi")),
-                   sum(str_detect(scenarioCombination[[i]][a,], "limbah")),
-                   sum(str_detect(scenarioCombination[[i]][a,], "pertanian"))) == 0)){
-          scenarioCombination[[i]][a,]<-NA
-        }
-      }
-      scenarioCombination[[i]]<-na.omit(scenarioCombination[[i]])
-    }
+    # for (i in 1:length(scenarioCombination)){
+    #   for (a in 1:nrow(scenarioCombination[[i]])){
+    #     if (any (c(sum(str_detect(scenarioCombination[[i]][a,], "lahan")), 
+    #                sum(str_detect(scenarioCombination[[i]][a,], "energi")),
+    #                sum(str_detect(scenarioCombination[[i]][a,], "limbah")),
+    #                sum(str_detect(scenarioCombination[[i]][a,], "pertanian"))) == 0)){
+    #       scenarioCombination[[i]][a,]<-NA
+    #     }
+    #   }
+    #   scenarioCombination[[i]]<-na.omit(scenarioCombination[[i]])
+    # }
     
     print(scenarioCombination)
 
