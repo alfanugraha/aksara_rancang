@@ -33,8 +33,13 @@ for (i in 1:ncol(scenarioPath)){
 #cek apakah ada sat satelit yang null
 cekSatSelisih<-matrix(NA, nrow=nrow(scenarioPath), ncol=1)
 rownames(cekSatSelisih)<-scenarioPath$ID
+
+cekGDP<-matrix(NA, nrow=nrow(scenarioPath), ncol=1)
+rownames(cekGDP)<-scenarioPath$ID
+
 for (i in scenarioPath$ID){
   eval(parse(text = paste0("cekSatSelisih['",i,"',1]<-is.null(",i,"$satSelisih)"))) 
+  eval(parse(text = paste0("cekGDP['",i,"',1]<-any(",i,"$scenarioResultGDP$GDP<0)"))) 
 }
 
 
@@ -61,6 +66,7 @@ for (a in scenarioPath$ID){
 # create all combinations
 scenarioCombination<-list()
 for (i in 22:nrow(scenarioPath)){
+# for (i in 22:nrow(scenarioPath)){
   scenarioCombination[[paste0(i)]]<-data.frame(combinations(nrow(scenarioPath),i,scenarioPath$ID), stringsAsFactors = FALSE)
 }
 # set rule for combination : each combination has to have >= 4 scens, with minimum 1 scen from each prk sectors
@@ -114,8 +120,8 @@ for (i in 1:length(scenarioCombination)){
 for (i in 1:length(scenarioCombination)){
   for (combinationName in rownames(scenarioCombination[[i]])){
     print(combinationName)
-    # for (x in 1:ncol(scenarioCombination[[i]])){
-    for (x in 1:1){
+    for (x in 1:ncol(scenarioCombination[[i]])){
+    # for (x in 1:6){
       scenName<-scenarioCombination[[i]][paste0(combinationName),x]
       print(scenName)
       eval(parse(text = paste0("tradeOffResult[['",combinationName,"']][['scenarioResultGDP']][['GDP']] <- tradeOffResult[['",combinationName,"']][['scenarioResultGDP']][['GDP']]  + ",scenName,"[['scenarioResultGDP']][['GDP']]")))
@@ -133,14 +139,20 @@ for (i in 1:length(scenarioCombination)){
       eval(parse(text = paste0("tradeOffResult[['",combinationName,"']][['scenarioAllResult']][,2:7] <- tradeOffResult[['",combinationName,"']][['scenarioAllResult']][,2:7] + ",scenName,"[['scenarioAllResult']][,2:7]")))
     }
     tradeOffResult[[paste0(combinationName)]][["scenarioAllResult"]]<-cbind(tradeOffResult[[paste0(combinationName)]][["scenarioAllResult"]], ID=paste0(combinationName))
-    }
+  }
 }
 
+
 # check for any negative values in all tables
-if(any(unlist(tradeOffResult[[i]])<0)){
-  tradeOffResult[[i]]<-NULL
-}
-any(is.null(tradeOffResult))
+# for (i in 1:length(tradeOffResult)){
+#   for(x in 1:length(tradeOffResult[[i]]))
+#   if(any(unlist(tradeOffResult[[i]][[x]])<0)){
+#     tradeOffResult[[i]][[x]]<-"NULL"
+# #   }
+# }
+# any(is.null(tradeOffResult))
+
+
 
 # bauAllResult$type<-"BAU"
 
@@ -216,23 +228,23 @@ for (i in 1:length(tradeOffResult)){
 tradeOffSummary<-tradeOffSummary[-is.na(tradeOffSummary),]
 
 ############################################
-
-remove_breaks <- function(original_func, remove_list = list()) {
-  function(x) {
-    original_result <- original_func(x)
-    original_result[!(original_result %in% remove_list)]
-  }
-}
-
-ggplot(tradeOffSummary, aes(x = peningkatan.PDRB, y = penurunan.emisi, color = ID)) +
-  geom_point(shape = 19, size = 4, position=position_jitter(h=0.05,w=0.05), alpha = 0.5) +
-  geom_hline(aes(yintercept = 0), colour = "#BB0000", linetype = "dashed") + 
-  geom_vline(aes(xintercept = 0), colour = "#BB0000", linetype ="dashed") +
-  theme(legend.position = "none")
-
-
-
-
+# 
+# remove_breaks <- function(original_func, remove_list = list()) {
+#   function(x) {
+#     original_result <- original_func(x)
+#     original_result[!(original_result %in% remove_list)]
+#   }
+# }
+# 
+# ggplot(tradeOffSummary, aes(x = peningkatan.PDRB, y = penurunan.emisi, color = ID)) +
+#   geom_point(shape = 19, size = 4, position=position_jitter(h=0.05,w=0.05), alpha = 0.5) +
+#   geom_hline(aes(yintercept = 0), colour = "#BB0000", linetype = "dashed") + 
+#   geom_vline(aes(xintercept = 0), colour = "#BB0000", linetype ="dashed") +
+#   theme(legend.position = "none")
+# 
+# 
+# 
+# 
 
 
 
@@ -254,10 +266,10 @@ tradeOffSummaryQ3$ID[tradeOffSummaryQ3$penurunan.intensitasEmisi == min(tradeOff
 # # Plot all interventions
 # tradeOffResultCombined <-data.frame(Year=NA, TotalEmission=NA,CummulativeEmission=NA, ResultTotalGDP=NA, EmissionIntensity = NA, ID = NA,  stringsAsFactors = FALSE)
 # for ( i in 1:length (tradeOffResult)){
-#   tradeOffResultCombined.addRow<-data.frame(Year = tradeOffResult[[i]][["scenarioAllResult"]][["Year"]], 
+#   tradeOffResultCombined.addRow<-data.frame(Year = tradeOffResult[[i]][["scenarioAllResult"]][["Year"]],
 #                                             TotalEmission = tradeOffResult[[i]][["scenarioAllResult"]][["TotalEmission"]],
-#                                             CummulativeEmission = tradeOffResult[[i]][["scenarioAllResult"]][["CummulativeEmission"]], 
-#                                             ResultTotalGDP = tradeOffResult[[i]][["scenarioAllResult"]][["ResultTotalGDP"]], 
+#                                             CummulativeEmission = tradeOffResult[[i]][["scenarioAllResult"]][["CummulativeEmission"]],
+#                                             ResultTotalGDP = tradeOffResult[[i]][["scenarioAllResult"]][["ResultTotalGDP"]],
 #                                             EmissionIntensity = tradeOffResult[[i]][["scenarioAllResult"]][["EmissionIntensity"]],
 #                                             ID = names(tradeOffResult)[[i]],
 #                                             stringsAsFactors = FALSE)
@@ -278,7 +290,7 @@ for ( i in 1:length (tradeOffResult)){
   } else if (any(str_detect(tradeOffSummaryQ4$ID, names(tradeOffResult)[[i]]))){
     quadrant <- "Q4"
   }
-  tradeOffResultCombined<-rbind(tradeOffResultCombined, cbind(tradeOffResult[[i]][["scenarioAllResult"]], 
+  tradeOffResultCombined<-rbind(tradeOffResultCombined, cbind(tradeOffResult[[i]][["scenarioAllResult"]],
                                                               Category = quadrant))
 }
 

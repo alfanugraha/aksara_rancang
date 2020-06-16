@@ -1160,12 +1160,14 @@ buttonModule <- function(input, output, session, data, type) {
       for (i in 1:6){   # 6 tipe yg akan dirun otomatis
         eval(parse(text=paste0("scenarioSeriesOfImpactLand3$",timeStep,"<-functionSatelliteLand3(inputLandScen=scenarioInputLandCover,
                                                                                              timeScen='",timeStep,"')")))
+        # browser()
+        ################
         eval(parse(text=paste0("
         scenarioSeriesOfImpactLand2$",timeStep,"<-tryCatch({
         functionSatelliteLand2 (type ='projected',
                                 landCoverProjection = as.matrix(scenarioSeriesOfImpactLand1[['",timeStep,"']][['landCover']][['luas.land.use']]),
                                 landCoverProjectionMin = as.matrix(scenarioSeriesOfImpactLand1[[paste0('y',",projectionYear,"-1)]][['landCover']][['luas.land.use']]),
-                                inputLandCover = scenarioSeriesOfImpactLand3[['",timeStep,"']][['landCover']],
+                                inputLandCover = scenarioSeriesOfImpactLand3[['",timeStep,"']][['inputLandCover']],
                                 LUTMTemplate = scenarioSeriesOfImpactLand3[['",timeStep,"']][['LUTMTemplate']],
                                 advanceMode = FALSE,
                                 runNum =",i," ,
@@ -1175,6 +1177,21 @@ buttonModule <- function(input, output, session, data, type) {
                                 )
         }, warning = function (a){NA}, error = function(b){NA})"
         )))
+        ##########
+        
+        # scenarioSeriesOfImpactLand2[[timeStep]]<-
+        # functionSatelliteLand2 (type ='projected',
+        #                         landCoverProjection = as.matrix(scenarioSeriesOfImpactLand1[[timeStep]][['landCover']][['luas.land.use']]),
+        #                         landCoverProjectionMin = as.matrix(scenarioSeriesOfImpactLand1[[paste0('y',projectionYear-1)]][['landCover']][['luas.land.use']]),
+        #                         inputLandCover = scenarioSeriesOfImpactLand3[[timeStep]][['inputLandCover']],
+        #                         LUTMTemplate = scenarioSeriesOfImpactLand3[[timeStep]][['LUTMTemplate']],
+        #                         advanceMode = FALSE,
+        #                         runNum =i ,
+        #                         GDP=as.matrix(scenarioSeriesOfGDP[[timeStep]]),
+        #                         additionalG = scenarioSeriesOfImpactLand3[[timeStep]][['additionalG']],
+        #                         additionalH= scenarioSeriesOfImpactLand3[[timeStep]][['additionalH']]
+        #                         )
+        ####################
         if(any(is.na(scenarioSeriesOfImpactLand2[[timeStep]]))==FALSE){
           print(paste0("use constraint ", i ," to make LUTM ",timeStep))
           break
@@ -1224,12 +1241,13 @@ buttonModule <- function(input, output, session, data, type) {
           for (i in 1:6){   # 6 tipe yg akan dirun otomatis
             eval(parse(text=paste0("scenarioSeriesOfImpactLand3$",timeStep,"<-functionSatelliteLand3(inputLandScen=scenarioInputLandCover,
                                                                                              timeScen='",timeStep,"')")))
+            browser()
             eval(parse(text=paste0("
             scenarioSeriesOfImpactLand2$",timeStep,"<-tryCatch({
             functionSatelliteLand2 (type ='projected',
                                     landCoverProjection = as.matrix(scenarioSeriesOfImpactLand1[['",timeStep,"']][['landCover']][['luas.land.use']]),
                                     landCoverProjectionMin = as.matrix(scenarioSeriesOfImpactLand1[[paste0('y',",projectionYear,"-1)]][['landCover']][['luas.land.use']]),
-                                    inputLandCover = scenarioSeriesOfImpactLand3[['",timeStep,"']][['landCover']],
+                                    inputLandCover = scenarioSeriesOfImpactLand3[['",timeStep,"']][['inputLandCover']],
                                     LUTMTemplate = scenarioSeriesOfImpactLand3[['",timeStep,"']][['LUTMTemplate']],
                                     advanceMode = TRUE,
                                     percentage = inputPercentageDiagTPM,
@@ -1522,8 +1540,8 @@ buttonModule <- function(input, output, session, data, type) {
     
     #comparison with BAU
     scenarioAllResult$type <- "SCENARIO"
-    bauAllResult$type<-"BAU"
-    comparison<-rbind(scenarioAllResult,bauAllResult[bauAllResult$Year==(initialYear:finalYear),])
+    bauAllResult.visualization$type<-"BAU"
+    comparison<-rbind(scenarioAllResult,bauAllResult.visualization[bauAllResult.visualization$Year==(initialYear:finalYear),])
     for (i in as.character(colnames(comparison[,-c(1,8)]))){
       eval(parse(text=paste0('plotComparison',i,'<-ggplot(comparison, aes(x=Year, y=',i,', group=type))+
       geom_line(aes(color=type))+

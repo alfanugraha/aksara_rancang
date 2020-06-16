@@ -4,11 +4,15 @@ library(plotly)
 library(rlist)
 
 ###BEGIN: initiate all variables & function####
-# username <- "alfanugraha"
-# password <- "1234"
-selectedProv = "Sulawesi_Selatan"
+
+selectedProv = "JaBar"
+selectedBAU = "bauAllResultGRK" #choices= bauAllResultGRK & bauAllResult 
+version<- "version1" # choices= version1 (bau emission rad GRK <- kumulatif), version2 (bau emission rad GRK <- tahunan)
+
+
 datapath <- paste0("_DB/data/", selectedProv, "/")
 datapathCSV <- ("_DB/input csv")
+
 
 
 # ioSector <- read.table("_DB/jabar_in_redcluwe/01_sektor.csv ", header = F, sep = ",") #for JaBar
@@ -94,6 +98,9 @@ if(selectedProv=="SumSel"){
 } else if (selectedProv == "Sulawesi_Selatan"){
   initialYear <- 2010
   finalYear <- 2030
+} else if (selectedProv == "JaBar"){
+  initialYear<-2016
+  finalYear<-2030
 }
 
 
@@ -168,22 +175,23 @@ functionSatelliteLand1<-function(type=NULL, # historis / projected
                                    
   impact<-list()
   
+  
   if(type=="historis"){
     impact$LRC<-analysisLRC
     impact$landReq<-landReq_his
     impact$landCover<-landCover_his
   } else{
     if(advanceMode== TRUE){
-      impact$LRC<-analysisLRC*LRCRate^(currYear-ioPeriod)
+      impact$LRC<-analysisLRC*LRCRate[c(which(rowSums(LDMProp_his)!=0)),1]^(currYear-ioPeriod)
     } else{
       if (runNum == 1 ){
-        impact$LRC<-analysisLRC*(LRCRate_his^(currYear-ioPeriod))
+        impact$LRC<-analysisLRC*(LRCRate_his[c(which(rowSums(LDMProp_his)!=0)),1]^(currYear-ioPeriod))
       } else if (runNum ==2 ){
-        impact$LRC<-analysisLRC*(LRCRate_2^(currYear-ioPeriod))
+        impact$LRC<-analysisLRC*(LRCRate_2[c(which(rowSums(LDMProp_his)!=0)),1]^(currYear-ioPeriod))
       }
     }
     # Land Requirement
-    impact$landReq<-diag(impact$LRC[,1]) %*% rbind(as.matrix(matrix_output[,1]),0)
+    impact$landReq<-diag(impact$LRC[,1]) %*% rbind(as.matrix(matrix_output),0)[c(which(rowSums(LDMProp_his)!=0)),1]
     impact$landReq[nrow(as.matrix(impact$landReq)),]<-sum(landCover_his[,1])-sum(as.matrix(impact$landReq[1:nrow(as.matrix(impact$landReq))-1,]))
     # Land Cover
     impact$landCover<-LDMProp_sektor %*% as.matrix(impact$landReq)
@@ -192,8 +200,8 @@ functionSatelliteLand1<-function(type=NULL, # historis / projected
   }
   
   # Rapikan
-  impact$landReq <- data.frame(c(rownames(ioSector), nrow(ioSector)+1),
-                               c(as.character(ioSector[,1]), "lainnya (tidak menghasilkan output)"),
+  impact$landReq <- data.frame(c(rownames(ioSector), as.character(nrow(ioSector)+1))[c(which(rowSums(LDMProp_his)!=0))],
+                               c(as.character(ioSector[,1]), "lainnya (tidak menghasilkan output)")[c(which(rowSums(LDMProp_his)!=0))],
                                impact$landReq, stringsAsFactors = FALSE)
   
   colnames(impact$landReq)<-c("id.sector", "sector", "land.requirement")
@@ -423,44 +431,51 @@ functionSatelliteLand2<- function(type=NULL, # historis / projection
 functionSatelliteLand3<-function (inputLandScen = NULL,
                                   timeScen = timeStep){
   impact<-list()
-  
+  # browser()
   if (is.null(inputLandScen)){
     impact$LUTMTemplate<-LUTMTemplate_his
     impact$additionalG<-NULL
     impact$additionalH<-NULL
     impact$inputLandCover<-NULL
-  } else{
-    # calculate scenario LUTM Template
-    impact$LUTMTemplate<-LUTMTemplate_his
-    impact$LUTMTemplate[impact$LUTMTemplate!="0"]<-NA
-    rownames(impact$LUTMTemplate)<-colnames(impact$LUTMTemplate)
-    for (i in 1:nrow(inputLandScen)){
-      impact$LUTMTemplate[paste0(inputLandScen[i,1]), paste0(inputLandScen[i,2])]<- NA
-    }
-    impact$LUTMTemplate[is.na(impact$LUTMTemplate)]<-paste0("x",1:length(impact$LUTMTemplate[is.na(impact$LUTMTemplate)]))
-    
-    # additional G & additional H
-    impact$additionalG<-matrix(0,ncol=length(impact$LUTMTemplate[impact$LUTMTemplate!=0]), nrow=nrow(inputLandScen))
-    impact$additionalH<-matrix(ncol=1, nrow=nrow(inputLandScen))
-    
-    colnames(impact$additionalG)<-as.character(impact$LUTMTemplate[impact$LUTMTemplate!=0])
-    
-    for (i in 1:nrow(inputLandScen)){
-      impact$additionalG[i,impact$LUTMTemplate[paste0(inputLandScen[i,1]), paste0(inputLandScen[i,2])]]<-1
-      impact$additionalH[i,1]<-inputLandScen[i,paste0(timeScen)]
-    }
-    
-    # inputLandCover
-    impact$inputLandCover<- matrix(0,ncol=1, nrow=23)
-    rownames(impact$inputLandCover)<-colnames(impact$LUTMTemplate)
-    
-    for (landCoverClass in unique(inputLandScen[,2])){
-      impact$inputLandCover[paste(landCoverClass),]<-sum(inputLandScen[inputLandScen[,2]==paste(landCoverClass), timeScen]) # pertambahan luas <- positif jumlah total luas kelas tupla yang sama di tahun akhir
-    } 
-    
-    for (landCoverClass in as.character(unique(inputLandScen[,1]))){
-      impact$inputLandCover[landCoverClass,]<--sum(inputLandScen[inputLandScen[,1]==paste(landCoverClass), timeScen]) # penurunan luas <- negatif jumlah total luas kelas tupla yang sama tahun akhir
-    } 
+  } else {
+     if (paste0(timeScen) %in% colnames(inputLandScen)){
+       # calculate scenario LUTM Template
+       impact$LUTMTemplate<-LUTMTemplate_his
+       impact$LUTMTemplate[impact$LUTMTemplate!="0"]<-NA
+       rownames(impact$LUTMTemplate)<-colnames(impact$LUTMTemplate)
+       for (i in 1:nrow(inputLandScen)){
+         impact$LUTMTemplate[paste0(inputLandScen[i,1]), paste0(inputLandScen[i,2])]<- NA
+       }
+       impact$LUTMTemplate[is.na(impact$LUTMTemplate)]<-paste0("x",1:length(impact$LUTMTemplate[is.na(impact$LUTMTemplate)]))
+       
+       # additional G & additional H
+       impact$additionalG<-matrix(0,ncol=length(impact$LUTMTemplate[impact$LUTMTemplate!=0]), nrow=nrow(inputLandScen))
+       impact$additionalH<-matrix(ncol=1, nrow=nrow(inputLandScen))
+       
+       colnames(impact$additionalG)<-as.character(impact$LUTMTemplate[impact$LUTMTemplate!=0])
+       
+       for (i in 1:nrow(inputLandScen)){
+         impact$additionalG[i,impact$LUTMTemplate[paste0(inputLandScen[i,1]), paste0(inputLandScen[i,2])]]<-1
+         impact$additionalH[i,1]<-inputLandScen[i,paste0(timeScen)]
+       }
+       
+       # inputLandCover
+       impact$inputLandCover<- matrix(0,ncol=1, nrow=23)
+       rownames(impact$inputLandCover)<-colnames(impact$LUTMTemplate)
+       
+       for (landCoverClass in unique(inputLandScen[,2])){
+         impact$inputLandCover[paste(landCoverClass),]<-sum(inputLandScen[inputLandScen[,2]==paste(landCoverClass), timeScen]) # pertambahan luas <- positif jumlah total luas kelas tupla yang sama di tahun akhir
+       } 
+       
+       for (landCoverClass in as.character(unique(inputLandScen[,1]))){
+         impact$inputLandCover[landCoverClass,]<--sum(inputLandScen[inputLandScen[,1]==paste(landCoverClass), timeScen]) # penurunan luas <- negatif jumlah total luas kelas tupla yang sama tahun akhir
+       } 
+     } else {
+       impact$LUTMTemplate<-LUTMTemplate_his
+       impact$additionalG<-NULL
+       impact$additionalH<-NULL
+       impact$inputLandCover<-NULL
+     }
   }
   return (impact)
 }
@@ -479,6 +494,12 @@ analysisFPD <- analysisDFL/(mean(analysisDFL))
 # GDP
 analysisGDP <- colSums(matrixIoAddedValue[rowIncome:nrowMatrixIoAddedValue,])
 analysisTotalGDP <- sum(analysisGDP)
+
+#GDP proportion #edit
+GDPProp<-ioTotalOutput/analysisGDP
+GDPProp[is.nan(GDPProp)]<- 0
+GDPProp[is.infinite(GDPProp)]<- 0
+
 
 # Multiplier Output (MO)
 analysisMO <- colSums(ioLeontiefInverse)
@@ -543,13 +564,17 @@ for (i in 1:ncol(TPM)){
 TPM[is.nan(TPM)]<-0
 
 #land distribution matrix dalam luas (analysisLDMLuas)
-analysisLDMLuas<-as.matrix(LDMProp_his)%*%as.matrix(diag(landCover_his[,1]))
+rownames(LDMProp_his)<-c(as.character(ioSector[,1]), "sektor lainnya")
+
+# analysisLDMLuas<-as.matrix(LDMProp_his)%*%as.matrix(diag(landCover_his[,1]))
+analysisLDMLuas<-as.matrix(LDMProp_his[c(which(rowSums(LDMProp_his)!=0)),])%*%as.matrix(diag(landCover_his[,1]))  #edit
+
 
 #land requirement historis (analysisLR)
 landReq_his<-as.matrix(rowSums(analysisLDMLuas))
 
 # Land requirement coefficient (analysisLRC) & land productivity coefficient (analysisLPC)
-analysisLPC<-rbind(as.matrix(rowSums(cbind(ioIntermediateDemand, ioFinalDemand))), 0)/landReq_his    #rowSums(cbind(indem, findem))=output
+analysisLPC<-as.matrix(c(ioTotalOutput, 0))[c(which(rowSums(LDMProp_his)!=0))]/landReq_his    #rowSums(cbind(indem, findem))=output
 analysisLPC[is.infinite(analysisLPC)]<-0
 analysisLPC[is.nan(analysisLPC)]<-0
 analysisLRC<-1/analysisLPC
@@ -616,12 +641,12 @@ analysisCPI[is.nan(analysisCPI)]<-0
 
 ###BEGIN: BAU projection####
 
-# Series of GPD & Output projection
+# Series of GPD & Output projection 
 bauSeriesOfGDP <- data.frame(Sektor = ioSector[,1], stringsAsFactors = FALSE) #ini
-# bauSeriesOfGDP$y2015 <- analysisGDP
 eval(parse(text=paste0("bauSeriesOfGDP$y",ioPeriod," <- analysisGDP")))
 bauSeriesOfFinalDemand <- rowSumsMatrixIoFinalDemand #ini
-bauSeriesOfOutput <- ioTotalOutput
+bauSeriesOfOutput <- as.matrix(ioTotalOutput)
+
 
 # Series of Intervention Point
 bauSeriesOfIntermediateDemand <- list()
@@ -648,6 +673,9 @@ eval(parse(text=paste0("bauSeriesOfImpactAgriculture$y",ioPeriod,"<- functionSat
 eval(parse(text=paste0("bauSeriesOfImpactLand1$y",ioPeriod,"<-functionSatelliteLand1(type= 'historis', matrix_output= as.matrix(ioTotalOutput))")))
 # LSEI
 eval(parse(text=paste0("bauSeriesOfImpactLand2$y",ioPeriod," <- functionSatelliteLand2(type='historis',carbonStock=carbonStock_his, GDP= as.matrix(bauSeriesOfGDP$y",ioPeriod,") )")))
+# eval(parse(text=paste0("bauSeriesOfImpactLand2$y",ioPeriod," <- functionSatelliteLand2(type='historis',carbonStock=carbonStock_his, GDP= analysisGDP)")))
+
+
 
 growthRateSeries <- growthRate
 growthRateSeries$Lap_usaha <- NULL
@@ -658,11 +686,25 @@ listYear <- paste0("y", ioPeriod)
 
 # economic & impact (energy, waste, & agriculture projection 
 for(step in 1:(iteration+1)){
-  projectionFinalDemand <- growthRateSeries[, step] * bauSeriesOfFinalDemand[, step]
   
+  
+  # projectionFinalDemand <- growthRateSeries[, step] * bauSeriesOfFinalDemand[, step]
+  # 
+  # bauSeriesOfFinalDemand <- cbind(bauSeriesOfFinalDemand, projectionFinalDemand)
+  # projectionOutput <- ioLeontiefInverse %*% projectionFinalDemand
+  # bauSeriesOfOutput <- cbind(bauSeriesOfOutput, projectionOutput)
+
+  
+  # calculate findem & output from GDP #edit
+  projectionGDP<-growthRateSeries[, step] * bauSeriesOfGDP[, step+1]
+  projectionOutput<-growthRateSeries[, step] * bauSeriesOfOutput[, step]
+
+  projectionFinalDemand <- ioLeontif %*% projectionOutput
+
+  bauSeriesOfOutput <-cbind(bauSeriesOfOutput, projectionOutput)
   bauSeriesOfFinalDemand <- cbind(bauSeriesOfFinalDemand, projectionFinalDemand)
-  projectionOutput <- ioLeontiefInverse %*% projectionFinalDemand 
-  bauSeriesOfOutput <- cbind(bauSeriesOfOutput, projectionOutput)
+  bauSeriesOfGDP<-cbind(bauSeriesOfGDP,projectionGDP)
+  
   
   # notes on the year
   timeStep <- paste0("y", projectionYear)
@@ -672,8 +714,8 @@ for(step in 1:(iteration+1)){
   eval(parse(text=paste0("bauSeriesOfIntermediateDemand$", timeStep, " <-  analysisCT %*% diag(as.vector(projectionOutput), ncol = ioDimention, nrow= ioDimention)")))
   eval(parse(text=paste0("bauSeriesOfAddedValue$", timeStep, " <-  analysisCPI %*% diag(as.vector(projectionOutput), ncol = ioDimention, nrow= ioDimention)")))
   
-  # GDP projection 
-  eval(parse(text = paste0("bauSeriesOfGDP$", timeStep, "<- colSums(bauSeriesOfAddedValue$", timeStep, "[setdiff(1:nrow(matrixIoAddedValue), rowImport),])")))
+  # GDP projection #edit
+  # eval(parse(text = paste0("bauSeriesOfGDP$", timeStep, "<- colSums(bauSeriesOfAddedValue$", timeStep, "[setdiff(1:nrow(matrixIoAddedValue), rowImport),])")))
   
   # Impact projection
   eval(parse(text= paste0("bauSeriesOfImpactLabour$", timeStep, " <- functionSatelliteImpact('labour', satellite = satelliteLabour, matrix_output = as.matrix(projectionOutput))")))
@@ -686,11 +728,14 @@ for(step in 1:(iteration+1)){
   
 }
 
+colnames(bauSeriesOfGDP) <- c("Sektor", listYear)  # edit
 colnames(bauSeriesOfOutput) <- as.character(listYear)
 colnames(bauSeriesOfFinalDemand)<- as.character(listYear)
 
 bauSeriesOfFinalDemandTable <- cbind(data.frame(ioSector$V1), bauSeriesOfFinalDemand)
 colnames(bauSeriesOfFinalDemandTable) <- c("Sektor", as.character(listYear)) 
+
+
 
 # land cover projection 
 
@@ -731,15 +776,19 @@ for (i in 1:2){
 
 landCoverTable<-data.frame(landCover_his)
 landReqTable<-data.frame(landReq_his)
+LRCTable<-data.frame(analysisLRC)
 for (i in names(bauSeriesOfImpactLand1)){
   eval(parse(text = paste("landCoverTable$", i, "<-bauSeriesOfImpactLand1$",i,"[['landCover']][['luas.land.use']]")))
   eval(parse(text = paste("landReqTable$", i, "<-bauSeriesOfImpactLand1$",i,"[['landReq']][['land.requirement']]")))
+  eval(parse(text = paste("LRCTable$", i, "<-bauSeriesOfImpactLand1$",i,"[['LRC']]")))
   
 }
 landCoverTable<-landCoverTable[,-1]
 rownames(landCoverTable)<-colnames(LDMProp_his)
 landReqTable<-landReqTable[,-1]
-rownames(landReqTable)<-rbind(as.matrix(ioSector[,1]), "sektor lainnya")
+rownames(landReqTable)<-rbind(as.matrix(ioSector[,1]), "sektor lainnya")[c(which(rowSums(LDMProp_his)!=0))]
+LRCTable<-as.matrix(LRCTable[,-1])
+rownames(LRCTable)<-rbind(as.matrix(ioSector[,1]), "sektor lainnya")[c(which(rowSums(LDMProp_his)!=0))]
 
 # jika masih ada value landCover yang negatif, force to enter advanceMode pada UI
 if(any(unlist(sapply(bauSeriesOfImpactLand1,'[[', "landCover"))<0)==TRUE){
@@ -807,12 +856,15 @@ for(step in 1:(iteration+1)){
 #####END : BAU projection ####
 
 #####BEGIN : BAU projection visualization ####
+
+# define year for visualization
 if (selectedProv == "SumSel"){
   #redefine year
   initialYear <- 2010
   finalYear<-2030
   iteration<- finalYear-initialYear
 }
+
 # 1. GDP (ind. 1)
 resultGDP <- data.frame(year = 0, sector = "", category="", GDP = 0, stringsAsFactors = FALSE)
 # resultGDP <- data.frame(year = 0, id.sector = 0, sector = "", GDP = 0, stringsAsFactors = FALSE)
@@ -1028,18 +1080,39 @@ for(t in 0:iteration){
   eval(parse(text=paste0("bauSeriesOfEmissionBySector$y", t_curr, " <- add_MEcons + add_MWdisp + add_MF + add_MLand")))
 }
 
-# resultTotalGDP <- colSums(bauSeriesOfGDP[,2:(ncol(bauSeriesOfGDP)-1)])
-bauAllResult <- subset(resultTotalEmission, select=c(Year, TotalEmission, CummulativeEmission))
-# insert bau from RADGRK
-# bauAllResult$TotalEmission<-as.matrix(read.csv(paste0(datapath, "bauTotalEmission.csv"), header = FALSE))
 
-# bauAllResult <- cbind(bauAllResult, resultTotalGDP)
-# bauAllResult$ResultTotalGDP<-colSums(bauSeriesOfGDP[,2:(ncol(bauSeriesOfGDP)-1)])
+#bauAllResult for scenario calculation 
+bauAllResult <- subset(resultTotalEmission, select=c(Year, TotalEmission, CummulativeEmission))
 bauAllResult$ResultTotalGDP<-colSums(bauSeriesOfGDP[,which(colnames(bauSeriesOfGDP)==paste0("y",initialYear)):ncol(bauSeriesOfGDP)])
 bauAllResult$CummulativeGDP <- cumsum(bauAllResult$ResultTotalGDP)
 bauAllResult$EmissionIntensity <- bauAllResult$TotalEmission / bauAllResult$ResultTotalGDP
 bauAllResult$CummulativeEmissionIntensity <-cumsum(bauAllResult$EmissionIntensity)
 
+
+# bauAllResultGRK <- bau dari dokumen kaji ulang RAD GRK
+bauAllResultGRK <- bauAllResult
+if(version == "version1"){
+  ##### if bau emisi dok. kaji ulang = cummulative #############
+  bauAllResultGRK$CummulativeEmission<-as.matrix(read.csv(paste0(datapath, "bauTotalEmission_version1.csv"), header = FALSE))
+  for (i in 1:nrow(bauAllResultGRK)){
+    if (i == 1){
+      bauAllResultGRK$TotalEmission[i]<- bauAllResultGRK$CummulativeEmission[i]
+    } else {
+      bauAllResultGRK$TotalEmission[i]<- bauAllResultGRK$CummulativeEmission[i]-bauAllResultGRK$CummulativeEmission[i-1]
+    }
+  }
+} else if (version == "version2"){
+  ##### if bau emisi dok. kaji ulang = yearly emission ########
+  bauAllResultGRK$TotalEmission<-as.matrix(read.csv(paste0(datapath, "bauTotalEmission_version2.csv"), header = FALSE))
+  bauAllResultGRK$CummulativeEmission<-cumsum(bauAllResultGRK$TotalEmission)
+}
+bauAllResultGRK$ResultTotalGDP<-colSums(bauSeriesOfGDP[,which(colnames(bauSeriesOfGDP)==paste0("y",initialYear)):ncol(bauSeriesOfGDP)])
+bauAllResultGRK$CummulativeGDP <- cumsum(bauAllResult$ResultTotalGDP)
+bauAllResultGRK$EmissionIntensity <- bauAllResultGRK$TotalEmission / bauAllResultGRK$ResultTotalGDP
+bauAllResultGRK$CummulativeEmissionIntensity <-cumsum(bauAllResultGRK$EmissionIntensity)
+
+
+#test plot
 
 ggplot(data=bauAllResult, aes(x=Year, y=TotalEmission, group=1)) + geom_line() + geom_point()
 ggplot(data=bauAllResult, aes(x=Year, y=CummulativeEmission, group=1)) + geom_line() + geom_point()
@@ -1050,3 +1123,6 @@ ggplot(data=bauAllResult, aes(x=Year, y=ResultTotalGDP, group=1)) + geom_line() 
 
 
 #####END : BAU projection visualization ####
+
+eval(parse(text = paste0("bauAllResult.visualization <-", selectedBAU)))
+
