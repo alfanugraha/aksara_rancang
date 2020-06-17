@@ -1,4 +1,4 @@
-### SULAWESI SELATAN ###
+### SULAWESI SELATAN ####
 ### Sistem Pertanian Terintegrasi
 rdsSimantriEnergy <- readRDS("_DB/skenarioData/Sulawesi_Selatan/energi/dw_Sulawesi_Selatan_2020-06-03_13-29-40_sistempertanianterintegrasi")
 rdsSimantriWaste <- readRDS("_DB/skenarioData/Sulawesi_Selatan/limbah/dw_Sulawesi_Selatan_2020-06-03_13-26-01_sistempertanianterintegrasi")
@@ -15,7 +15,7 @@ rdsTernakAgri <- readRDS("_DB/skenarioData/Sulawesi_Selatan/pertanian/dw_Sulawes
 rdsTernakAgri$satSelisihEnergy <- rdsSimantriEnergy$satSelisih
 rdsTernakAgri$satSelisihWaste <- rdsSimantriWaste$satSelisih
 
-### SUMATERA SELATAN ###
+### SUMATERA SELATAN ####
 ### Pengelolaan Tanaman Terpadu
 rdsPTTEnergy <- readRDS("_DB/skenarioData/SumSel/energi/dw_SumSel_2020-06-04_16-20-39_PengelolaanTanamanTerpadu(PTT)")
 rdsPTTWaste <- readRDS("_DB/skenarioData/SumSel/limbah/dw_SumSel_2020-06-04_16-20-15_PengelolaanTanamanTerpadu(PTT)")
@@ -33,3 +33,19 @@ rdsAPPOAgri <- readRDS("_DB/skenarioData/SumSel/pertanian/dw_SumSel_2020-06-04_1
 rdsAPPOAgri$satSelisihWaste <- rdsPTTWaste$satSelisih
 
 saveRDS(rdsAPPOAgri, "_DB/skenarioData/SumSel/pertanian/dw_SumSel_2020-06-04_13-42-30_AlatPencacahPupukOrganik(APPO)") 
+
+### JAWA BARAT ####
+### IPAL Aerobik ###
+rdsIPALWaste <- readRDS("_DB/skenarioData/Jabar/limbah/dw_JaBar_2020-06-16_22-49-40_PengelolaanAirLimbahSecaraTerpusatAerobik")
+
+saveRDS(rdsIPALWaste, "_DB/skenarioData/Jabar/limbah/dw_JaBar_2020-06-16_22-49-40_PengelolaanAirLimbahSecaraTerpusatAerobik") 
+
+### Komposting TPA ###
+rdsTPAWaste <- readRDS("_DB/skenarioData/Jabar/limbah/dw_JaBar_2020-06-16_22-50-03_RencanaKompostingdiTPA")
+
+saveRDS(rdsTPAWaste, "_DB/skenarioData/Jabar/limbah/dw_JaBar_2020-06-16_22-50-03_RencanaKompostingdiTPA") 
+
+### Pembangunan TPS 3R ###
+rdsTPSWaste <- readRDS("_DB/skenarioData/Jabar/limbah/dw_JaBar_2020-06-16_22-52-07_RencanaPembangunananOperasionalTPSTerpadu3R")
+
+saveRDS(rdsTPSWaste, "_DB/skenarioData/Jabar/limbah/dw_JaBar_2020-06-16_22-52-07_RencanaPembangunananOperasionalTPSTerpadu3R") 
