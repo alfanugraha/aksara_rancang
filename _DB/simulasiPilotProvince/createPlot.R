@@ -1,6 +1,6 @@
 library(ggplot2)
 
-version<-"version2"
+version<-"version1"
 selectedProv<-"SumSel"
 whatAnalysis<-"kajiUlangPlusDelta"
 

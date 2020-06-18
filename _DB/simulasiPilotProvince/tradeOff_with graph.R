@@ -11,6 +11,9 @@ whatAnalysis <- "kajiUlangPlusDelta" # "redcluwePlusDelta" or "kajiUlangPlusDelt
 # read all intervention scenario  
 scenarioPath<-data.frame(path =list.files(paste0("_DB/skenarioData/", selectedProv), all.files=TRUE, full.names = TRUE, recursive = TRUE))
 # scenarioPath<-data.frame(path=scenarioPath[-c(3,7,8,12),]) #delete after use 
+scenarioPath<-data.frame(scenarioPath[!grepl(pattern="desktop.ini", scenarioPath$path),], stringsAsFactors = FALSE)
+colnames(scenarioPath)<-"path"
+  
 for (i in 1:nrow(scenarioPath)){
   if(grepl("/energi/", scenarioPath$path[i])==TRUE){
     scenarioPath$type[i] <- "energi"
