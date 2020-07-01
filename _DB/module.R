@@ -187,7 +187,7 @@ buttonModule <- function(input, output, session, data, type) {
         Sunting.Skenario = ListButton_fun(actionButton,
                                           length(loadRDSAll()),
                                           'button_',
-                                          label = "Sunting Konstruksi Ekonomi dan Satelit Akun",
+                                          label = "Sunting Konstruksi Ekonomi dan Akun Satelit",
                                           onclick = sprintf('Shiny.onInputChange("%s", Math.random());Shiny.onInputChange("%s",this.id)',
                                                             ns("select_button_trigger"), ns("select_button"))),
         Jalankan.analisis = ListButton_fun(actionButton,
@@ -249,11 +249,11 @@ buttonModule <- function(input, output, session, data, type) {
             
             ################################################################################
             #                                                                              #
-            #                        BUTTON KONSTRUKSI SATELIT AKUN LAHAN                  #
+            #                        BUTTON KONSTRUKSI AKUN SATELIT LAHAN                  #
             #                                                                              #
             ################################################################################
             tabPanel(
-              h2("Satelit akun lahan"),
+              h2("Akun satelit lahan"),
               sidebarLayout(
                 sidebarPanel(
                   fluidPage(
@@ -273,7 +273,7 @@ buttonModule <- function(input, output, session, data, type) {
                   tags$div(id = ns('satLandPlaceholder')),
                   width=12)
               ),
-              title="Sunting Intervensi Satelit Akun"
+              title="Sunting Intervensi Akun Satelit"
             ))
           ,
           size="l",
@@ -281,7 +281,7 @@ buttonModule <- function(input, output, session, data, type) {
       )
       
     })
-  }else{
+  }else if(type=="energy"){
     observeEvent(input$select_button_trigger,{
       #browser()
       showModal(
@@ -315,11 +315,11 @@ buttonModule <- function(input, output, session, data, type) {
             
             ################################################################################
             #                                                                              #
-            #                        BUTTON KONSTRUKSI SATELIT AKUN                        #
+            #                        BUTTON KONSTRUKSI AKUN SATELIT                        #
             #                                                                              #
             ################################################################################
             tabPanel(
-              h2("Satelit akun"),
+              h2("Akun satelit"),
               sidebarLayout(sidebarPanel(
                 fluidRow(
                   selectInput(ns("intervensiSat"),
@@ -337,7 +337,136 @@ buttonModule <- function(input, output, session, data, type) {
                 tags$div(id = ns('satPlaceholder')),
                 width=7)
               ),
-              title="Sunting Intervensi Satelit Akun"
+              title="Sunting Intervensi Akun Satelit"
+            ))
+          ,
+          size="l",
+          easyClose = FALSE)
+      )
+      
+    })
+  }else if(type=="waste"){
+    observeEvent(input$select_button_trigger,{
+      #browser()
+      showModal(
+        modalDialog( 
+          footer=tagList(
+            actionButton(ns("closeModalFD"), "Tutup")
+          ),
+          tabsetPanel(
+            tabPanel(
+              h2("Ekonomi"),
+              sidebarLayout(
+                sidebarPanel(
+                  fluidRow(
+                    selectInput(ns("intervensiEcon"),
+                                label="pilih intervensi",
+                                choices=c("Final Demand","AV","Input-Output")),
+                    pickerInput(ns("sektorEcon"),
+                                label="pilih sektor", selected = Sector[1],
+                                choices=Sector,options = list(`actions-box` = TRUE),multiple = T)),
+                  tags$br(),
+                  actionButton(ns("econHit"),"tentukan tahun intervensi"),
+                  width=5
+                ),
+                mainPanel(
+                  tags$div(id = ns('FDPlaceholder')),
+                  width=7)
+              ),
+              title="Sunting Intervensi Ekonomi"
+            ),
+            
+            
+            ################################################################################
+            #                                                                              #
+            #                        BUTTON KONSTRUKSI AKUN SATELIT                        #
+            #                                                                              #
+            ################################################################################
+            tabPanel(
+              h2("Akun satelit"),
+              sidebarLayout(sidebarPanel(
+                fluidRow(
+                  selectInput(ns("intervensiSat"),
+                              label="pilih intervensi",
+                              choices=c("timbulan limbah","faktor emisi")),
+                  pickerInput(ns("sektorSat"),
+                              label="pilih sektor",selected = Sector[1],
+                              choices=Sector,options = list(`actions-box` = TRUE),multiple = T)
+                ),
+                tags$br(),
+                actionButton(ns("satHit"),"tentukan tahun intervensi"),
+                width=5
+              ),
+              mainPanel(
+                tags$div(id = ns('satPlaceholder')),
+                width=7)
+              ),
+              title="Sunting Intervensi Akun Satelit"
+            ))
+          ,
+          size="l",
+          easyClose = FALSE)
+      )
+      
+    })
+  }else if(type=="agriculture"){
+    
+    observeEvent(input$select_button_trigger,{
+      #browser()
+      showModal(
+        modalDialog( 
+          footer=tagList(
+            actionButton(ns("closeModalFD"), "Tutup")
+          ),
+          tabsetPanel(
+            tabPanel(
+              h2("Ekonomi"),
+              sidebarLayout(
+                sidebarPanel(
+                  fluidRow(
+                    selectInput(ns("intervensiEcon"),
+                                label="pilih intervensi",
+                                choices=c("Final Demand","AV","Input-Output")),
+                    pickerInput(ns("sektorEcon"),
+                                label="pilih sektor", selected = Sector[1],
+                                choices=Sector,options = list(`actions-box` = TRUE),multiple = T)),
+                  tags$br(),
+                  actionButton(ns("econHit"),"tentukan tahun intervensi"),
+                  width=5
+                ),
+                mainPanel(
+                  tags$div(id = ns('FDPlaceholder')),
+                  width=7)
+              ),
+              title="Sunting Intervensi Ekonomi"
+            ),
+            
+            
+            ################################################################################
+            #                                                                              #
+            #                        BUTTON KONSTRUKSI AKUN SATELIT                        #
+            #                                                                              #
+            ################################################################################
+            tabPanel(
+              h2("Akun satelit"),
+              sidebarLayout(sidebarPanel(
+                fluidRow(
+                  selectInput(ns("intervensiSat"),
+                              label="pilih intervensi",
+                              choices=c("penggunaan pupuk","faktor emisi")),
+                  pickerInput(ns("sektorSat"),
+                              label="pilih sektor",selected = Sector[1],
+                              choices=Sector,options = list(`actions-box` = TRUE),multiple = T)
+                ),
+                tags$br(),
+                actionButton(ns("satHit"),"tentukan tahun intervensi"),
+                width=5
+              ),
+              mainPanel(
+                tags$div(id = ns('satPlaceholder')),
+                width=7)
+              ),
+              title="Sunting Intervensi Akun Satelit"
             ))
           ,
           size="l",
@@ -346,7 +475,6 @@ buttonModule <- function(input, output, session, data, type) {
       
     })
   }
-  
   
   
   
@@ -497,7 +625,7 @@ buttonModule <- function(input, output, session, data, type) {
   
   ################################################################################
   #                                                                              #
-  #                   ALUR BUTTON KONSTRUKSI SATELIT AKUN                        #
+  #                   ALUR BUTTON KONSTRUKSI AKUN SATELIT                        #
   #                                                                              #
   ################################################################################
   satAkun <- reactiveValues(
@@ -625,19 +753,45 @@ buttonModule <- function(input, output, session, data, type) {
     )
   })
   
+  
   output$satUIManual<- renderUI({
+    if(type=="energy"){
     tagList(selectInput(ns("pilihtahunSat"),
                         label="pilih tahun", selected = loadFileRDS()$tahunAwal,
                         choices=c(loadFileRDS()$tahunAwal:loadFileRDS()$tahunAkhir)),
             pickerInput(ns("pilihBahanBakar"),
-                        label="pilih faktor emisi",selected = data$faktorEmisi[1],
+                        label="pilih jenis bahan bakar",selected = data$faktorEmisi[1],
                         choices=data$faktorEmisi,options = list(`actions-box` = TRUE),multiple = T),
             tags$br(),
             actionButton(ns('showYearSat'), 'tampilkan tabel'),
             tags$br(),
             tags$br(),
             tags$div(id = 'SuntingSatPlaceHolder')
-    )
+    )} else if(type=="waste"){
+      tagList(selectInput(ns("pilihtahunSat"),
+                          label="pilih tahun", selected = loadFileRDS()$tahunAwal,
+                          choices=c(loadFileRDS()$tahunAwal:loadFileRDS()$tahunAkhir)),
+              pickerInput(ns("pilihBahanBakar"),
+                          label="pilih jenis pengolahan limbah",selected = data$faktorEmisi[1],
+                          choices=data$faktorEmisi,options = list(`actions-box` = TRUE),multiple = T),
+              tags$br(),
+              actionButton(ns('showYearSat'), 'tampilkan tabel'),
+              tags$br(),
+              tags$br(),
+              tags$div(id = 'SuntingSatPlaceHolder')
+      )}else if(type=="agriculture"){
+        tagList(selectInput(ns("pilihtahunSat"),
+                            label="pilih tahun", selected = loadFileRDS()$tahunAwal,
+                            choices=c(loadFileRDS()$tahunAwal:loadFileRDS()$tahunAkhir)),
+                pickerInput(ns("pilihBahanBakar"),
+                            label="pilih jenis pupuk",selected = data$faktorEmisi[1],
+                            choices=data$faktorEmisi,options = list(`actions-box` = TRUE),multiple = T),
+                tags$br(),
+                actionButton(ns('showYearSat'), 'tampilkan tabel'),
+                tags$br(),
+                tags$br(),
+                tags$div(id = 'SuntingSatPlaceHolder')
+        )}
   })
   
   observeEvent(input$showYearSat, {
@@ -727,7 +881,7 @@ buttonModule <- function(input, output, session, data, type) {
       inputSektorTampil<-capture.output(cat(input$sektorSat , sep=", ")) #"tanaman pangan"
       inputTahun<-paste0("y",input$pilihtahunSat)
       inputBahanBakarTampil <- capture.output(cat(input$pilihBahanBakar , sep=", "))
-      textTampil <- paste0("Satelit akun yang diedit adalah ","sektor: ",inputSektorTampil," - ","tahun: ",
+      textTampil <- paste0("Akun satelit yang diedit adalah ","sektor: ",inputSektorTampil," - ","tahun: ",
                            inputTahun," - ","bahan bakar: ",inputBahanBakarTampil)
       insertUI(selector='#teksSatSave',
                where = 'afterEnd',
