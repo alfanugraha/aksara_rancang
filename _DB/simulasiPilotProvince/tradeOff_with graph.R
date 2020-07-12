@@ -64,9 +64,28 @@ for (a in scenarioPath$ID){
 
 # create all combinations
 scenarioCombination<-list()
+
+#single-scenario combination
 i<-1
 scenarioCombination[[paste0(i)]]<-data.frame(combinations(nrow(scenarioPath),i,scenarioPath$ID), stringsAsFactors = FALSE)
 
+#energy scenario combination
+scenarioPathEnergy<-scenarioPath[scenarioPath$type=="energi",]
+scenarioCombination$energy<-data.frame(combinations(nrow(scenarioPathEnergy), nrow(scenarioPathEnergy), scenarioPathEnergy$ID), stringsAsFactors = FALSE)
+
+#waste scenario combination
+scenarioPathWaste<-scenarioPath[scenarioPath$type=="limbah",]
+scenarioCombination$waste<-data.frame(combinations(nrow(scenarioPathWaste), nrow(scenarioPathWaste), scenarioPathWaste$ID), stringsAsFactors = FALSE)
+
+#land scenario combination
+scenarioPathLand<-scenarioPath[scenarioPath$type=="lahan",]
+scenarioCombination$land<-data.frame(combinations(nrow(scenarioPathLand), nrow(scenarioPathLand), scenarioPathLand$ID), stringsAsFactors = FALSE)
+
+#agriculture scenario combination
+scenarioPathAgriculture<-scenarioPath[scenarioPath$type=="pertanian",]
+scenarioCombination$agriculture<-data.frame(combinations(nrow(scenarioPathAgriculture), nrow(scenarioPathAgriculture), scenarioPathAgriculture$ID), stringsAsFactors = FALSE)
+
+#all-2 scenarios combination
 for (i in (nrow(scenarioPath)-2) :nrow(scenarioPath)){
 # for (i in 1:nrow(scenarioPath)){
   scenarioCombination[[paste0(i)]]<-data.frame(combinations(nrow(scenarioPath),i,scenarioPath$ID), stringsAsFactors = FALSE)
@@ -220,6 +239,22 @@ for(i in 1:nrow(tradeOffSummary)){
       "tradeOffSummary$ScenarioName[i]<-as.character(",scenarioCombination[[1]][as.character(tradeOffSummary$ID[i]),1],"[['namaSken']])"
     )))
     tradeOffSummary$ScenarioID[i]<-scenarioCombination[[1]][as.character(tradeOffSummary$ID[i]),1]
+  } else if(grepl("combination2.", tradeOffSummary$ID[i])){
+    eval(parse(text = paste0(
+      "tradeOffSummary$ScenarioName[i]<-'energy sector scenario'"
+    )))
+  } else if(grepl("combination3.", tradeOffSummary$ID[i])){
+    eval(parse(text = paste0(
+      "tradeOffSummary$ScenarioName[i]<-'waste sector scenario'"
+    )))
+  } else if(grepl("combination4.", tradeOffSummary$ID[i])){
+    eval(parse(text = paste0(
+      "tradeOffSummary$ScenarioName[i]<-'land sector scenario'"
+    )))
+  } else if(grepl("combination5.", tradeOffSummary$ID[i])){
+    eval(parse(text = paste0(
+      "tradeOffSummary$ScenarioName[i]<-'agriculture sector scenario'"
+    )))
   } else{
     tradeOffSummary$ScenarioName[i]<- as.character(tradeOffSummary$ID[i])
     tradeOffSummary$ScenarioID[i]<- as.character(tradeOffSummary$ID[i])
@@ -284,6 +319,22 @@ for(i in 1:nrow(tradeOffResultCombined)){
     eval(parse(text = paste0(
       "tradeOffResultCombined$ScenarioName[i]<-as.character(",scenarioCombination[[1]][as.character(tradeOffResultCombined$ID[i]),1],"[['namaSken']])"
     )))
+  } else if(grepl("combination2.", tradeOffResultCombined$ID[i])){
+    eval(parse(text = paste0(
+      "tradeOffResultCombined$ScenarioName[i]<-'energy sector scenario'"
+    )))
+  } else if(grepl("combination3.", tradeOffResultCombined$ID[i])){
+    eval(parse(text = paste0(
+      "tradeOffResultCombined$ScenarioName[i]<-'waste sector scenario'"
+    )))
+  } else if(grepl("combination4.", tradeOffResultCombined$ID[i])){
+    eval(parse(text = paste0(
+      "tradeOffResultCombined$ScenarioName[i]<-'land sector scenario'"
+    )))
+  } else if(grepl("combination5.", tradeOffResultCombined$ID[i])){
+    eval(parse(text = paste0(
+      "tradeOffResultCombined$ScenarioName[i]<-'agriculture sector scenario'"
+    )))
   } else{
     tradeOffResultCombined$ScenarioName[i]<- as.character(tradeOffResultCombined$ID[i])
   }
@@ -330,7 +381,7 @@ write.csv(bestInterventionScenario, paste0("_DB/simulasiPilotProvince/result/",s
 
 #scenarioCombination
 saveRDS(scenarioCombination, paste0("_DB/simulasiPilotProvince/result/",selectedProv,"/", whatAnalysis, "/",version,"/scenarioCombination"))
-saveRDS(scenarioPath, paste0("_DB/simulasiPilotProvince/result/",selectedProv,"/", whatAnalysis, "/",version,"/scenarioPath"))
+write.csv(scenarioPath, paste0("_DB/simulasiPilotProvince/result/",selectedProv,"/", whatAnalysis, "/",version,"/scenarioPath.csv"))
 
 
 # ---------------------------------- END: SAVE ------------------------#

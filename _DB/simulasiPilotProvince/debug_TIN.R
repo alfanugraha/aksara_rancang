@@ -5,7 +5,7 @@ library(rlist)
 
 ###BEGIN: initiate all variables & function####
 
-selectedProv = "JaBar"
+selectedProv = "SumSel"
 selectedBAU = "bauAllResultGRK" #choices= bauAllResultGRK & bauAllResult 
 version<- "version1" # choices= version1 (bau emission rad GRK <- kumulatif), version2 (bau emission rad GRK <- tahunan)
 
@@ -348,7 +348,11 @@ functionSatelliteLand2<- function(type=NULL, # historis / projection
     if (is.null(additionalG)){
       impact$matrixG<-impact$matrixG
     } else{
-      impact$matrixG<- rbind(impact$matrixG, as.matrix(additionalG))
+      if (runNum==6){
+        impact$matrixG<-impact$matrixG
+      } else{
+        impact$matrixG<- rbind(impact$matrixG, as.matrix(additionalG))
+      }
     }
     
     # get TPM value for each diagonal variable
@@ -366,7 +370,11 @@ functionSatelliteLand2<- function(type=NULL, # historis / projection
     if (is.null(additionalH)){
       impact$matrixH<-impact$matrixH
     } else{
-      impact$matrixH<- rbind(impact$matrixH, as.matrix(additionalH))
+      if ( runNum==6){
+        impact$matrixH<-impact$matrixH
+      } else {
+        impact$matrixH<- rbind(impact$matrixH, as.matrix(additionalH))
+      }
     }
     
     
